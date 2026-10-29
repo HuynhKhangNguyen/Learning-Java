@@ -1,0 +1,6 @@
+{
+  "COSMETIC": {"newAttemptAllowed": true, "submitAllowed": true, "finalizeAllowed": true, "currentEvidencePolicy": "RETAIN", "bodyAvailable": true},
+  "REVERIFY": {"newAttemptAllowed": false, "submitAllowed": true, "finalizeAllowed": true, "currentEvidencePolicy": "REVERIFY", "bodyAvailable": true},
+  "WITHDRAWN": {"newAttemptAllowed": false, "submitAllowed": false, "finalizeAllowed": true, "currentEvidencePolicy": "WITHDRAW", "bodyAvailable": true},
+  "INVALID_OLD_RUBRIC": {"newAttemptAllowed": false, "submitAllowed": false, "finalizeAllowed": false, "currentEvidencePolicy": "REVIEW", "bodyAvailable": true}
+}

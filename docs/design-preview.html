@@ -1,0 +1,234 @@
+<style>
+#backend-lab-design{--bl-bg:light-dark(#f4f5f1,#141c20);--bl-paper:light-dark(#ffffff,#1c272d);--bl-ink:light-dark(#192e36,#e8f0ef);--bl-muted:light-dark(#53666d,#b1c0c6);--bl-line:light-dark(#d6dfdc,#405258);--bl-soft:light-dark(#e7eeea,#293a3e);--bl-accent:light-dark(#11675a,#8dd5c0);--bl-onaccent:light-dark(#ffffff,#102d26);--bl-tint:light-dark(#e3f1e9,#223f36);--bl-red:light-dark(#a93225,#ffb7ab);--bl-redbg:light-dark(#fff0eb,#442e2c);--bl-amber:light-dark(#79540d,#ecd293);--bl-amberbg:light-dark(#fff6da,#3e3929);--bl-code:#16262e;--bl-codetext:#e3eee9;--bl-radius:16px;--bl-gap:24px;color:var(--bl-ink);font:15px/1.55 'Segoe UI',Arial,sans-serif;width:100%;container:bl-preview / inline-size;margin-inline:auto;background:transparent}
+#backend-lab-design *{box-sizing:border-box}
+#backend-lab-design [hidden]{display:none!important}
+#backend-lab-design h1,#backend-lab-design h2,#backend-lab-design h3,#backend-lab-design p{margin:0}
+#backend-lab-design h1{font-size:34px;line-height:1.2;font-weight:600;letter-spacing:-1.1px}
+#backend-lab-design h2{font-size:22px;line-height:1.3;font-weight:600;letter-spacing:-.45px}
+#backend-lab-design h3{font-size:16px;line-height:1.4;font-weight:600}
+#backend-lab-design button,#backend-lab-design input,#backend-lab-design select{font:inherit;color:inherit}
+#backend-lab-design button{border:0;background:none;text-align:left}
+#backend-lab-design input,#backend-lab-design select{width:100%;min-width:0;background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:8px;padding:10px 12px;font-size:16px}
+#backend-lab-design input[type=checkbox]{width:18px;height:18px;accent-color:var(--bl-accent)}
+#backend-lab-design label{display:grid;gap:7px}
+#backend-lab-design .bl-check{display:flex;align-items:center;gap:8px;font-size:13px}
+#backend-lab-design .bl-preview-label{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:9px 13px;background:var(--bl-soft);font-size:11px;letter-spacing:.06em;color:var(--bl-muted)}
+#backend-lab-design .bl-shell{display:grid;grid-template-columns:176px minmax(0,1fr);background:var(--bl-bg);min-height:730px}
+#backend-lab-design .bl-side{background:var(--bl-paper);border-right:1px solid var(--bl-line);padding:24px 14px;display:flex;flex-direction:column;gap:28px}
+#backend-lab-design .bl-brand{display:flex;gap:9px;align-items:center;font-weight:650;font-size:17px;line-height:1.15}
+#backend-lab-design .bl-brandmark{display:grid;place-items:center;width:33px;height:36px;background:var(--bl-accent);color:var(--bl-onaccent);border-radius:8px;font-family:Consolas,monospace;font-size:17px;flex-shrink:0}
+#backend-lab-design .bl-brand small{display:block;font-size:10px;color:var(--bl-muted);font-weight:400;letter-spacing:.1em;margin-top:5px}
+#backend-lab-design .bl-nav{display:grid;gap:6px}
+#backend-lab-design .bl-nav button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:10px;border-radius:8px;font-size:14px;color:var(--bl-muted)}
+#backend-lab-design .bl-nav button[aria-current=page]{background:var(--bl-tint);color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-side-note{margin-top:auto;border-top:1px solid var(--bl-line);padding:18px 4px 0;font-size:12px;color:var(--bl-muted)}
+#backend-lab-design .bl-main{min-width:0}
+#backend-lab-design .bl-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:18px 28px;border-bottom:1px solid var(--bl-line);font-size:12px;color:var(--bl-muted)}
+#backend-lab-design .bl-topbar strong{color:var(--bl-ink);font-weight:600}
+#backend-lab-design .bl-page{padding:28px;display:grid;gap:var(--bl-gap)}
+#backend-lab-design .bl-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+#backend-lab-design .bl-between{justify-content:space-between}
+#backend-lab-design .bl-stack{display:grid;gap:14px}
+#backend-lab-design .bl-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--bl-muted)}
+#backend-lab-design .bl-muted{color:var(--bl-muted)}
+#backend-lab-design .bl-small{font-size:12px}
+#backend-lab-design .bl-lead{font-size:15px;color:var(--bl-muted);max-width:55ch;margin-top:10px}
+#backend-lab-design .bl-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:5px;background:var(--bl-soft);font-size:11px;font-weight:600;line-height:1.5}
+#backend-lab-design .bl-tag.good{background:var(--bl-tint);color:var(--bl-accent)}
+#backend-lab-design .bl-tag.bad{background:var(--bl-redbg);color:var(--bl-red)}
+#backend-lab-design .bl-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 15px;border-radius:8px;background:var(--bl-paper);border:1px solid var(--bl-line);font-size:13px;font-weight:600;line-height:1.4}
+#backend-lab-design .bl-action.primary{background:var(--bl-accent);border-color:var(--bl-accent);color:var(--bl-onaccent)}
+#backend-lab-design .bl-action.quiet{background:transparent;border-color:transparent;padding-inline:6px;color:var(--bl-accent)}
+#backend-lab-design .bl-action:disabled{opacity:.5}
+#backend-lab-design .bl-panel{background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:var(--bl-radius);min-width:0;padding:22px}
+#backend-lab-design .bl-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:var(--bl-radius);overflow:hidden}
+#backend-lab-design .bl-hero-copy{padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:17px}
+#backend-lab-design .bl-hero h2{font-size:30px;line-height:1.2;letter-spacing:-.9px}
+#backend-lab-design .bl-hero-scene{padding:28px 24px;background:var(--bl-tint);display:grid;align-content:center;gap:20px}
+#backend-lab-design .bl-mini-flow{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:7px}
+#backend-lab-design .bl-mini-node{padding:14px 10px;background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:10px;text-align:center;font-size:13px}
+#backend-lab-design .bl-mini-node.issue{border-color:var(--bl-red);color:var(--bl-red)}
+#backend-lab-design .bl-mini-console{background:var(--bl-code);color:var(--bl-codetext);padding:15px;border-radius:10px;font:12px/1.8 Consolas,monospace;overflow-wrap:anywhere}
+#backend-lab-design .bl-mini-console .bl-comment{color:#a4bdb3}
+#backend-lab-design .bl-home-bottom{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--bl-gap)}
+#backend-lab-design .bl-clean-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:14px}
+#backend-lab-design .bl-clean-list li{display:flex;align-items:flex-start;gap:11px}
+#backend-lab-design .bl-number{display:grid;place-items:center;width:27px;height:27px;background:var(--bl-soft);border-radius:7px;flex:0 0 auto;font:12px Consolas,monospace;color:var(--bl-muted)}
+#backend-lab-design .bl-progress-line{height:5px;background:var(--bl-soft);margin-top:18px;border-radius:3px;overflow:hidden}
+#backend-lab-design .bl-progress-line span{display:block;background:var(--bl-accent);height:100%;width:40%}
+#backend-lab-design .bl-segments{display:flex;flex-wrap:wrap;gap:4px;background:var(--bl-soft);padding:4px;border-radius:9px;width:fit-content}
+#backend-lab-design .bl-segments button{padding:8px 13px;border-radius:6px;font-size:13px;min-height:38px}
+#backend-lab-design .bl-segments button[aria-pressed=true]{background:var(--bl-paper);color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-chapter{border-top:1px solid var(--bl-line);padding:18px 0}
+#backend-lab-design .bl-chapter summary{display:flex;align-items:center;gap:14px;list-style:none;min-height:44px}
+#backend-lab-design .bl-chapter summary::after{content:'+';margin-left:auto;color:var(--bl-muted);font-size:20px}
+#backend-lab-design .bl-chapter[open] summary::after{content:'−'}
+#backend-lab-design .bl-chapter summary .bl-muted{display:block;font-size:12px;margin-top:3px}
+#backend-lab-design .bl-lesson-row{margin:17px 0 0 41px;padding:17px;background:var(--bl-tint);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#backend-lab-design .bl-steps{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:0}
+#backend-lab-design .bl-steps li{font-size:12px;display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;color:var(--bl-muted)}
+#backend-lab-design .bl-steps li.current{background:var(--bl-tint);color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-workspace{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:18px;align-items:start}
+#backend-lab-design .bl-lab-content{min-width:0;display:grid;gap:18px}
+#backend-lab-design .bl-stage{padding:20px;background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:var(--bl-radius)}
+#backend-lab-design .bl-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin:28px 0}
+#backend-lab-design .bl-node{position:relative;text-align:center;border:1px solid var(--bl-line);border-radius:10px;padding:15px 5px;background:var(--bl-bg);font-size:12px;min-width:0;overflow-wrap:anywhere}
+#backend-lab-design .bl-node:not(:last-child)::after{content:'→';position:absolute;right:-16px;top:23px;color:var(--bl-muted)}
+#backend-lab-design .bl-node-symbol{font:19px/1.5 Consolas,monospace;display:block;margin-bottom:5px}
+#backend-lab-design .bl-node small{display:block;font-size:11px;margin-top:4px;color:var(--bl-muted)}
+#backend-lab-design .bl-node.active{background:var(--bl-tint);border-color:var(--bl-accent);color:var(--bl-accent)}
+#backend-lab-design .bl-node.error{background:var(--bl-redbg);border-color:var(--bl-red);color:var(--bl-red)}
+#backend-lab-design .bl-inline-note{padding:12px 14px;background:var(--bl-soft);border-radius:8px;font-size:13px;overflow-wrap:anywhere}
+#backend-lab-design .bl-inline-note.bad{background:var(--bl-redbg);color:var(--bl-red)}
+#backend-lab-design .bl-inline-note.good{background:var(--bl-tint);color:var(--bl-accent)}
+#backend-lab-design .bl-inline-note.warn{background:var(--bl-amberbg);color:var(--bl-amber)}
+#backend-lab-design .bl-workbench{background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:var(--bl-radius);overflow:hidden}
+#backend-lab-design .bl-tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--bl-line);padding:0 12px;gap:9px}
+#backend-lab-design .bl-tabs button{padding:14px 6px;border-bottom:2px solid transparent;font-size:12px;color:var(--bl-muted)}
+#backend-lab-design .bl-tabs button[aria-pressed=true]{border-bottom-color:var(--bl-accent);color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-tabcontent{padding:18px;display:grid;gap:14px;min-height:185px}
+#backend-lab-design pre{margin:0;border-radius:8px;background:var(--bl-code);color:var(--bl-codetext);padding:17px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.8 Consolas,'Courier New',monospace;min-width:0}
+#backend-lab-design code{font:inherit}
+#backend-lab-design .bl-task-aside{display:grid;gap:17px;padding:18px;background:var(--bl-paper);border:1px solid var(--bl-line);border-radius:var(--bl-radius)}
+#backend-lab-design .bl-task-aside ol{padding-left:19px;font-size:13px;margin:0;display:grid;gap:12px}
+#backend-lab-design .bl-task-aside li::marker{color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-task-aside details{border-top:1px solid var(--bl-line);padding-top:13px;font-size:13px}
+#backend-lab-design .bl-task-aside summary{min-height:36px;color:var(--bl-accent);font-weight:600}
+#backend-lab-design .bl-form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:end}
+#backend-lab-design .bl-form-row label{font-size:12px}
+#backend-lab-design .bl-expand .bl-workspace{grid-template-columns:minmax(0,1fr)}
+#backend-lab-design .bl-expand .bl-stage,#backend-lab-design .bl-expand .bl-task-aside{display:none}
+#backend-lab-design .bl-expand pre{min-height:340px;font-size:14px}
+#backend-lab-design .bl-challenge-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+#backend-lab-design .bl-choice{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--bl-line);border-radius:9px;padding:14px;font-size:13px;min-height:55px}
+#backend-lab-design .bl-choice input{width:18px;height:18px;margin-top:2px;flex:0 0 auto;accent-color:var(--bl-accent)}
+#backend-lab-design .bl-choice:has(input:checked){border-color:var(--bl-accent);background:var(--bl-tint)}
+#backend-lab-design .bl-tests{display:grid;gap:0;list-style:none;padding:0;margin:0}
+#backend-lab-design .bl-tests li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--bl-line);font-size:13px}
+#backend-lab-design .bl-tests li:last-child{border-bottom:0}
+#backend-lab-design .bl-result{max-width:660px;margin-inline:auto;width:100%;display:grid;gap:22px}
+#backend-lab-design .bl-result-mark{height:54px;width:54px;border-radius:16px;display:grid;place-items:center;background:var(--bl-tint);color:var(--bl-accent);font-size:29px}
+#backend-lab-design .bl-footer{padding:0 28px 22px;font-size:11px;color:var(--bl-muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+#backend-lab-design .bl-wire *{box-shadow:none!important;background-image:none!important}
+#backend-lab-design .bl-wire{--bl-radius:3px;--bl-bg:light-dark(#f4f4f4,#171717);--bl-paper:light-dark(#ffffff,#262626);--bl-ink:light-dark(#222222,#eeeeee);--bl-muted:light-dark(#555555,#bbbbbb);--bl-line:light-dark(#999999,#777777);--bl-soft:light-dark(#eeeeee,#393939);--bl-accent:light-dark(#333333,#dddddd);--bl-onaccent:light-dark(#ffffff,#111111);--bl-tint:light-dark(#e8e8e8,#353535);--bl-red:light-dark(#333333,#eeeeee);--bl-redbg:light-dark(#e4e4e4,#3b3b3b);--bl-code:#222222;--bl-codetext:#eeeeee}
+@container bl-preview (max-width:1100px){#backend-lab-design .bl-workspace{grid-template-columns:minmax(0,1fr)}#backend-lab-design .bl-task-aside{grid-template-columns:1fr 1fr}#backend-lab-design .bl-task-aside>h3{grid-column:1/-1}#backend-lab-design .bl-shell{grid-template-columns:158px minmax(0,1fr)}}
+@container bl-preview (max-width:800px){#backend-lab-design .bl-shell{grid-template-columns:minmax(0,1fr);min-height:0}#backend-lab-design .bl-side{flex-direction:row;align-items:center;padding:13px 18px;border-right:0;border-bottom:1px solid var(--bl-line);gap:16px;flex-wrap:wrap}#backend-lab-design .bl-nav{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}#backend-lab-design .bl-nav button{width:auto}#backend-lab-design .bl-side-note,#backend-lab-design .bl-brand small{display:none}#backend-lab-design .bl-topbar{padding:13px 22px}#backend-lab-design .bl-page{padding:22px}#backend-lab-design .bl-hero-copy{padding:22px}#backend-lab-design .bl-hero-scene{padding:22px}#backend-lab-design .bl-footer{padding:0 22px 18px}}
+@container bl-preview (max-width:560px){#backend-lab-design h1{font-size:28px}#backend-lab-design .bl-brand{font-size:16px}#backend-lab-design .bl-side{padding:12px 15px;gap:10px}#backend-lab-design .bl-nav{width:100%;margin:0;justify-content:space-between}#backend-lab-design .bl-nav button{font-size:12px;padding:8px 9px}#backend-lab-design .bl-nav i{display:none}#backend-lab-design .bl-topbar{padding:12px 16px}#backend-lab-design .bl-page{padding:20px 16px;gap:20px}#backend-lab-design .bl-hero,#backend-lab-design .bl-home-bottom,#backend-lab-design .bl-challenge-grid{grid-template-columns:1fr}#backend-lab-design .bl-hero h2{font-size:28px}#backend-lab-design .bl-hero-copy,#backend-lab-design .bl-hero-scene{padding:22px}#backend-lab-design .bl-hero-scene{gap:12px}#backend-lab-design .bl-panel{padding:18px}#backend-lab-design .bl-form-row{grid-template-columns:1fr}#backend-lab-design .bl-task-aside{grid-template-columns:1fr}#backend-lab-design .bl-task-aside>h3{grid-column:auto}#backend-lab-design .bl-flow{grid-template-columns:1fr 1fr;gap:22px;margin:22px 0}#backend-lab-design .bl-node:not(:last-child)::after{content:''}#backend-lab-design .bl-stage{padding:17px}#backend-lab-design .bl-lesson-row{margin-left:0}#backend-lab-design .bl-steps{gap:3px}#backend-lab-design .bl-steps li{font-size:11px;padding:5px 6px}#backend-lab-design .bl-tabs{gap:4px;padding:0 10px}#backend-lab-design .bl-footer{padding:0 16px 18px}#backend-lab-design .bl-action{min-height:44px}}
+@media(prefers-reduced-motion:reduce){#backend-lab-design *{animation:none!important;transition:none!important}}
+</style>
+<div id="backend-lab-design" lang="vi" aria-label="Backend Lab — thiết kế giao diện">
+  <div class="bl-preview-label"><span>BẢN THIẾT KẾ · T02</span><span>Dữ liệu minh họa · chưa lưu tiến độ học</span></div>
+  <div id="bl-product"></div>
+  <div id="bl-announcement" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></div>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('backend-lab-design');
+  const product = root.querySelector('#bl-product');
+  const ui = { screen:'home', experience:'fresh', lab:'idle', tab:'input', expanded:false, patch:'original', preset:'missing', title:'Học Java', challenge:'none', choice:'', saveError:false, track:'java', notice:'', selectedNode:'', traceIndex:0, hints:0 };
+  const design = { appearance:'system', accent:'teal', wireframe:false, mobile:false, roomy:true, reduced:matchMedia('(prefers-reduced-motion: reduce)').matches };
+  const allowedScreens = ['home','journey','lab','challenge','result'];
+  const allowedLabs = ['idle','running','failed','repaired','created','bad-created'];
+  const labels = {home:'Hôm nay',journey:'Hành trình',lab:'Phòng lab',challenge:'Thử thách',result:'Kết quả'};
+  const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const icon = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
+  const action = (label,cmd,primary=false) => `<button type="button" class="bl-action ${primary?'primary':''} cursor-interaction" data-action="${cmd}">${label}</button>`;
+  function restore(saved){
+    if(!saved || saved.version!==1)return;
+    if(allowedScreens.includes(saved.screen))ui.screen=saved.screen;
+    if(['fresh','resume'].includes(saved.experience))ui.experience=saved.experience;
+    if(['system','light','dark'].includes(saved.appearance))design.appearance=saved.appearance;
+    if(['teal','blue'].includes(saved.accent))design.accent=saved.accent;
+    if(typeof saved.wireframe==='boolean')design.wireframe=saved.wireframe;
+    if(typeof saved.mobile==='boolean')design.mobile=saved.mobile;
+  }
+  restore(window.openai?.widgetState?.privateContent);
+  function save(){
+    if(!window.openai?.setWidgetState)return;
+    window.openai.setWidgetState({modelContent:{design:'Backend Lab T02',screen:ui.screen,accent:design.accent,appearance:design.appearance,wireframe:design.wireframe},privateContent:{version:1,screen:ui.screen,experience:ui.experience,appearance:design.appearance,accent:design.accent,wireframe:design.wireframe,mobile:design.mobile}}).catch(()=>{});
+  }
+  function announce(message){root.querySelector('#bl-announcement').textContent=message;}
+  function navigate(screen){ui.screen=screen;ui.notice='';render();save();announce(labels[screen]);}
+  function chrome(content){return `<div class="bl-shell ${design.wireframe?'bl-wire':''}"><aside class="bl-side"><div class="bl-brand"><span class="bl-brandmark" aria-hidden="true">{ }</span><span>backend<span style="font-weight:400"> lab</span><small>HIỂU SÂU. TỰ LÀM ĐƯỢC.</small></span></div><nav class="bl-nav" aria-label="Điều hướng chính">${[['home','house','Hôm nay'],['journey','layers','Hành trình'],['lab','flask-conical','Phòng lab']].map(([s,i,l])=>`<button type="button" class="cursor-interaction" data-screen="${s}" ${ui.screen===s || s==='lab'&&['challenge','result'].includes(ui.screen)?'aria-current="page"':''}>${icon(i)}${l}</button>`).join('')}</nav><div class="bl-side-note">Lộ trình của bạn<br><strong>Java Backend</strong><p style="margin-top:8px">Từng khái niệm.<br>Từng lần tự làm được.</p></div></aside><div class="bl-main"><header class="bl-topbar"><span>Không gian học <span aria-hidden="true">/</span> <strong>${labels[ui.screen]}</strong></span><span>${ui.screen==='lab'?'LAB 01 · HTTP & API':'JAVA BACKEND · LAB MẪU'}</span></header>${content}<footer class="bl-footer"><span>Học theo nhịp của bạn.</span><span>Mô phỏng tương tác · dữ liệu minh họa</span></footer></div></div>`;}
+  function home(){const resume=ui.experience==='resume';return `<div class="bl-page"><div><p class="bl-eyebrow">MỘT CHÚT TÒ MÒ, MỘT BƯỚC TIẾN</p><h1 style="margin-top:8px">${resume?'Tiếp tục điều bạn đang khám phá.':'Hiểu backend, từ bên trong.'}</h1><p class="bl-lead">${resume?'Bạn đang ở bước lần theo request. Mọi thứ đã sẵn sàng để thử tiếp.':'Gửi một request. Nhìn nó đi qua hệ thống. Tự tìm ra điều đang xảy ra.'}</p></div><section class="bl-hero" aria-label="Nhiệm vụ hôm nay"><div class="bl-hero-copy"><div class="bl-row"><span class="bl-tag good">LAB KHÁM PHÁ</span><span class="bl-small bl-muted">15–20 phút</span></div><h2>Cứu API<br>trả lỗi 500.</h2><p class="bl-muted">Một task chưa được tạo. Lần theo request, tìm dấu hiệu trong log và thử cách sửa của bạn.</p>${resume?'<p class="bl-small">Đang dở: <strong>02 · Lần theo request</strong></p>':'<p class="bl-small">Mới học API? Có phần làm quen ngắn trước lab.</p>'}${action(`${resume?'Tiếp tục bài':'Thử lab đầu tiên'} ${icon('arrow-right')}`,'start',true)}</div><div class="bl-hero-scene"><div class="bl-row bl-between"><span class="bl-eyebrow">BÊN TRONG NHIỆM VỤ</span><span class="bl-tag">Mô phỏng</span></div><div class="bl-mini-flow"><div class="bl-mini-node">Client<br><span class="bl-small bl-muted">POST /tasks</span></div><span aria-hidden="true">→</span><div class="bl-mini-node issue">API<br><strong>500</strong></div></div><div class="bl-mini-console"><span class="bl-comment">// Manh mối đầu tiên</span><br>title = null<br>NullPointerException</div><p class="bl-small bl-muted">Điều gì đã xảy ra trước khi dữ liệu đến database?</p></div></section><div class="bl-home-bottom"><section class="bl-panel"><p class="bl-eyebrow">SAU LAB NÀY, BẠN CÓ THỂ</p><ol class="bl-clean-list"><li><span class="bl-number">01</span><span>Đọc request và response.</span></li><li><span class="bl-number">02</span><span>Tìm điểm lỗi bằng dấu hiệu cụ thể.</span></li><li><span class="bl-number">03</span><span>Kiểm tra cách sửa với dữ liệu mới.</span></li></ol></section><section class="bl-panel bl-stack"><div><p class="bl-eyebrow">HÀNH TRÌNH CỦA BẠN</p><h3 style="margin-top:10px">Từ Java đến backend chạy thật</h3></div><p class="bl-small bl-muted">Java → API → dữ liệu → triển khai.<br>Mỗi chương là một khả năng mới.</p>${action('Xem các chặng '+icon('arrow-up-right'),'journey')}${resume?'<div><p class="bl-small bl-muted">Đã xem 2/5 phần của lab · trạng thái mẫu</p><div class="bl-progress-line" aria-hidden="true"><span></span></div></div>':'<p class="bl-small bl-muted">Bắt đầu bằng lab mẫu. Chưa có tiến độ học.</p>'}</section></div></div>`;}
+  function journey(){const java=ui.track==='java';const chapters=java?[['01','Java nền tảng','Hiểu dữ liệu, object và cách code chạy.'],['02','HTTP & API','Nhìn thấy một request được xử lý ra sao.'],['03','Dữ liệu & nghiệp vụ','SQL, transaction và những thay đổi đồng thời.'],['04','Đóng gói & triển khai','Đưa backend ra môi trường chạy thật.']]:[['01','Linux & network','Process, port, DNS và môi trường chạy.'],['02','Docker cơ bản','Image, container, network và volume.'],['03','CI/CD & vận hành','Build, triển khai, quan sát và khôi phục.']];return `<div class="bl-page"><div><p class="bl-eyebrow">BẢN ĐỒ KIẾN THỨC</p><h1 style="margin-top:8px">Một chặng, một khả năng mới.</h1><p class="bl-lead">Khám phá theo chương. Học sâu bằng thực hành.</p></div><div class="bl-segments" aria-label="Chọn lộ trình"><button type="button" class="cursor-interaction" data-track="java" aria-pressed="${java}">Java Backend</button><button type="button" class="cursor-interaction" data-track="devops" aria-pressed="${!java}">DevOps</button></div><section class="bl-panel"><div class="bl-row bl-between"><h2>${java?'Java Backend':'DevOps & vận hành'}</h2><span class="bl-small bl-muted">${java?'1 lab mẫu có thể xem':'Nội dung đang biên soạn'}</span></div><p class="bl-small bl-muted" style="margin:8px 0 18px">${java?'Đây là mục lục định hướng; các bài chưa viết được ghi rõ.':'Docker và vận hành thiết yếu sẽ dùng chung bài học với Java Backend.'}</p>${chapters.map(([n,t,d])=>`<details class="bl-chapter" ${java&&n==='02'?'open':''}><summary class="cursor-interaction"><span class="bl-number">${n}</span><span><strong>${t}</strong><span class="bl-muted">${d}</span></span></summary>${java&&n==='02'?`<div class="bl-lesson-row"><div><span class="bl-tag good">MÔ PHỎNG</span><h3 style="margin-top:7px">Cứu API trả lỗi 500</h3><p class="bl-small bl-muted">15–20 phút · Có phần làm quen API</p></div>${action('Mở lab '+icon('arrow-right'),'start',true)}</div>`:`<p class="bl-small bl-muted" style="margin:16px 0 0 41px">Đang biên soạn. Bạn có thể xem chủ đề; bài thực hành sẽ được bổ sung sau.</p>`}</details>`).join('')}</section></div>`;}
+  function nodeStatus(i){if(['created','bad-created'].includes(ui.lab))return 'Đã qua';if(ui.lab==='failed')return i<2?'Đã qua':i===2?'Lỗi tại đây':'Chưa được gọi';if(ui.lab==='repaired')return i===0?'Đã gửi':i===1?'Từ chối input':'Không chạy';if(ui.lab==='running')return i<ui.traceIndex?'Đã qua':i===ui.traceIndex?'Đang xem':'Chờ';return 'Chưa chạy';}
+  function lab(){const stateText={idle:'Chưa chạy',running:'Đang xem từng bước',failed:'500 · Lỗi tại service',repaired:'400 · Input bị từ chối',created:'201 · Đã tạo task','bad-created':'201 · Nhận nhầm title rỗng'};return `<div class="bl-page ${ui.expanded?'bl-expand':''}"><div class="bl-row bl-between"><div><p class="bl-eyebrow">LAB 01 / HTTP & API</p><h1 style="margin-top:7px">Cứu API trả lỗi 500</h1></div><span class="bl-tag">Mô phỏng tương tác</span></div><ol class="bl-steps" aria-label="Các phần của bài"><li class="${ui.lab==='idle'?'current':''}">01 · Thử request</li><li class="${['running','failed'].includes(ui.lab)?'current':''}">02 · Tìm nguyên nhân</li><li class="${['repaired','created','bad-created'].includes(ui.lab)?'current':''}">03 · Sửa & kiểm tra</li><li>04 · Thử thách</li></ol>${ui.notice?`<div class="bl-inline-note warn" role="status">${esc(ui.notice)}</div>`:''}<div class="bl-workspace"><div class="bl-lab-content"><section class="bl-stage" aria-label="Luồng xử lý request"><div class="bl-row bl-between"><h3>Một request đi đâu?</h3><span class="bl-tag ${ui.lab==='failed'||ui.lab==='bad-created'?'bad':['repaired','created'].includes(ui.lab)?'good':''}">${stateText[ui.lab]}</span></div><div class="bl-flow">${[['[ ]','Client'],['↳','Controller'],['ƒ','Service'],['▤','Database']].map(([s,n],i)=>`<button type="button" class="bl-node cursor-interaction ${ui.lab==='failed'&&i===2?'error':ui.lab==='repaired'&&i===1||ui.lab==='running'&&i===ui.traceIndex?'active':''}" data-node="${n}" aria-label="${n}: ${nodeStatus(i)}"><span class="bl-node-symbol" aria-hidden="true">${s}</span><strong>${String(i+1).padStart(2,'0')} · ${n}</strong><small>${nodeStatus(i)}</small></button>`).join('')}</div><div class="bl-inline-note ${ui.lab==='failed'||ui.lab==='bad-created'?'bad':['repaired','created'].includes(ui.lab)?'good':''}">${ui.selectedNode?esc(ui.selectedNode):ui.lab==='failed'?'Service gọi strip() khi title = null. Database chưa được gọi.':ui.lab==='repaired'?'Controller từ chối title không hợp lệ trước khi gọi service.':ui.lab==='running'?'Quan sát snapshot hiện tại. Nhấn bước tiếp để đi theo request.':ui.lab==='created'?'201 Created · Dữ liệu hợp lệ đi qua Repository và được ghi vào Database.':ui.lab==='bad-created'?'201 Created · Title rỗng vẫn được ghi. Cần kiểm tra blank trước xử lý.':'Gửi request để xem các thành phần bắt đầu làm việc.'}</div><div class="bl-row bl-between" style="margin-top:16px"><div class="bl-row">${action(icon('skip-forward')+' Bước tiếp','step')}${action(icon('rotate-ccw')+' Reset','reset')}</div><label class="bl-check"><input type="checkbox" data-control="motion" ${design.reduced?'checked':''}>Giảm chuyển động</label></div></section><section class="bl-workbench" aria-label="Bàn thao tác"><div class="bl-row bl-between" style="padding-right:12px"><div class="bl-tabs" aria-label="Nội dung bàn thao tác">${[['input','Thao tác'],['code','Code'],['log','Log'],['explain','Giải thích']].map(([t,l])=>`<button type="button" class="cursor-interaction" data-tab="${t}" aria-pressed="${ui.tab===t}">${l}</button>`).join('')}</div><button type="button" class="bl-action quiet cursor-interaction" data-action="expand" aria-pressed="${ui.expanded}">${icon(ui.expanded?'minimize-2':'maximize-2')}${ui.expanded?'Thu gọn':'Mở rộng'}</button></div><div class="bl-tabcontent">${tabContent()}</div></section><div class="bl-row bl-between"><span class="bl-small bl-muted">${['repaired','created'].includes(ui.lab)?'Đã thấy kết quả. Thử thêm một trường hợp.':'Mỗi lần chạy dùng dữ liệu mẫu riêng.'}</span>${action('Đến thử thách '+icon('arrow-right'),'challenge',true)}</div></div><aside class="bl-task-aside"><h3>Nhiệm vụ của bạn</h3><ol><li>Gửi request thiếu title.</li><li>Tìm nơi lỗi xuất hiện trong luồng.</li><li>Thêm kiểm tra dữ liệu và chạy lại.</li></ol><div><details><summary class="cursor-interaction">Cần một gợi ý?</summary><p>Tìm bước cuối cùng chạy được. Giá trị của title tại bước đó là gì?</p></details><details style="margin-top:12px"><summary class="cursor-interaction">Mới học API?</summary><p>Request là yêu cầu từ client. Response là câu trả lời. Status 500 báo lỗi nội bộ, chưa nói chính xác nguyên nhân.</p></details></div></aside></div></div>`;}
+  function tabContent(){if(ui.tab==='code')return `<div class="bl-row bl-between"><span class="bl-small bl-muted">TaskService.java · đoạn code minh họa</span><span class="bl-tag">Chỉ đọc</span></div><pre><code>${ui.patch==='validate-title'?'// Controller: kiểm tra trước khi gọi service\nif (title == null || title.isBlank()) {\n    return invalidTitle(); // 400\n}\n\n// Service\nString normalized = title.strip();\nreturn repository.save(normalized);':'// Service: title có thể đang là null\nString normalized = request.title().strip();\nreturn repository.save(normalized);'}</code></pre><p class="bl-small bl-muted">Bản thiết kế chọn cách sửa định sẵn; không biên dịch Java.</p>${action('Thử thêm validation','repair',true)}`;
+    if(ui.tab==='log')return `<span class="bl-small bl-muted">Log mô phỏng · không phải log máy của bạn</span><pre>${ui.lab==='idle'?'Chưa có log. Gửi request để bắt đầu.':ui.lab==='failed'?'01  → POST /tasks\n02  → Controller: title = null\n03  ✕ Service: NullPointerException\n04  · Repository: chưa được gọi\n05  ← 500 INTERNAL_ERROR':['created','bad-created'].includes(ui.lab)?'01  → POST /tasks\n02  → Controller: nhận title\n03  → Service: normalize\n04  → Repository → Database: ghi một task\n05  ← 201 Created':ui.lab==='repaired'?'01  → POST /tasks\n02  → Controller: title không hợp lệ\n03  · Service: không chạy\n04  ← 400 INVALID_TITLE':'01  → POST /tasks\n02  → Đang xem snapshot của request...'}</pre>`;
+    if(ui.tab==='explain')return `<h3>Lỗi bắt đầu trước database.</h3><p class="bl-muted">Khi thiếu title, giá trị trong ví dụ là null. Service gọi strip() trên giá trị này và gặp lỗi.</p><p class="bl-small">Kiểm tra title trước xử lý giúp trả phản hồi rõ ràng. Lỗi nội bộ khác vẫn cần được phân biệt với lỗi dữ liệu gửi lên.</p>${action('Xem cách sửa','repair',true)}`;
+    return `<div class="bl-row"><span class="bl-tag good">POST</span><strong style="font:14px Consolas,monospace">/tasks</strong><span class="bl-small bl-muted">Request mẫu</span></div><div class="bl-form-row"><label>Dữ liệu gửi lên<select data-control="preset"><option value="missing" ${ui.preset==='missing'?'selected':''}>Thiếu title · {}</option><option value="blank" ${ui.preset==='blank'?'selected':''}>Title chỉ có dấu cách</option><option value="valid" ${ui.preset==='valid'?'selected':''}>Title hợp lệ</option></select></label><label>Cách xử lý<select data-control="patch"><option value="original" ${ui.patch==='original'?'selected':''}>Chưa kiểm tra dữ liệu</option><option value="validate-title" ${ui.patch==='validate-title'?'selected':''}>Kiểm tra title trước xử lý</option></select></label></div>${ui.preset==='valid'?`<label class="bl-small">Title<input data-control="title" value="${esc(ui.title)}"></label>`:''}<div class="bl-row bl-between"><span class="bl-small bl-muted">${ui.preset==='missing'?'Body: {}':ui.preset==='blank'?'Body: { "title": "   " }':'Body được tạo từ title ở trên.'}</span>${action(icon('play')+' Gửi request','run',true)}</div>`;}
+  function challenge(){const tested=ui.challenge!=='none';const passed=ui.challenge==='pass';return `<div class="bl-page"><div><p class="bl-eyebrow">THỬ THÁCH / ÁP DỤNG ĐIỀU VỪA HỌC</p><h1 style="margin-top:8px">Có title. Vẫn chưa đủ.</h1><p class="bl-lead">Người dùng gửi title chỉ gồm dấu cách. Bạn sẽ xử lý thế nào?</p></div><div class="bl-challenge-grid"><section class="bl-panel bl-stack"><span class="bl-tag">Tình huống mô phỏng</span><pre>POST /tasks
+{ "title": "   " }</pre><h3>Chọn cách kiểm tra</h3>${[['null','Chỉ kiểm tra title khác null','Field đã tồn tại là đủ.'],['blank','Từ chối cả null và blank','Chỉ xử lý title có nội dung.'],['catch','Đổi mọi lỗi thành 400','Bắt tất cả exception ở một nơi.']].map(([v,t,d])=>`<label class="bl-choice cursor-interaction"><input type="radio" name="bl-answer" value="${v}" ${ui.choice===v?'checked':''}><span><strong>${t}</strong><br><span class="bl-muted">${d}</span></span></label>`).join('')}${action('Kiểm tra lời giải','check',true)}<button type="button" class="bl-action quiet cursor-interaction" data-action="hint">${icon('lightbulb')}Gợi ý${ui.hints?' · '+ui.hints+'/3':''}</button>${ui.hints?`<p class="bl-small bl-muted">${['Một field có giá trị không có nghĩa giá trị đó dùng được.','So sánh title = null với title = "   ". Kiểm tra null có bắt được cả hai?','Kiểm tra null hoặc blank trước xử lý. Giữ lỗi nội bộ là 500.'][Math.min(ui.hints,3)-1]}</p>`:''}</section><section class="bl-panel bl-stack"><div class="bl-row bl-between"><h3>Kết quả kiểm tra</h3><span class="bl-tag ${tested?passed?'good':'bad':''}">${tested?passed?'Đạt trong bản mẫu':'Cần thử lại':'Chưa chạy'}</span></div><ul class="bl-tests">${[['Thiếu title','400'],['Title chỉ có dấu cách','400'],['Title hợp lệ','201'],['Lỗi ghi dữ liệu nội bộ','500']].map(([t,s],i)=>`<li><span>${t}</span><strong>${!tested?'—':!passed&&(ui.choice==='null'&&i===1||ui.choice==='catch'&&i===3)?'<span style="color:var(--bl-red)">✕ '+(i===1?'201':'400')+'</span>':'✓ '+s}</strong></li>`).join('')}</ul><div class="bl-inline-note ${tested?passed?'good':'bad':''}" role="status">${tested?passed?'Cách sửa xử lý được title blank và giữ đúng loại lỗi.':ui.choice==='catch'?'Lỗi ghi nội bộ bị đổi thành 400. Cần phân biệt lỗi server và dữ liệu không hợp lệ.':'Title toàn dấu cách vẫn được nhận. Điều kiện null chưa đủ.':'Chọn cách xử lý rồi kiểm tra để xem kết quả.'}</div><p class="bl-small bl-muted">Bản T02 minh họa feedback. Bộ chấm đầy đủ và 5 điều kiện hoàn thành được triển khai ở T08.</p>${tested?action(passed?'Xem kết quả mẫu '+icon('arrow-right'):'Quay lại xem cơ chế',passed?'result':'lab',passed):''}</section></div>${ui.notice?`<div class="bl-inline-note warn" role="alert">${esc(ui.notice)}</div>`:''}</div>`;}
+  function result(){const passed=ui.challenge==='pass';return `<div class="bl-page"><section class="bl-result"><div class="bl-result-mark" aria-hidden="true">${passed?'✓':'↻'}</div><div><p class="bl-eyebrow">KẾT QUẢ MINH HỌA</p><h1 style="margin-top:8px">${passed?'Bạn đã tìm ra điểm lỗi.':'Thêm một lần thử, hiểu rõ hơn.'}</h1><p class="bl-lead">${passed?'Một request, một dấu hiệu, một cách sửa có thể kiểm chứng.':'Bạn đã xác định được vấn đề. Bước tiếp theo là kiểm tra đủ các trường hợp.'}</p></div><span class="bl-tag ${passed?'good':''}" style="width:fit-content">${passed?'Đã qua bài tập mô phỏng · trạng thái mẫu':'Chưa hoàn thành · trạng thái mẫu'}</span><section class="bl-panel"><h3>Những gì bạn vừa thực hành</h3><ul class="bl-clean-list"><li><span class="bl-number">✓</span><div><strong>Đọc đường đi của request</strong><p class="bl-small bl-muted">Nhận diện nơi xuất hiện exception.</p></div></li><li><span class="bl-number">${passed?'✓':'·'}</span><div><strong>Kiểm tra input trước xử lý</strong><p class="bl-small bl-muted">Phân biệt null, blank và title hợp lệ.</p></div></li><li><span class="bl-number">${passed?'✓':'·'}</span><div><strong>Giữ đúng ý nghĩa của lỗi</strong><p class="bl-small bl-muted">Lỗi nội bộ vẫn là 500.</p></div></li></ul></section>${ui.saveError?`<div class="bl-inline-note warn" role="alert"><strong>Chưa lưu được tiến độ.</strong><p>Kết quả vẫn ở đây. Bạn có thể thử lưu lại.</p><div style="margin-top:10px">${action('Thử lưu lại','retry-save')}</div></div>`:'<p class="bl-small bl-muted">Bản thiết kế không lưu tiến độ thật. '+(ui.hints?'Hoàn thành với gợi ý · nên thử lại khi đã tự tin.':'')+'</p>'}<div class="bl-row">${action(passed?'Về hành trình':'Thử lại',passed?'journey':'challenge',true)}${action(passed?'Thử một cách sửa khác':'Ôn lại cơ chế',passed?'replay':'lab')}</div><p class="bl-small bl-muted">${passed?'Bạn đã xem hết lab mẫu. Các chương tiếp theo đang được biên soạn.':'Có thể quay lại phần giải thích mà không mất câu trả lời.'}</p></section></div>`;}
+  let lastRenderedLab=ui.lab;
+  function render(){
+    lastRenderedLab=ui.lab;
+    root.style.colorScheme=design.appearance==='system'?'light dark':design.appearance;
+    root.style.maxWidth=design.mobile?'390px':'none';
+    root.style.setProperty('--bl-gap',design.roomy?'24px':'16px');
+    const blue=design.accent==='blue';
+    root.style.setProperty('--bl-accent',blue?'light-dark(#315b9b,#a8c7ff)':'light-dark(#11675a,#8dd5c0)');
+    root.style.setProperty('--bl-onaccent',blue?'light-dark(#ffffff,#162d4a)':'light-dark(#ffffff,#102d26)');
+    root.style.setProperty('--bl-tint',blue?'light-dark(#e7eefb,#26364d)':'light-dark(#e3f1e9,#223f36)');
+    product.innerHTML=chrome(({home,journey,lab,challenge,result})[ui.screen]());
+    if(globalThis.lucide)lucide.createIcons({attrs:{width:16,height:16}});
+  }
+  root.addEventListener('click',event=>{
+    const el=event.target.closest('button');if(!el || !root.contains(el))return;
+    if(el.dataset.screen){navigate(el.dataset.screen);return;}
+    if(el.dataset.track){ui.track=el.dataset.track;render();save();return;}
+    if(el.dataset.tab){ui.tab=el.dataset.tab;render();return;}
+    if(el.dataset.node){const info={Client:'Client gửi method, path và dữ liệu đến API.',Controller:'Controller nhận request và kiểm tra input.',Service:'Service xử lý nghiệp vụ. Ví dụ này gọi strip() trên title.',Database:'Database chỉ được gọi sau khi service đi qua repository.'};ui.selectedNode=info[el.dataset.node];render();announce(ui.selectedNode);return;}
+    const cmd=el.dataset.action;if(!cmd)return;
+    if(['home','journey','lab','challenge','result'].includes(cmd)){navigate(cmd);return;}
+    if(cmd==='start'){ui.experience='resume';ui.screen='lab';ui.notice='Bạn có thể mở “Mới học API?” để làm quen trước khi gửi request.';}
+    if(cmd==='step'){ui.lab='running';ui.traceIndex=(ui.traceIndex+1)%3;ui.selectedNode='';ui.notice='Bản thiết kế đang hiển thị snapshot. Chọn Gửi request để xem trạng thái kết thúc.';}
+    if(cmd==='reset'){ui.lab='idle';ui.traceIndex=0;ui.selectedNode='';ui.notice='Đã reset hình minh họa. Lựa chọn cách sửa vẫn được giữ.';}
+    if(cmd==='repair'){ui.patch='validate-title';ui.tab='input';ui.lab='idle';ui.notice='Đã thêm validation. Gửi request lại để quan sát kết quả.';}
+    if(cmd==='expand'){ui.expanded=!ui.expanded;if(ui.expanded)ui.tab='code';}
+    if(cmd==='run'){
+      ui.selectedNode='';ui.notice='';
+      if(ui.preset==='valid'&&ui.title.trim()!==''){ui.lab='created';ui.selectedNode='201 Created · title hợp lệ. Service → Repository → Database tạo một task mẫu.';ui.notice='Kết quả minh họa: tạo đúng một task trong lần chạy mẫu.';}
+      else if(ui.patch==='validate-title'){ui.lab='repaired';}
+      else if(ui.preset==='missing'){ui.lab='failed';}
+      else {ui.lab='bad-created';ui.selectedNode='201 Created · Bản chưa validate vẫn nhận title rỗng. Đây là lỗi nghiệp vụ cần sửa.';ui.notice='Hãy thử kiểm tra cả blank, không chỉ missing/null.';}
+    }
+    if(cmd==='hint')ui.hints=Math.min(ui.hints+1,3);
+    if(cmd==='check'){if(!ui.choice){ui.notice='Chọn một cách xử lý trước khi kiểm tra.';}else{ui.challenge=ui.choice==='blank'?'pass':'fail';ui.notice='';}}
+    if(cmd==='replay'){ui.challenge='none';ui.choice='';ui.screen='challenge';}
+    if(cmd==='retry-save'){ui.saveError=false;ui.notice='';announce('Đã đóng trạng thái lỗi lưu mẫu. Bản thiết kế không lưu tiến độ thật.');}
+    render();save();
+  });
+  root.addEventListener('change',event=>{
+    const el=event.target;
+    if(el.name==='bl-answer'){ui.choice=el.value;ui.challenge='none';ui.notice='';render();return;}
+    if(el.dataset.control==='motion'){design.reduced=el.checked;announce('Đã đổi tùy chọn giảm chuyển động. Bản thiết kế dùng snapshot.');return;}
+    if(el.dataset.control==='title'){ui.lab='idle';ui.selectedNode='';ui.notice='Title đã thay đổi. Gửi lại request để xem kết quả mới.';render();}
+    if(el.dataset.control==='preset'||el.dataset.control==='patch'){ui[el.dataset.control]=el.value;ui.lab='idle';ui.selectedNode='';ui.notice='Dữ liệu đã thay đổi. Gửi lại request để xem kết quả mới.';render();}
+  });
+  root.addEventListener('input',event=>{if(event.target.dataset.control==='title')ui.title=event.target.value;});
+  window.addEventListener('openai:set_globals',event=>{const saved=event.detail?.globals?.widgetState?.privateContent;if(saved){restore(saved);render();}});
+  render();
+  if(globalThis.Tweak){
+    const tweak=new Tweak({container:root,onChange:()=>{
+      if(ui.lab!==lastRenderedLab){
+        ui.selectedNode='';ui.notice='';ui.traceIndex=1;
+        ui.preset=ui.lab==='created'?'valid':ui.lab==='bad-created'?'blank':'missing';
+        ui.patch=['repaired','created'].includes(ui.lab)?'validate-title':'original';
+      }
+      render();save();
+    }});
+    tweak.addSelect(ui,'screen',{label:'Màn hình',options:allowedScreens.map(value=>({value,label:labels[value]}))});
+    tweak.addSelect(ui,'experience',{label:'Trang chủ',options:[{value:'fresh',label:'Người học mới'},{value:'resume',label:'Đang học dở'}]});
+    tweak.addSelect(ui,'lab',{label:'Trạng thái lab',options:allowedLabs.map(value=>({value,label:{idle:'Chưa chạy',running:'Đang chạy / snapshot',failed:'Lỗi 500',repaired:'Đã thêm validation',created:'Tạo task hợp lệ','bad-created':'Nhận nhầm title rỗng'}[value]}))});
+    tweak.addSelect(ui,'challenge',{label:'Kết quả mẫu',options:[{value:'none',label:'Chưa làm'},{value:'fail',label:'Chưa đạt'},{value:'pass',label:'Đạt'}]});
+    tweak.addToggle(ui,'saveError',{label:'Hiện lỗi lưu ở Kết quả'});
+    tweak.addSelect(design,'appearance',{label:'Giao diện',options:[{value:'system',label:'Theo thiết bị'},{value:'light',label:'Sáng'},{value:'dark',label:'Tối'}]});
+    tweak.addSelect(design,'accent',{label:'Màu nhấn',options:[{value:'teal',label:'Teal · đề xuất'},{value:'blue',label:'Xanh lam'}]});
+    tweak.addToggle(design,'wireframe',{label:'Xem wireframe đơn sắc'});
+    tweak.addToggle(design,'mobile',{label:'Bố cục mobile 390px'});
+    tweak.addToggle(design,'roomy',{label:'Khoảng cách thoáng'});
+  }
+})();
+</script>

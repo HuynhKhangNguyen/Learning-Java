@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 1,
+  "scope": "BL-R01 build/bootstrap, R02a DB harness, R02b lab TLS/common-wire and R03 local Identity credentials; not release qualification",
+  "checkedAt": "2026-10-01T02:53:05Z",
+  "toolchain": {
+    "jdk": {
+      "distribution": "Microsoft Build of OpenJDK",
+      "version": "21.0.12.1",
+      "runtimeVersion": "21.0.12.1+1-LTS",
+      "vendorBuild": "Microsoft-14941484",
+      "platform": "windows-x64",
+      "archive": "microsoft-jdk-21.0.12.1-windows-x64.zip",
+      "downloadUrl": "https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-x64.zip",
+      "resolvedDownloadUrl": "https://download.visualstudio.microsoft.com/download/pr/f1e5f23f-9d50-4b9f-8ed3-80522ae82bb5/71e8e5f0f13419cc726e470d25e0a0d0/microsoft-jdk-21.0.12.1-windows-x64.zip",
+      "checksumUrl": "https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-x64.zip.sha256sum.txt",
+      "sha256": "192441a9d27da813bada974bb88b4cf64d37a9589ed37f204374d411ca5ce07f",
+      "installDirectory": ".tools/jdk/jdk-21.0.12.1+1",
+      "releaseNotes": "https://learn.microsoft.com/en-us/java/openjdk/release-notes",
+      "signatureVerified": false
+    },
+    "maven": {
+      "version": "3.9.16",
+      "distributionUrl": "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.16/apache-maven-3.9.16-bin.zip",
+      "sha256": "5af3b743dd8b876b5c45da33b676251e5f1687712644abb4ee519ca56e1d89ce",
+      "publisherChecksum": {
+        "algorithm": "sha512",
+        "value": "ed41650d42485cfc243fad22158caf9cbb5dc408ce7a09ddb94dd42a019de929ca43065bfa450612cf12bf78b5cafa3884b96c090de326ff590448c933454af3",
+        "source": "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.16/apache-maven-3.9.16-bin.zip.sha512"
+      }
+    },
+    "wrapper": {
+      "version": "3.3.4",
+      "type": "only-script",
+      "source": "https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper-distribution/3.3.4/maven-wrapper-distribution-3.3.4-only-script.zip",
+      "sha256": "6cb584c2bc907b849a0b931d8266d3ff3214cdd3127115ed4f49fb7176413d36",
+      "publisherChecksum": {
+        "algorithm": "sha1",
+        "value": "640f7c39ee902b630ada7e77086a6ddb9fceae56"
+      },
+      "verifiedSource": {
+        "url": "https://downloads.apache.org/maven/wrapper/maven-wrapper-3.3.4-source-release.zip",
+        "sha512": "8659504fac71a179681ba508a6a0ecb790678080488ae123c16151fa4c88aa89a9689b0b73b0c4830ab8ab867d586c2b13bab872ca4eed0ffe585c14dc8e9ae6",
+        "scriptComparison": "Both scripts equal the Apache source only-mvnw templates after substituting @@project.version@@ with 3.3.4; LF/CRLF normalized for comparison."
+      },
+      "files": {
+        "mvnw": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+        "mvnw.cmd": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c"
+      }
+    },
+    "postgresqlLab": {
+      "version": "18.6",
+      "vendorBuild": "18.6-5",
+      "platform": "windows-x64",
+      "manifest": "ops/release/postgresql.json",
+      "manifestSha256": "23ed7c616285922c1d2a3e70abc77cc12c74ae97b0aabbd169157bee9ffd5d14",
+      "qualification": "Disposable loopback Windows lab only; SCRAM; no publisher signature/checksum, production TLS or Linux/container parity"
+    }
+  },
+  "build": {
+    "parentPackaging": "pom",
+    "javaRelease": 21,
+    "parentAndBom": [
+      {
+        "groupId": "org.springframework.boot",
+        "artifactId": "spring-boot-starter-parent",
+        "version": "4.1.1",
+        "source": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/4.1.1/spring-boot-starter-parent-4.1.1.pom",
+        "sha256": "04cc8a51d17b04d518c232ab5423fb3b9ca6c9eb95d2562800267a6bf991f953",
+        "publisherChecksum": {
+          "algorithm": "sha1",
+          "value": "f676634541999da6cfcf39a1a68576382e0ab218"
+        },
+        "evidence": "POM metadata only; no application dependency tree yet"
+      },
+      {
+        "groupId": "org.springframework.boot",
+        "artifactId": "spring-boot-dependencies",
+        "version": "4.1.1",
+        "source": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-dependencies/4.1.1/spring-boot-dependencies-4.1.1.pom",
+        "sha256": "1c929eeccb48f8ee12225e9fec725177170b89575754bd903f184c185db77775",
+        "publisherChecksum": {
+          "algorithm": "sha1",
+          "value": "1393d32ca9c60594333bc646234d63132099ddda"
+        },
+        "evidence": "POM metadata only; no application dependency tree yet"
+      }
+    ],
+    "enforcerVersion": "3.6.3",
+    "managedCompilerVersion": "3.15.0",
+    "managedSurefireVersion": "3.5.6",
+    "securityOverrides": [
+      {
+        "property": "tomcat.version",
+        "bomVersion": "11.0.24",
+        "selectedVersion": "11.0.26",
+        "source": "https://tomcat.apache.org/security-11.html",
+        "metadataUrl": "https://repo.maven.apache.org/maven2/org/apache/tomcat/embed/tomcat-embed-core/11.0.26/tomcat-embed-core-11.0.26.pom",
+        "metadataSha256": "56b9cf450d0f6b6b2984fd96e186cf55cee6336eab734238d17c40e6d6f57aa4",
+        "reason": "Includes published fixes affecting 11.0.24, including request header mix-up and client certificate checking; runtime compatibility remains R01b-d/R02b."
+      }
+    ],
+    "managedFailsafeVersion": "3.5.6"
+  },
+  "advisoryReview": {
+    "checkedAt": "2026-10-01T02:53:05Z",
+    "method": "Manual review of vendor release notes/security pages and selected BOM metadata; not full transitive SCA or signed supply-chain verification",
+    "sources": [
+      "https://learn.microsoft.com/en-us/java/openjdk/release-notes",
+      "https://maven.apache.org/security.html",
+      "https://spring.io/security/",
+      "https://spring.io/security/cve-2026-41707/",
+      "https://spring.io/security/cve-2026-47841/",
+      "https://tomcat.apache.org/security-11.html"
+    ],
+    "observations": [
+      "JDK 21.0.12.1 is the selected vendor security patch release; recheck before release.",
+      "Maven 3.9.16 is above the listed affected Maven core ranges; build POMs and repositories remain trusted inputs.",
+      "Boot BOM manages Spring Security 7.1.1, the fixed version in the two reviewed Spring Security advisories; no Security runtime exists in R01a.",
+      "Tomcat BOM 11.0.24 has known published fixes; pin 11.0.26 as a build override before service bootstrap."
+    ]
+  },
+  "pendingEvidence": [
+    {
+      "owner": "BL-R31c",
+      "required": "Per-artifact SBOM, full dependency/image/secret scans and current advisory recheck"
+    },
+    {
+      "owner": "BL-R31c",
+      "required": "Linux/container image toolchain hashes and parity; Windows x64 is the only runtime qualified in R01a"
+    },
+    {
+      "owner": "BL-R04/BL-R05/BL-R06/BL-R31a/BL-R31c",
+      "required": "Update snapshots for future business dependencies; session/admission/fences/catalog/publication, actual edge/secret isolation/rotation. R03 qualifies local credential/CLI only; R02b qualifies lab TLS/common-wire receiver foundation."
+    }
+  ],
+  "updatedAt": "2026-10-25T10:02:06.2457760+07:00",
+  "services": {
+    "identity": {
+      "artifactId": "identity-service",
+      "version": "0.1.0-SNAPSHOT",
+      "packaging": "executable jar",
+      "mainClass": "lab.backend.identity.IdentityApplication",
+      "dependencySnapshot": "ops/release/identity-dependencies.json",
+      "dependencySnapshotSha256": "9359bcee3d60d44b83d8819df50f4085ae7495726d234adc79e3bacf44475193",
+      "artifactSha256": "9ca2809faa537e9ed5c933394173196b836539bb394efd1a5b8a711706e8ae55",
+      "dependenciesByScope": {
+        "compile": 42,
+        "test": 31,
+        "runtime": 1
+      },
+      "packagedRuntimeLibraries": 38,
+      "qualifiedRuntime": "Microsoft JDK21.0.12.1+1-LTS Windows x64 with explicit workspace jdk.net.unixdomain.tmpdir for this runner",
+      "testScope": "R03 credential workflow/KDF/corpus/throttle actual PostgreSQL + R02b packaged TLS/common-wire regression; no browser session/admission/edge qualification",
+      "bootstrapSmokeEvidence": "artifacts/quality/R03/artifact-identity/artifact-smoke.json",
+      "transportEvidence": {
+        "run": "artifacts/quality/R03/1e1eba9b-6fbc-4b83-a233-a9fb985e9b07",
+        "inputHashes": "artifacts/quality/R03/1e1eba9b-6fbc-4b83-a233-a9fb985e9b07/identity-inputs.json",
+        "sha256": "9ca2809faa537e9ed5c933394173196b836539bb394efd1a5b8a711706e8ae55",
+        "contentSha256": "14e3387cecb4d97a14048cd09adc7da2a11e32552ca793aacbc4582018735496",
+        "retainedArtifact": "artifacts/quality/R03/1e1eba9b-6fbc-4b83-a233-a9fb985e9b07/identity/qualified-artifact.jar",
+        "reports": {
+          "bootstrap": {
+            "tests": 35,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          "transport": {
+            "tests": 75,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        },
+        "contractRun": "artifacts/quality/R03/1e1eba9b-6fbc-4b83-a233-a9fb985e9b07"
+      },
+      "runtimeClock": "own app DB clock_timestamp plus credential workflow; JDBC runtime, no application migration",
+      "credentialEvidence": {
+        "db": {
+          "run": "artifacts/quality/R03/a38ad5e0-b816-44dd-9e6f-cbaba564f190",
+          "inputHashes": "artifacts/quality/R03/a38ad5e0-b816-44dd-9e6f-cbaba564f190/identity-inputs.json",
+          "sha256": "d8696154041bf2a24ecfd9a78733f7f54020f723693d1c40ebc47a20e5007de4",
+          "contentSha256": "14e3387cecb4d97a14048cd09adc7da2a11e32552ca793aacbc4582018735496",
+          "retainedArtifact": "artifacts/quality/R03/a38ad5e0-b816-44dd-9e6f-cbaba564f190/identity/qualified-artifact.jar",
+          "reports": {
+            "bootstrap": {
+              "tests": 35,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "database": {
+              "tests": 53,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "sec12": {
+          "run": "artifacts/quality/R03/0051e4e7-b356-4df0-9c31-c7fc1016cb1e",
+          "inputHashes": "artifacts/quality/R03/0051e4e7-b356-4df0-9c31-c7fc1016cb1e/identity-inputs.json",
+          "sha256": "976e4457b307461799480311a858363e1be80bdcff6a68c341b2beb7c37ae0c1",
+          "contentSha256": "14e3387cecb4d97a14048cd09adc7da2a11e32552ca793aacbc4582018735496",
+          "retainedArtifact": "artifacts/quality/R03/0051e4e7-b356-4df0-9c31-c7fc1016cb1e/identity/qualified-artifact.jar",
+          "reports": {
+            "bootstrap": {
+              "tests": 35,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "credential": {
+              "tests": 44,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "sec22": {
+          "run": "artifacts/quality/R03/53607950-d1e7-420b-85d9-643417e4da61",
+          "inputHashes": "artifacts/quality/R03/53607950-d1e7-420b-85d9-643417e4da61/identity-inputs.json",
+          "sha256": "a8dd4ab57997029875788f46420c6d55c143d7b4fc997a79f32ad56e7b8bbe6e",
+          "contentSha256": "14e3387cecb4d97a14048cd09adc7da2a11e32552ca793aacbc4582018735496",
+          "retainedArtifact": "artifacts/quality/R03/53607950-d1e7-420b-85d9-643417e4da61/identity/qualified-artifact.jar",
+          "reports": {
+            "bootstrap": {
+              "tests": 35,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "credential": {
+              "tests": 40,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "corpusManifest": "ops/identity/password-corpus.json",
+        "dependencyTree": "artifacts/quality/R03/identity-dependency-tree.json",
+        "artifactComparison": "Each run retains its exact ZIP SHA; every uncompressed entry matches the current contract candidate. No claim that timestamp-different ZIP bytes are identical."
+      },
+      "workingCandidate": {
+        "task": "BL-R04d",
+        "state": "DONE",
+        "scope": "Canonical admission/distributed auth barrier/reauth owned-lab candidate only; no learner business/lifecycle journal/production qualification",
+        "checkpoint": "docs/features/f10-identity-access/sessions/tasks/BL-R04d.md",
+        "artifactQualification": "R04d owned-lab AC01-07 qualified; full21 canonical run6ad9c54d plus own DB/transport/fault regressions, helper/guards/smoke/dependency/source/secret audits linked from task checkpoint. Standalone R04a sensitive capability remains unavailable; no learner business/lifecycle journal/production qualification. Post-qualification metadata transition only; original manifest retained with runtime evidence.",
+        "qualifiedCanonicalRuntime": {
+          "runId": "6ad9c54d-73f0-45d8-ac90-8abf09e4307b",
+          "artifactSha256": "22ece18e67a366b78be10f37ebc10f51fb512b6bf8a635a5407241638e95fa4b",
+          "audit": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/runtime-review.json",
+          "qualifiedInputManifest": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/qualified-input-dependencies.json"
+        },
+        "previousReauthDatabaseCandidate": {
+          "runId": "537a0915-a647-4866-9634-a58fa203e98a",
+          "scope": "Own-PG canonical admission/auth barrier/reauth and current Identity foundation regressions only; fixture ACK bytes, no remote commits/canonical mTLS/three-app/browser/full leaf DoD",
+          "databaseTests": 166,
+          "unitTests": 296,
+          "canonicalCases": 13,
+          "barrierCases": 16,
+          "reauthCases": 13,
+          "inputFiles": 93,
+          "retainedArtifact": "artifacts/quality/R04d/537a0915-a647-4866-9634-a58fa203e98a/identity/qualified-artifact.jar",
+          "artifactSha256": "b6500b9dcb76824431f9ccf9d03504f9618d3aaa6c6fb378d7eb5675438ef738",
+          "reportSha256": "dbb18bb98747a15516438bab4ea884e614dcd80c4e0abc75a758f5d079599c1f",
+          "reviewSha256": "6370378fd0c8f34f2c66db042ca051b5ad3ed7ab5d416b9c58322d111fbf2d56",
+          "deliveryTestSha256": "72f1f3cb1d9712855319c3a0c49dcdea0032b3088e6c0792c1b78c809510e40f"
+        },
+        "previousBarrierDatabaseCandidate": {
+          "runId": "7df86128-6a0b-4421-b9df-b5658a7a49ab",
+          "scope": "Own-PG canonical admission/auth barrier and current Identity foundation regressions only; fixture ACK bytes, no remote commits/mTLS/reauth/three-app/browser/full leaf DoD",
+          "databaseTests": 150,
+          "unitTests": 195,
+          "canonicalCases": 13,
+          "barrierCases": 13,
+          "artifactSha256": "174b2c25096ca0e03aba6a1e2241d02f727a6778799d1510e24ad14589f39273",
+          "reportSha256": "b0dbdd619a7ccd60b2edb00e7a5713f1e604cbc1d2d5e29a4730bbc564ecb9c0",
+          "reviewSha256": "91cc1f0a12ce4a5fbaf68ee959180d88d1619827e8a606f644519c54e90c62f4",
+          "migrationSha256": "34f1a4118c7a6899bb4c936be82e0b64826acc18360c056b95d26ad997319097",
+          "coordinatorSourceSha256": "308685183addd3692776450ac0c30630f7e07a496d20f37b5c81652b4717df1a",
+          "authoritySourceSha256": "36039452e119f58cf6bb4e0aa137dceff9c7fcfe79f52b097ac30e372de285f8",
+          "authorityTestSha256": "756c6e51956f7ad9c4c3794d03dbe20556d0272ccb3a3f6dbce491332e88569c"
+        },
+        "previousAdmissionDatabaseCandidate": {
+          "runId": "c2ab78e0-fc07-4822-82c8-0cb55fe1a695",
+          "scope": "Own-PG canonical admission and current Identity foundation regressions only; no canonical mTLS/two-ACK coordinator/reauth/three-app/browser/full leaf DoD",
+          "databaseTests": 137,
+          "unitTests": 195,
+          "canonicalCases": 13,
+          "artifactSha256": "1e5e4926908869e99b0ef20f87fef6e99d432fc807e86c9c8e93bc105636e4f0",
+          "reportSha256": "2035eac4cb24bf854a5cdb81b92308a54ebf5a9f2b8b7ae00656b43361963ebe",
+          "reviewSha256": "bc67252a690d5445469e23646ab516087d17eee265dd3cc91edc29d370c58cfb",
+          "authoritySourceSha256": "27245e2a940453fd0cecd433b2723dced03d5f41a276039a6c4d231b3a42353c",
+          "authorityTestSha256": "4a04750fbe734dc0546f3006aa8f6888db45bbdf9e111a244d6ad551c3d6fe8e"
+        }
+      },
+      "qualifiedDeliveryCandidate": {
+        "task": "BL-R02c",
+        "state": "DONE",
+        "scope": "Own durable delivery foundation/FX04 only; no canonical coordinator/publication/lifecycle/production restore qualification",
+        "checkpoint": "docs/platform/delivery/tasks/BL-R02c.md",
+        "artifactQualification": "Current-source DB/contract/full relay and actual DATA selectors qualified; each retained ZIP has its own SHA, all uncompressed entries match this smoke-checked candidate. Own foundation lab only, not canonical coordinator/publication/production restore.",
+        "artifactSha256": "dbac70d02259faaed3c58b56a687dcc3e928a69455c36b130ab29d958b93b04a",
+        "dependencyTreeSha256": "c0a221ba6b85600917b0c90464d00d70bd22bc3f0d086d7b4e2ccae05b13605c",
+        "dependenciesByScope": {
+          "compile": 46,
+          "runtime": 1,
+          "test": 31
+        },
+        "packagedRuntimeLibraries": 42,
+        "dependencyTree": "artifacts/quality/R02c/identity-dependency-tree.json",
+        "dbEvidence": "artifacts/quality/R02c/ba077ebf-f6af-4b13-aba3-e0b764cd3e67",
+        "contractEvidence": "artifacts/quality/R02c/b474b07b-6138-411a-9c3d-ee37aa54f72d",
+        "relayEvidence": "artifacts/quality/R02c/6cd34438-1beb-4b19-af6d-4c2b8d7b0339",
+        "selectedEvidence": {
+          "DATA-10": "artifacts/quality/R02c/70768811-232f-4275-8d65-464e59b0afd8"
+        },
+        "bootstrapSmokeEvidence": "artifacts/quality/R02c/artifact-identity/artifact-smoke.json",
+        "closingAudit": "artifacts/quality/R02c/delivery-review.json",
+        "qualifiedBaseline": "Prior credential/session/receiver/transport fields retain scoped historical candidates; their hashes are not current delivery qualification."
+      },
+      "qualifiedSessionCandidate": {
+        "task": "BL-R04a",
+        "state": "DONE",
+        "scope": "BL-R04a DONE local DB/credential atomicity and opt-in owned lab auth TLS/browser; not distributed completion/production edge/release qualification",
+        "artifactSha256": "b7e9c93849e8a63b62eda5d265489f6cc5f83f3727dbb9dc83fd6e7298377308",
+        "dependencySnapshot": "artifacts/quality/R04a/identity-dependency-snapshot.json",
+        "dependencySnapshotSha256": "8577f6e2876243f3fc050563228e2097a89b567902f4546037809c2ed4a85c1a",
+        "dependenciesByScope": {
+          "compile": 46,
+          "test": 31,
+          "runtime": 1
+        },
+        "packagedRuntimeLibraries": 42,
+        "dbEvidence": {
+          "run": "artifacts/quality/R04a/7568c05a-3750-493a-8bd5-c34cd7ed221b",
+          "retainedArtifact": "artifacts/quality/R04a/7568c05a-3750-493a-8bd5-c34cd7ed221b/identity/qualified-artifact.jar",
+          "artifactSha256": "c5c55f577acbc9bf9867a43c62ba14bec5658d3dd87cba10ab22bdd585ad49eb",
+          "inputHashes": "artifacts/quality/R04a/7568c05a-3750-493a-8bd5-c34cd7ed221b/identity-inputs.json",
+          "reports": {
+            "bootstrap": {
+              "tests": 63,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "database": {
+              "tests": 81,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "transportRegression": {
+          "run": "artifacts/quality/R04a/b033ae94-e719-46b7-9de8-fca1b512a9b4",
+          "retainedArtifact": "artifacts/quality/R04a/b033ae94-e719-46b7-9de8-fca1b512a9b4/identity/qualified-artifact.jar",
+          "artifactSha256": "b7e9c93849e8a63b62eda5d265489f6cc5f83f3727dbb9dc83fd6e7298377308",
+          "inputHashes": "artifacts/quality/R04a/b033ae94-e719-46b7-9de8-fca1b512a9b4/identity-inputs.json",
+          "reports": {
+            "bootstrap": {
+              "tests": 63,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            },
+            "transport": {
+              "tests": 116,
+              "failures": 0,
+              "errors": 0,
+              "skipped": 0
+            }
+          }
+        },
+        "browserEvidence": "artifacts/quality/R04a/b033ae94-e719-46b7-9de8-fca1b512a9b4/session-browser-report.json",
+        "bootstrapSmokeEvidence": "artifacts/quality/R04a/artifact-identity/artifact-smoke.json",
+        "qualifiedBaseline": "Existing R03 service artifact/dependency/evidence fields are retained historical qualified baseline, NOT this working candidate."
+      }
+    },
+    "content": {
+      "artifactId": "content-service",
+      "version": "0.1.0-SNAPSHOT",
+      "packaging": "executable jar",
+      "mainClass": "lab.backend.content.ContentApplication",
+      "dependencySnapshot": "ops/release/content-dependencies.json",
+      "dependencySnapshotSha256": "9aae8e07e3663dead963965f1b556bd3e406841ad0158face047719f4e8725a7",
+      "artifactSha256": "007e6e192cdd8b19e447b1f8b2fedcd4139482d2feb297f8aba1864b53139f97",
+      "dependenciesByScope": {
+        "compile": 40,
+        "test": 31,
+        "runtime": 1
+      },
+      "packagedRuntimeLibraries": 36,
+      "qualifiedRuntime": "Microsoft JDK21.0.12.1+1-LTS Windows x64 with explicit workspace jdk.net.unixdomain.tmpdir for this runner",
+      "testScope": "R02b packaged TLS/common-wire receiver foundation + R02a DB/96 bootstrap regressions; no canonical auth/edge/business qualification",
+      "bootstrapSmokeEvidence": "artifacts/quality/R02b/artifact-content/artifact-smoke.json",
+      "transportEvidence": {
+        "sha256": "007e6e192cdd8b19e447b1f8b2fedcd4139482d2feb297f8aba1864b53139f97",
+        "contractRun": "artifacts\\quality\\R02b\\5f9a3d8f-3045-4803-9ac5-3fc6aec1d483",
+        "retainedArtifact": "artifacts\\quality\\R02b\\qualified-artifacts\\content-service-0.1.0-SNAPSHOT.jar",
+        "inputHashes": "artifacts\\quality\\R02b\\5f9a3d8f-3045-4803-9ac5-3fc6aec1d483\\content-inputs.json"
+      },
+      "runtimeClock": "own app DB clock_timestamp; JDBC runtime, no application migration",
+      "workingCandidate": {
+        "task": "BL-R04d",
+        "state": "DONE",
+        "scope": "Canonical admission/distributed auth barrier/reauth owned-lab candidate only; no learner business/lifecycle journal/production qualification",
+        "checkpoint": "docs/features/f10-identity-access/sessions/tasks/BL-R04d.md",
+        "artifactQualification": "R04d owned-lab AC01-07 qualified by full21 run6ad9c54d and closing owner/helper/guard/smoke/dependency/source/secret evidence in task checkpoint. Original manifest retained before metadata-only DONE transition; qualifiedDeliveryCandidate preserves R02c history. No learner API/publication/lifecycle journal/production qualification.",
+        "qualifiedCanonicalRuntime": {
+          "runId": "6ad9c54d-73f0-45d8-ac90-8abf09e4307b",
+          "artifactSha256": "ed97d6dfd385de0d1f8a2a6357f20a45fc753096b15273a24b2e181b4a24ab37",
+          "audit": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/runtime-review.json",
+          "qualifiedInputManifest": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/qualified-input-dependencies.json"
+        }
+      },
+      "qualifiedDeliveryCandidate": {
+        "task": "BL-R02c",
+        "state": "DONE",
+        "scope": "Own durable delivery foundation/FX04 only; no canonical coordinator/publication/lifecycle/production restore qualification",
+        "checkpoint": "docs/platform/delivery/tasks/BL-R02c.md",
+        "artifactQualification": "Current-source DB/contract/full relay and actual DATA selectors qualified; each retained ZIP has its own SHA, all uncompressed entries match this smoke-checked candidate. Own foundation lab only, not canonical coordinator/publication/production restore.",
+        "artifactSha256": "da6933ee6da964569115605018cd3ac1683999dfd1dda614f930d6ab583f2631",
+        "dependencyTreeSha256": "bcd77e02c47316584e3e51d4372f0e913523dcac598637d29e6bdf93caf93924",
+        "dependenciesByScope": {
+          "compile": 40,
+          "runtime": 1,
+          "test": 31
+        },
+        "packagedRuntimeLibraries": 36,
+        "dependencyTree": "artifacts/quality/R02c/content-dependency-tree.json",
+        "dbEvidence": "artifacts/quality/R02c/93358a58-f5e6-4543-be41-e74e7f1b4f28",
+        "contractEvidence": "artifacts/quality/R02c/4a857158-c2e5-471d-940b-2e61772f1068",
+        "relayEvidence": "artifacts/quality/R02c/81f908b4-004c-4012-93a3-aae9af8dd753",
+        "selectedEvidence": {
+          "DATA-11": "artifacts/quality/R02c/6eb8fa30-4bcb-4621-a183-ffd10c3467d4",
+          "DATA-13": "artifacts/quality/R02c/82908027-cf7a-431d-b210-b50b9fb40438",
+          "DATA-14": "artifacts/quality/R02c/b8c2075f-1f7a-4446-a7a5-822dd44c56da",
+          "DATA-15": "artifacts/quality/R02c/9fcca50a-dd55-402c-b56c-27c88201bcc6"
+        },
+        "bootstrapSmokeEvidence": "artifacts/quality/R02c/artifact-content/artifact-smoke.json",
+        "closingAudit": "artifacts/quality/R02c/delivery-review.json",
+        "qualifiedBaseline": "Prior credential/session/receiver/transport fields retain scoped historical candidates; their hashes are not current delivery qualification."
+      },
+      "qualifiedReceiverCandidate": {
+        "task": "BL-R04b",
+        "state": "DONE",
+        "scope": "Content own DB admission/fence receiver and controlled mTLS provider-contract fixture; not canonical Identity INT-01, learner API, coordinator, production or release qualification",
+        "artifactSha256": "3606875ef35c4f3e0d5662f3ac58ac1ec1c449b43cb095230614b99d5cd70cca",
+        "dependencyAndEvidenceAudit": "artifacts/quality/R04b/receiver-review.json",
+        "dependencyAndEvidenceAuditSha256": "a94d965c9b9ce10fbc91b23fcca4ecbf86885e801e3253489bfc56dc483c6400",
+        "dependencyTree": "artifacts/quality/R04b/content-dependency-tree.json",
+        "dependencyTreeSha256": "bcd77e02c47316584e3e51d4372f0e913523dcac598637d29e6bdf93caf93924",
+        "dependenciesByScope": {
+          "compile": 40,
+          "runtime": 1,
+          "test": 31
+        },
+        "packagedRuntimeLibraries": 36,
+        "dbEvidence": "artifacts/quality/R04b/12175851-34e8-4b2c-a143-5ddf5876b049",
+        "transportAndReceiverEvidence": "artifacts/quality/R04b/2096f815-fd08-42c5-8fb6-1f432b6ad6ad",
+        "faultEvidence": {
+          "SEC-02": "artifacts/quality/R04b/b4aa4e3d-5331-4915-aec5-24b816c21e94",
+          "SEC-04": "artifacts/quality/R04b/68e7a189-3a0d-4048-9366-8e538f189e8e",
+          "SEC-09": "artifacts/quality/R04b/aaef7262-c1fa-49d7-80f3-36a9d93cc3a6",
+          "SEC-15": "artifacts/quality/R04b/9d50a913-8815-4588-9096-a49c87f282a9"
+        },
+        "bootstrapSmokeEvidence": "artifacts/quality/R04b/artifact-content/artifact-smoke.json",
+        "qualifiedBaseline": "Existing R02b Content fields remain the historical trust-foundation baseline; this candidate is scoped to R04b and does not overwrite them."
+      },
+      "qualifiedPublicationCandidate": {
+        "task": "BL-R06a",
+        "state": "DONE",
+        "scope": "R06a Content candidate/version store, validate/prepare CLI and private INT-03 provider candidate; no Learning replica, STAGE/FENCE/canonical activation/RELEASE/ABORT, semantic content approval or production qualification",
+        "checkpoint": "docs/features/f08-content/tasks/BL-R06a.md",
+        "artifactSha256": "2d4fd6e6c9a1f924151cb035ed64f724618dc2a17ec3cae079f38f56e19ca469",
+        "dbEvidence": "artifacts/quality/R06a/79dcb472-5f54-4721-8f28-d102b111451d",
+        "contractEvidence": "artifacts/quality/R06a/400482b8-44fa-45a1-975f-20ba23064560",
+        "helperEvidence": "artifacts/quality/R06a/helper-publication-tests.json",
+        "catalogRegressionEvidence": "artifacts/quality/R05/99c66a88-b4e3-457d-977e-61fd8ba43759",
+        "dbTests": 204,
+        "contractTests": 13,
+        "helperCases": 62,
+        "catalogRegressionTests": 36,
+        "requiredSkips": 0,
+        "qualifiedBaseline": "R06a is DONE only for the Content-owned candidate store, validate/prepare CLI and private INT-03 provider lab scope. Final current-input runs and exact limitations are recorded in the checkpoint. The post-acceptance REVIEW-to-DONE state and evidence-pointer update is an expected metadata-only input delta; it does not start R06b or qualify cross-service publication."
+      },
+      "publicationCoordinatorCandidate": {
+        "task": "BL-R06c",
+        "state": "DONE",
+        "scope": "Content durable global-sequence coordinator, packaged maintenance CLI, actual INT-03/INT-04 mTLS and own-PostgreSQL CMD-03/04/05 lab candidate; DATA-02/06/07 are coordinator/manifest layers only, with no learner T1/T2/current-overlay or production qualification",
+        "checkpoint": "docs/features/f08-content/tasks/BL-R06c.md",
+        "artifactSha256": "ee55b98880ccff78f1e0fe592277a6e88f9bd95d3fe8e77cd9729632e8b55953",
+        "dbEvidence": "artifacts/quality/R06c/c4962b42-3ed9-435f-ac03-e0cb9cc042ef",
+        "contractEvidence": "artifacts/quality/R06c/d9c0562c-490b-4dcd-9761-05993a3d9a4b",
+        "selectedEvidence": {
+          "DATA-02": "artifacts/quality/R06c/0fc6ba82-49c7-49b8-a3df-a4bbfba3175a",
+          "DATA-03": "artifacts/quality/R06c/07880568-40e8-45cd-a361-e08b5c750536",
+          "DATA-04": "artifacts/quality/R06c/17edc633-4905-49da-94cb-1d89a24c9ea9",
+          "DATA-05": "artifacts/quality/R06c/5708adc1-5995-4ebc-aafb-dabb925bed8a",
+          "DATA-06": "artifacts/quality/R06c/6b052dd5-ed8d-49ea-ab63-2085ed34bfc8",
+          "DATA-07": "artifacts/quality/R06c/a2972266-6aee-4f24-bd00-0a0d7b355508",
+          "DATA-14": "artifacts/quality/R06c/11cb1a3a-5a0f-4a4c-90e7-384899977ad0"
+        },
+        "helperEvidence": "artifacts/quality/R06c/helper-coordinator-tests.json",
+        "requiredSkips": 0,
+        "qualifiedBaseline": "R06c is DONE only for the Content-owned durable global-sequence coordinator, packaged maintenance CLI, exact cross-service publication protocol and own-PostgreSQL lab scope recorded in the checkpoint. The Control Center metadata transition does not roll up BL-R06, open BL-R07, or qualify learner T1/T2/current progress or production publication."
+      }
+    },
+    "learning": {
+      "artifactId": "learning-service",
+      "version": "0.1.0-SNAPSHOT",
+      "packaging": "executable jar",
+      "mainClass": "lab.backend.learning.LearningApplication",
+      "dependencySnapshot": "ops/release/learning-dependencies.json",
+      "dependencySnapshotSha256": "cbc50f065ebbc74dc2611e21720c47bce77199f5a824cd86d74581f93ac09720",
+      "artifactSha256": "e82b136e32423bf937c989a523474e1ba7c4076dc0c0b54a3663bc7ef8c10d0c",
+      "dependenciesByScope": {
+        "compile": 40,
+        "test": 31,
+        "runtime": 1
+      },
+      "packagedRuntimeLibraries": 36,
+      "qualifiedRuntime": "Microsoft JDK21.0.12.1+1-LTS Windows x64 with explicit workspace jdk.net.unixdomain.tmpdir for this runner",
+      "testScope": "R02b packaged TLS/common-wire receiver foundation + R02a DB/96 bootstrap regressions; no canonical auth/edge/business qualification",
+      "bootstrapSmokeEvidence": "artifacts/quality/R02b/artifact-learning/artifact-smoke.json",
+      "transportEvidence": {
+        "sha256": "e82b136e32423bf937c989a523474e1ba7c4076dc0c0b54a3663bc7ef8c10d0c",
+        "contractRun": "artifacts\\quality\\R02b\\5f9a3d8f-3045-4803-9ac5-3fc6aec1d483",
+        "retainedArtifact": "artifacts\\quality\\R02b\\qualified-artifacts\\learning-service-0.1.0-SNAPSHOT.jar",
+        "inputHashes": "artifacts\\quality\\R02b\\5f9a3d8f-3045-4803-9ac5-3fc6aec1d483\\learning-inputs.json"
+      },
+      "runtimeClock": "own app DB clock_timestamp; JDBC runtime, no application migration",
+      "workingCandidate": {
+        "task": "BL-R04d",
+        "state": "DONE",
+        "scope": "Canonical admission/distributed auth barrier/reauth owned-lab candidate only; no learner business/lifecycle journal/production qualification",
+        "checkpoint": "docs/features/f10-identity-access/sessions/tasks/BL-R04d.md",
+        "artifactQualification": "R04d owned-lab AC01-07 qualified by full21 run6ad9c54d and closing owner/helper/guard/smoke/dependency/source/secret evidence in task checkpoint. Original manifest retained before metadata-only DONE transition; qualifiedDeliveryCandidate preserves R02c history. Java mutation probe is not learner work/draft/T1/T2/reset commit or production qualification.",
+        "qualifiedCanonicalRuntime": {
+          "runId": "6ad9c54d-73f0-45d8-ac90-8abf09e4307b",
+          "artifactSha256": "6fb2e282256d68dcc39296a1f8c3f953595a0700da7a175ca4353eb09433964d",
+          "audit": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/runtime-review.json",
+          "qualifiedInputManifest": "artifacts/quality/R04d/6ad9c54d-73f0-45d8-ac90-8abf09e4307b/qualified-input-dependencies.json"
+        }
+      },
+      "qualifiedDeliveryCandidate": {
+        "task": "BL-R02c",
+        "state": "DONE",
+        "scope": "Own durable delivery foundation/FX04 only; no canonical coordinator/publication/lifecycle/production restore qualification",
+        "checkpoint": "docs/platform/delivery/tasks/BL-R02c.md",
+        "artifactQualification": "Current-source DB/contract/full relay and actual DATA selectors qualified; each retained ZIP has its own SHA, all uncompressed entries match this smoke-checked candidate. Own foundation lab only, not canonical coordinator/publication/production restore.",
+        "artifactSha256": "d5d1a5729e0566a5b63cfac2f99cf80c0c0af8ea94a645663371e1b1c5b56af9",
+        "dependencyTreeSha256": "57ba6ee2866c02c7c0b279d6c9cfd5a51b005916e49217266736c83c684f0455",
+        "dependenciesByScope": {
+          "compile": 40,
+          "runtime": 1,
+          "test": 31
+        },
+        "packagedRuntimeLibraries": 36,
+        "dependencyTree": "artifacts/quality/R02c/learning-dependency-tree.json",
+        "dbEvidence": "artifacts/quality/R02c/da5f5e37-e709-4bc1-aaed-128d8ef5405f",
+        "contractEvidence": "artifacts/quality/R02c/44ba63ce-7e16-4d11-899a-503b63979c93",
+        "relayEvidence": "artifacts/quality/R02c/54268805-e8d7-450c-bf71-0006a4b18f25",
+        "selectedEvidence": {
+          "DATA-12": "artifacts/quality/R02c/4a25c223-2e21-49bc-99eb-fcff37045328",
+          "DATA-15": "artifacts/quality/R02c/40d490ba-2598-4661-a04a-55e9257e0a5a"
+        },
+        "bootstrapSmokeEvidence": "artifacts/quality/R02c/artifact-learning/artifact-smoke.json",
+        "closingAudit": "artifacts/quality/R02c/delivery-review.json",
+        "qualifiedBaseline": "Prior credential/session/receiver/transport fields retain scoped historical candidates; their hashes are not current delivery qualification."
+      },
+      "qualifiedReceiverCandidate": {
+        "task": "BL-R04c",
+        "state": "DONE",
+        "scope": "Learning own admission/fence receiver and local SQL mutation hook with controlled mTLS provider fixture; not canonical Identity, draft/T1/T2, global completion, production or release qualification",
+        "artifactSha256": "900944d2cd44bb3f7f5ad5c582b98a9474d47e7699814b96932bc34e424dad11",
+        "dependencyAndEvidenceAudit": "artifacts/quality/R04c/receiver-review.json",
+        "dependencyAndEvidenceAuditSha256": "02971d71d0d3c7ad6b8c57f9a4d9d48b49ae72db32b45de8e81b9c6c465e3be5",
+        "dependencyTree": "artifacts/quality/R04c/learning-dependency-tree.json",
+        "dependencyTreeSha256": "57ba6ee2866c02c7c0b279d6c9cfd5a51b005916e49217266736c83c684f0455",
+        "dependenciesByScope": { "compile": 40, "runtime": 1, "test": 31 },
+        "packagedRuntimeLibraries": 36,
+        "dbEvidence": "artifacts/quality/R04c/4c6a9482-0b29-47df-8e6e-6dda04d08977",
+        "transportAndReceiverEvidence": "artifacts/quality/R04c/860ad024-bd26-414a-bcd1-32fd9181c90d",
+        "faultEvidence": {
+          "SEC-01": "artifacts/quality/R04c/83368544-2e6f-4ce5-affe-8d01b8329659",
+          "SEC-02": "artifacts/quality/R04c/26f90338-12ba-4c40-9571-f8871faebe6c",
+          "SEC-03": "artifacts/quality/R04c/7292a97f-5cbc-46ee-bb75-fa81807b6d26",
+          "SEC-04": "artifacts/quality/R04c/32ff086e-0b52-4875-8724-a5a8b25ad147",
+          "SEC-05": "artifacts/quality/R04c/36a9a508-ecd1-4f69-877b-97395265ac3b",
+          "SEC-09": "artifacts/quality/R04c/44cad06f-dc9c-4766-a939-c10519bef4cf",
+          "SEC-15": "artifacts/quality/R04c/97214e5d-b44b-4d61-bba5-eb0980ad658b"
+        },
+        "bootstrapSmokeEvidence": "artifacts/quality/R04c/artifact-learning/artifact-smoke.json",
+        "qualifiedBaseline": "Existing R02b Learning fields retain historical foundation evidence; this R04c candidate is scoped separately and does not overwrite them."
+      },
+      "qualifiedPublicationCandidate": {
+        "task": "BL-R06b",
+        "state": "DONE",
+        "scope": "Learning verified INT-03 bundle replica, durable INT-04 participant receipts/state machine and local shared/exclusive publication gate in owned lab; no Content canonical coordinator/commit, learner T1/T2/progress or production qualification",
+        "checkpoint": "docs/features/f08-content/tasks/BL-R06b.md",
+        "artifactSha256": "0b20da2aede323f84f9022a434436964b529e471f2b1737462bde84983dad177",
+        "dbEvidence": "artifacts/quality/R06b/886033e9-7055-4fb5-ae7d-4bb34001f7d4",
+        "contractEvidence": "artifacts/quality/R06b/c16a06a4-fc03-4790-8080-aee2d71959a7",
+        "selectedEvidence": {
+          "DATA-02": "artifacts/quality/R06b/86764821-2f33-40a3-964b-58e33ba3ba62",
+          "DATA-01": "artifacts/quality/R06b/4c1ff853-6ea9-4edf-bebd-64df6e5d4d01",
+          "SEC-16": "artifacts/quality/R06b/1c8a4c20-436e-42c4-8b28-a65370ee9568"
+        },
+        "helperEvidence": "artifacts/quality/R06b/helper-publication-tests.json",
+        "requiredSkips": 0,
+        "qualifiedBaseline": "R06b is DONE only for the Learning-owned verified replica, INT-04 participant and local publication gate lab scope recorded in the task checkpoint. The post-acceptance registry/task/F08/release-pointer transition is an expected metadata-only input delta; it does not start R06c or qualify cross-service canonical publication."
+      }
+    }
+  }
+}

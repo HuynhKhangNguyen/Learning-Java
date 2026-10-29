@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:backend-lab:error:1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "code",
+    "traceId",
+    "messageKey"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "code": {
+      "type": "string"
+    },
+    "traceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "messageKey": {
+      "type": "string"
+    },
+    "operationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "retryAfterSeconds": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "fieldErrors": {
+      "type": "array"
+    }
+  },
+  "additionalProperties": false
+}

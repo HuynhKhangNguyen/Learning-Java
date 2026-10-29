@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "action": "ADMISSION_TRANSPORT",
+  "audience": "identity",
+  "nonce": "83e52102-3236-4ca9-bdfd-01e0b3d18cfa",
+  "expectedRevision": "9007199254740993",
+  "issuedAt": "2026-10-02T00:00:00.123Z",
+  "validUntil": "2026-10-02T00:00:15.123Z",
+  "requestBinding": "cfbcf23dbc7a341b7d0029c32aa2d69331556386647350583e43e2751907df45"
+}

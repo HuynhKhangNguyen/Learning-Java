@@ -1,0 +1,93 @@
+[
+  {
+    "pair": "body light",
+    "foreground": "#192e36",
+    "background": "#ffffff",
+    "ratio": 14.14,
+    "normalText45": true
+  },
+  {
+    "pair": "muted light",
+    "foreground": "#53666d",
+    "background": "#f4f5f1",
+    "ratio": 5.5,
+    "normalText45": true
+  },
+  {
+    "pair": "teal CTA light",
+    "foreground": "#ffffff",
+    "background": "#11675a",
+    "ratio": 6.75,
+    "normalText45": true
+  },
+  {
+    "pair": "error light",
+    "foreground": "#a93225",
+    "background": "#fff0eb",
+    "ratio": 5.97,
+    "normalText45": true
+  },
+  {
+    "pair": "warning light",
+    "foreground": "#79540d",
+    "background": "#fff6da",
+    "ratio": 6.3,
+    "normalText45": true
+  },
+  {
+    "pair": "body dark",
+    "foreground": "#e8f0ef",
+    "background": "#1c272d",
+    "ratio": 13.17,
+    "normalText45": true
+  },
+  {
+    "pair": "muted dark",
+    "foreground": "#b1c0c6",
+    "background": "#293a3e",
+    "ratio": 6.34,
+    "normalText45": true
+  },
+  {
+    "pair": "teal CTA dark",
+    "foreground": "#102d26",
+    "background": "#8dd5c0",
+    "ratio": 8.71,
+    "normalText45": true
+  },
+  {
+    "pair": "error dark",
+    "foreground": "#ffb7ab",
+    "background": "#442e2c",
+    "ratio": 7.54,
+    "normalText45": true
+  },
+  {
+    "pair": "warning dark",
+    "foreground": "#ecd293",
+    "background": "#3e3929",
+    "ratio": 7.8,
+    "normalText45": true
+  },
+  {
+    "pair": "code",
+    "foreground": "#e3eee9",
+    "background": "#16262e",
+    "ratio": 13.08,
+    "normalText45": true
+  },
+  {
+    "pair": "blue CTA light",
+    "foreground": "#ffffff",
+    "background": "#315b9b",
+    "ratio": 6.77,
+    "normalText45": true
+  },
+  {
+    "pair": "blue CTA dark",
+    "foreground": "#162d4a",
+    "background": "#a8c7ff",
+    "ratio": 8.14,
+    "normalText45": true
+  }
+]

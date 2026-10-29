@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "scope": "Disposable R02a PostgreSQL lab; no production credentials or service API",
+  "services": {
+    "identity": { "database": "identity_db", "schema": "identity", "owner": "identity_owner", "migrator": "identity_migrator", "app": "identity_app" },
+    "content": { "database": "content_db", "schema": "content", "owner": "content_owner", "migrator": "content_migrator", "app": "content_app" },
+    "learning": { "database": "learning_db", "schema": "learning", "owner": "learning_owner", "migrator": "learning_migrator", "app": "learning_app" }
+  }
+}

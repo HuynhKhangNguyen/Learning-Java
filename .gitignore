@@ -1,0 +1,22 @@
+node_modules/
+dist/
+.npm-cache/
+.vite/
+*.tsbuildinfo
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+# Portable toolchains, Maven cache and generated quality evidence.
+.tools/
+artifacts/quality/
+backend/**/target/
+# JVM fatal-error diagnostics and replay data are machine/runtime-specific.
+backend/hs_err_pid*.log
+backend/replay_pid*.log
+# Python harness output; keep .py sources in the repository.
+__pycache__/
+*.py[cod]

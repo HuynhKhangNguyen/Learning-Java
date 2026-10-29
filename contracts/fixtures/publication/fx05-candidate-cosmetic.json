@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "operationId": "10000000-0000-4000-8000-000000000001",
+  "parentRevision": 1,
+  "targetRevision": 2,
+  "bundle": {"id": "fx05-p2", "sha256": "b7726cb64e6ec295d72e3d04a9ab7a78d32d00b95cbd16796b572434fee9497b"},
+  "components": [
+    {"id": "UNIT-CATALOG-FIXTURE", "type": "content", "version": "2", "sha256": "1111111111111111111111111111111111111111111111111111111111111111"},
+    {"id": "CAP-COL-002-A", "type": "rubric", "version": "2", "sha256": "2222222222222222222222222222222222222222222222222222222222222222"},
+    {"id": "CASE-CATALOG-FIXTURE", "type": "case", "version": "2", "sha256": "b7726cb64e6ec295d72e3d04a9ab7a78d32d00b95cbd16796b572434fee9497b"}
+  ],
+  "references": [{"from": "UNIT-CATALOG-FIXTURE", "to": "CAP-COL-002-A", "expectedType": "rubric"}],
+  "prerequisiteEdges": [{"from": "UNIT-CATALOG-FIXTURE", "to": "CAP-COL-002-A"}],
+  "coverage": {"reportId": "coverage-fx05", "subjectVersion": 1, "subjectSha256": "bea8ba092db09044d97e656bda1f8c7fa7f13bc24f2b74458cc22f6abebf37b5", "status": "PASSED"},
+  "review": {"reportId": "review-fx05", "subjectVersion": 1, "subjectSha256": "bea8ba092db09044d97e656bda1f8c7fa7f13bc24f2b74458cc22f6abebf37b5", "status": "APPROVED"},
+  "impacts": [{"capabilityId": "CAP-COL-002-A", "classification": "COSMETIC", "affectedVersions": ["1"]}],
+  "oldVersions": [{"capabilityId": "CAP-COL-002-A", "version": "1", "newAttemptAllowed": true, "submitAllowed": true, "finalizeAllowed": true, "currentEvidencePolicy": "RETAIN", "bodyAvailable": true, "reason": "Typographic correction only"}]
+}

@@ -1,0 +1,58 @@
+.http-lesson { display: grid; gap: 22px; min-width: 0; }
+.http-lesson .button { display: block; }
+.http-lesson .tag { flex-direction: column; align-items: flex-start; }
+.lesson-body > section { padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+.lesson-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.lesson-tabs [aria-current] { background: var(--accent-soft); border-color: var(--accent); }
+.lesson-body { line-height: 1.85; }
+.lesson-body h3 { margin-top: 12px; }
+.lesson-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+.lesson-body pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 20px; background: var(--soft); border-radius: 12px; font-size: 13px; }
+.lesson-flow { margin: 8px 0; overflow-x: auto; }
+.lesson-flow svg { width: 100%; height: auto; min-width: 590px; }
+.lesson-flow figcaption { font-size: 13px; color: var(--muted); }
+.lesson-body table { width: 100%; border-collapse: collapse; }
+.lesson-body td,.lesson-body th { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+.lesson-body fieldset { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: 12px; }
+.lesson-option { display: flex; align-items: baseline; gap: 12px; padding: 9px; cursor: pointer; }
+.lesson-feedback { padding: 18px; border-left: 3px solid var(--accent); background: var(--soft); border-radius: 6px; }
+.lesson-body select { max-width: 100%; padding: 10px; background: var(--surface); color: var(--text); }
+@media(max-width: 650px) { .lesson-columns { grid-template-columns: 1fr; } .lesson-body fieldset { padding: 12px; } }
+
+/* Khối nội dung dùng lại; màu theo theme hiện có, không phụ thuộc thứ tự bài. */
+.lesson-hero { padding: clamp(24px,4vw,48px); border-radius: 24px; background: var(--accent-soft); border: 1px solid var(--border); }
+.lesson-hero h1 { max-width: 920px; }
+.reader-layout { display: grid; grid-template-columns: 215px minmax(0,1fr); gap: 24px; align-items: start; }
+.reader-outline { position: sticky; top: 16px; display: grid; gap: 8px; }
+.reader-outline .button { display: flex; align-items: flex-start; text-align: left; gap: 12px; width: 100%; }
+.reader-outline [aria-current] { background: var(--accent-soft); border-color: var(--accent); }
+.section-number { color: var(--accent); font-family: var(--font-mono); }
+.reader-main { min-width: 0; display: grid; gap: 24px; }
+.standard-lesson .lesson-body { gap: 30px; grid-template-columns: minmax(0,1fr); }
+/* Cho grid item co nhỏ hơn bảng bên trong; bảng chỉ cuộn trong vùng riêng trên mobile. */
+.standard-lesson .lesson-body > * { min-width: 0; }
+.standard-lesson .lesson-body > section { padding-bottom: 28px; }
+.standard-lesson h4 { font-size: 14px; margin: 12px 0 0; }
+.learning-goals { padding: 20px; background: var(--soft); border-radius: 14px; }
+.learning-goals li { margin-block: 12px; }
+.exchange-figure { margin: 0; padding: 22px; border-radius: 20px; background: var(--accent-soft); }
+.exchange-nodes { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; margin: 20px 0; }
+.exchange-node { border-radius: 16px; padding: 18px; background: var(--surface); text-align: center; }
+.exchange-node svg { width: 120px; max-width: 100%; height: 80px; display: block; margin: auto; fill: var(--accent-soft); stroke: var(--accent); stroke-width: 3; }
+.exchange-arrow { margin: 10px 0; padding: 12px; border-left: 4px solid var(--accent); background: var(--surface); }
+.response-arrow { border-left: 0; border-right: 4px solid var(--accent); text-align: right; }
+.exchange-figure figcaption { margin-top: 18px; font-size: 13px; }
+.message-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; padding: 14px; border-bottom: 1px solid var(--border); align-items: center; }
+.annotated-message { border: 1px solid var(--border); border-radius: 15px; margin-top: 16px; overflow: hidden; }
+.message-row pre { margin: 0; padding: 12px; }
+.message-row p { font-size: 14px; }
+.method-example { border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+.method-badge { display: inline-block; font: 700 16px var(--font-mono); color: var(--accent); background: var(--accent-soft); border-radius: 8px; padding: 6px 14px; }
+.before-after { display: grid; grid-template-columns: minmax(0,1fr) 20px minmax(0,1fr); gap: 12px; align-items: center; }
+.lesson-table-scroll { overflow-x: auto; margin-top: 14px; }
+.lesson-table-scroll table { min-width: 420px; }
+.lesson-table-scroll caption { text-align: left; padding-bottom: 12px; }
+.inline-check { background: var(--soft); }
+.standard-lesson :where(p,li,td,th,legend) { overflow-wrap: anywhere; }
+@media(max-width: 1050px) { .reader-layout { grid-template-columns: 1fr; } .reader-outline { position: static; grid-template-columns: repeat(2,minmax(0,1fr)); } .reader-outline > p { grid-column: 1/-1; } }
+@media(max-width: 650px) { .message-row,.before-after { grid-template-columns: 1fr; } .before-after > span { transform: rotate(90deg); justify-self: center; } .method-example { padding: 15px; } .exchange-figure { padding: 16px; } .exchange-nodes { gap: 10px; } .exchange-node { padding: 10px; } .reader-outline { grid-template-columns: 1fr; } }

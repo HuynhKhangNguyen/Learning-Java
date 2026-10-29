@@ -1,0 +1,22 @@
+package lab.backend.learning.contentreplica;
+
+import java.net.URI;
+import java.net.http.*;
+import java.io.ByteArrayOutputStream;
+import java.time.Duration;
+import java.util.List;
+import lab.backend.learning.transport.TransportPeerClient;
+import lab.backend.learning.transport.TransportSettings;
+
+/** Fixed INT-03 client with no redirects and exact bounded body/header verification. */
+public final class ContentBundleClient implements AutoCloseable {
+  private final HttpClient client;private final String base;
+  public ContentBundleClient(TransportSettings settings)throws Exception{var ssl=new javax.net.ssl.SSLParameters();ssl.setEndpointIdentificationAlgorithm("HTTPS");ssl.setProtocols(new String[]{"TLSv1.3","TLSv1.2"});client=HttpClient.newBuilder().sslContext(TransportPeerClient.tls(settings,settings.keyStore(),"content")).sslParameters(ssl).connectTimeout(Duration.ofSeconds(1)).followRedirects(HttpClient.Redirect.NEVER).build();base="https://127.0.0.1:"+settings.peerPrivatePort("content")+"/internal/v1/content-bundles/";}
+  ContentBundleClient(HttpClient client,String base){this.client=client;this.base=base.endsWith("/")?base:base+"/";}
+  public ReplicaValidator.Verified pull(PublicationWire.Command command)throws Exception{Response bundle=get(base+command.bundleId(),1_048_576,"application/octet-stream");String manifestPath="/internal/v1/content-bundles/"+command.bundleId()+"/manifest";int manifestLength=decimal(single(bundle,"X-Content-Manifest-Length"),262_144);if(!"1".equals(single(bundle,"X-Content-Contract-Version"))||!Long.toString(command.targetRevision()).equals(single(bundle,"X-Content-Revision"))||!("sha-256="+command.bundleSha256()).equals(single(bundle,"Digest"))||!("sha-256="+command.manifestSha256()).equals(single(bundle,"X-Content-Manifest-Digest"))||!("<"+manifestPath+">; rel=\"manifest\"; type=\"application/json\"").equals(single(bundle,"Link")))throw new IllegalArgumentException("INT03_HEADER_INVALID");Response manifest=get(base+command.bundleId()+"/manifest",262_144,"application/json");if(!"1".equals(single(manifest,"X-Content-Contract-Version"))||!Long.toString(command.targetRevision()).equals(single(manifest,"X-Content-Revision"))||!("sha-256="+command.manifestSha256()).equals(single(manifest,"Digest"))||!("sha-256="+command.bundleSha256()).equals(single(manifest,"X-Content-Bundle-Digest"))||manifestLength!=manifest.bytes().length)throw new IllegalArgumentException("INT03_HEADER_INVALID");return new ReplicaValidator().verify(bundle.bytes(),manifest.bytes(),command.bundleSha256(),command.manifestSha256());}
+  private Response get(String target,int max,String mediaType)throws Exception{var output=new ByteArrayOutputStream(Math.min(max,8192));HttpResponse.BodyHandler<Void> bounded=info->{long declared=info.headers().firstValueAsLong("Content-Length").orElse(-1);if(declared>max)throw new IllegalArgumentException("INT03_RESPONSE_TOO_LARGE");return HttpResponse.BodySubscribers.ofByteArrayConsumer(part->{if(part.isPresent()){byte[] chunk=part.get();if(output.size()+chunk.length>max)throw new IllegalArgumentException("INT03_RESPONSE_TOO_LARGE");output.writeBytes(chunk);}});};var response=client.send(HttpRequest.newBuilder(URI.create(target)).timeout(Duration.ofSeconds(2)).GET().build(),bounded);byte[] bytes=output.toByteArray();Response result=new Response(response,bytes);String actual=single(result,"Content-Type").toLowerCase(java.util.Locale.ROOT);if(response.statusCode()!=200||bytes.length<1||bytes.length>max||!"no-store".equalsIgnoreCase(single(result,"Cache-Control"))||response.headers().firstValueAsLong("Content-Length").orElse(-1)!=bytes.length||!actual.matches(java.util.regex.Pattern.quote(mediaType)+"(?:; ?charset=utf-8)?")||!response.headers().allValues("Set-Cookie").isEmpty()||response.headers().firstValue("Location").isPresent())throw new IllegalArgumentException("INT03_RESPONSE_INVALID");return result;}
+  private static String single(Response response,String name){List<String> values=response.response().headers().allValues(name);if(values.size()!=1||values.get(0).isBlank())throw new IllegalArgumentException("INT03_HEADER_INVALID");return values.get(0);}
+  private static int decimal(String value,int max){if(!value.matches("[1-9][0-9]{0,6}"))throw new IllegalArgumentException("INT03_HEADER_INVALID");long parsed=Long.parseLong(value);if(parsed>max)throw new IllegalArgumentException("INT03_HEADER_INVALID");return (int)parsed;}
+  public void close(){client.shutdownNow();}
+  private record Response(HttpResponse<?> response,byte[] bytes){}
+}

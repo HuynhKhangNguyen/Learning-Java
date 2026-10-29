@@ -1,0 +1,3696 @@
+{
+  "schemaVersion": 2,
+  "catalogVersion": 2,
+  "topics": [
+    {
+      "id": "TOP-ENV-001",
+      "title": "JDK/JVM, IDE và chạy Java",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01",
+        "K06"
+      ],
+      "prerequisites": [],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-ENV-002",
+      "title": "File/path, terminal, process/port/env",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01"
+      ],
+      "prerequisites": [],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-ENV-003",
+      "title": "Git và thay đổi có thể xem lại",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-ENV-004",
+      "title": "Project, build và dependency đủ dùng",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-001",
+      "title": "Kiểu, biến, toán tử và chuyển kiểu",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-001-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-002",
+      "title": "Điều khiển luồng, method và scope",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-001"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-003",
+      "title": "Array và String",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-002"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-004",
+      "title": "Reference, null và truyền tham số",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K06"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-003"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-005",
+      "title": "Class/object và đóng gói trạng thái",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K07"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-004"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-006",
+      "title": "Interface, composition và đa hình cơ bản",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K07"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-005"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-007",
+      "title": "Input validation và exception",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-003"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-008",
+      "title": "Debugger và tái hiện lỗi",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03",
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-002"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-009",
+      "title": "Unit test một method",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-002"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-004-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-JAVA-010",
+      "title": "Equality, hashCode và mutability",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-005"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-001",
+      "title": "Generics và đọc collection API",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-006"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-002",
+      "title": "List: phần tử, vị trí và thứ tự",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-003"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-003",
+      "title": "Set: duy nhất và equality",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-010"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-004",
+      "title": "Map: khóa, giá trị và tra cứu",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-010"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-005",
+      "title": "Duyệt, sửa, sắp xếp và tính bất biến",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-004"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-006",
+      "title": "Chọn cấu trúc, tìm/nhóm/đếm và Big O",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K05"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-004"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-COL-007",
+      "title": "Quy tắc task và tách giao diện CLI",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K07",
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-009"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-001",
+      "title": "Đọc/ghi file và quản lý resource",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-002",
+      "title": "JSON và chuyển đổi dữ liệu có kiểm soát",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K08"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-004-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-003",
+      "title": "Storage interface và adapter file",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K07"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-FILE-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-FILE-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-007"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-004",
+      "title": "Kiểm thử hồi quy và cô lập dữ liệu test",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-009"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-FILE-003"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-005",
+      "title": "Logging có ngữ cảnh, không lộ dữ liệu",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-004-A"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-006",
+      "title": "Date/time và biểu diễn thời gian",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K04",
+        "K07"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-FILE-007",
+      "title": "Lambda, Stream và Optional đủ dùng",
+      "status": "planned",
+      "level": "M",
+      "knowledgeAreas": [
+        "K04"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-COL-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-006"
+        }
+      ],
+      "source": "docs/curriculum/core-foundations.md"
+    },
+    {
+      "id": "TOP-HTTP-001",
+      "title": "Client/server và đường đi của request",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-B"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-HTTP-002",
+      "title": "HTTP request/response và semantics",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K08"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-001"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-HTTP-003",
+      "title": "Resource, JSON và contract API",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K08"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-FILE-002"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-HTTP-004",
+      "title": "Browser, cookie, origin và trust boundary",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-002"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-HTTP-005",
+      "title": "Validation/error, phân trang và API docs",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K08"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-002"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-001",
+      "title": "Phân loại database và làm quen một RDBMS",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-002",
+      "title": "Schema, kiểu dữ liệu và ràng buộc",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-001"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-003",
+      "title": "SQL CRUD, điều kiện và NULL",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-002"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-004",
+      "title": "JOIN, tổng hợp và subquery",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-003"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-005",
+      "title": "Transaction, isolation và cập nhật đồng thời",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-003"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-006",
+      "title": "Index, execution plan và chi phí truy vấn",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-004"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SQL-007",
+      "title": "Quyền DB và backup/restore trong lab",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-003"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-001",
+      "title": "Dependency injection và cấu hình thành phần",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K07",
+        "K09"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-004"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-002",
+      "title": "Boot, cấu hình và request lifecycle",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03",
+        "K09"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-002"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-B"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-003",
+      "title": "MVC, DTO và lớp nghiệp vụ",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K07",
+        "K08",
+        "K09"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-007"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-004",
+      "title": "Validation, lỗi và contract có thể gọi lại",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K08",
+        "K09"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-005"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-005",
+      "title": "Shared state và repository trong bộ nhớ",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K06",
+        "K09"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-COL-004"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-006",
+      "title": "Kiểm thử API và nghiệp vụ",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-009"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SPR-007",
+      "title": "Cấu hình an toàn và log request",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03",
+        "K09",
+        "K16",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-FILE-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-004"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-001",
+      "title": "JDBC, prepared statement và connection",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K11",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-JAVA-007"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-002",
+      "title": "Migration và môi trường dữ liệu riêng",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10",
+        "K11"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-002"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-003",
+      "title": "JPA/Hibernate/Spring Data và mapping",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K09",
+        "K11"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-004"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-004",
+      "title": "Fetch, N+1 và phân trang dữ liệu",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K11"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-006"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-005",
+      "title": "Transaction boundary và rollback ứng dụng",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K09",
+        "K10",
+        "K11"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-005"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-006",
+      "title": "Xung đột cập nhật và optimistic locking",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K06",
+        "K11"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-005"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-DATA-007",
+      "title": "Integration test API–DB và khôi phục trạng thái",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K11",
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-006"
+        }
+      ],
+      "source": "docs/curriculum/core-api-data.md"
+    },
+    {
+      "id": "TOP-SEC-001",
+      "title": "Trust boundary và rủi ro input",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K08",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-004"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-002",
+      "title": "Tài khoản và password hash",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K07",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-003"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-003",
+      "title": "Spring Security và session đăng nhập",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K09",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-002"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-004",
+      "title": "Quyền tài nguyên và ownership",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K07",
+        "K09",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-004"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-005",
+      "title": "Cookie, CSRF và CORS theo client",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-004"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-006",
+      "title": "Secrets, hash, mã hóa và log an toàn",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K16",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-001"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-SQL-007-A"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-007",
+      "title": "Abuse, rate limit và xử lý lỗi an toàn",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K08",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-004"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-SEC-008",
+      "title": "Security test và kiểm tra vượt quyền",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K16",
+        "K17"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SPR-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-DATA-007"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-001",
+      "title": "Image/container và khác biệt với VM",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01",
+        "K18"
+      ],
+      "prerequisites": [
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-B"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-002",
+      "title": "Dockerfile, build context và image",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K18"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-001"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-004-A"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-003",
+      "title": "Lifecycle, logs và chẩn đoán container",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K18",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-001"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-B"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-004",
+      "title": "Port, network và service name",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K18"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-001"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-005",
+      "title": "Bind mount, volume và dữ liệu bền vững",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K18"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-003"
+        },
+        {
+          "kind": "competency",
+          "id": "CAP-ENV-002-A"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-006",
+      "title": "Compose: app và database",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K18",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-009"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-007",
+      "title": "Health, readiness và shutdown",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K18",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-006"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-CTR-008",
+      "title": "Cấu hình runtime, non-root và giới hạn tài nguyên",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K16",
+        "K18",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-006"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-001",
+      "title": "CI, artifact và release có dấu vết",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03",
+        "K17",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-006"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-002",
+      "title": "Environment, secret, domain và TLS",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K16",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-008"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-NET-002"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-003",
+      "title": "Triển khai và kiểm tra sau phát hành",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-009"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-004",
+      "title": "Migration tương thích và rollback ứng dụng",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-009"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-005",
+      "title": "Log, metrics, trace cơ bản và health",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-009"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-007"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-006",
+      "title": "Alert, sự cố và runbook",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K20",
+        "K21"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-005"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-007",
+      "title": "Backup drill và restore DB",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10",
+        "K20"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-004"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-OPS-008",
+      "title": "Smoke test, tải nhỏ và giới hạn hệ thống",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K17",
+        "K20",
+        "K21"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-009"
+        }
+      ],
+      "source": "docs/curriculum/core-security-operations.md"
+    },
+    {
+      "id": "TOP-ENV-005",
+      "title": "Linux user, permission, package và service",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-002"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-ENV-006",
+      "title": "Shell script có xử lý lỗi",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01",
+        "K03"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-003"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-ENV-007",
+      "title": "Git cộng tác và review thay đổi",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K03"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-003"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-NET-001",
+      "title": "IP, subnet, routing và transport",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-NET-002",
+      "title": "Proxy, firewall và chẩn đoán DNS/TLS",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K02",
+        "K16"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-NET-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-002"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-SEC-009",
+      "title": "IAM và danh tính workload",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K16",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-SEC-010",
+      "title": "Supply chain và kiểm soát artifact",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K16",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-006"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-CLD-001",
+      "title": "Cloud resource và mô hình triển khai",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K19",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-NET-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-009"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-CLD-002",
+      "title": "Chi phí, inventory và vòng đời resource",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K20",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CLD-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-IAC-001",
+      "title": "Resource, state và plan/apply",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CLD-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-007"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-IAC-002",
+      "title": "Module, drift và thay đổi hạ tầng",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-IAC-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-IAC-003",
+      "title": "Configuration management cho host",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K01",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CLD-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-OPS-009",
+      "title": "Hợp đồng vận hành app và dữ liệu mẫu",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K10",
+        "K17",
+        "K19"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-HTTP-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SQL-003"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-OPS-010",
+      "title": "SLI/SLO và capacity có số đo",
+      "status": "planned",
+      "level": "C",
+      "knowledgeAreas": [
+        "K20",
+        "K21"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-005"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-008"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-KUB-001",
+      "title": "Cluster, workload và scheduling",
+      "status": "planned",
+      "level": "M",
+      "knowledgeAreas": [
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-008"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-NET-001"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-KUB-002",
+      "title": "Service, ingress, config và storage",
+      "status": "planned",
+      "level": "M",
+      "knowledgeAreas": [
+        "K18",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-KUB-001"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-NET-002"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    },
+    {
+      "id": "TOP-KUB-003",
+      "title": "Rollout, scale và chẩn đoán cluster",
+      "status": "planned",
+      "level": "M",
+      "knowledgeAreas": [
+        "K20",
+        "K22"
+      ],
+      "prerequisites": [
+        {
+          "kind": "topic",
+          "id": "TOP-KUB-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-005"
+        }
+      ],
+      "source": "docs/curriculum/devops-catalog.md"
+    }
+  ],
+  "competencies": [
+    {
+      "id": "CAP-ENV-001-A",
+      "topicId": "TOP-ENV-001",
+      "description": "Chạy một chương trình mẫu từ IDE và terminal, xác định source/bytecode/runtime ở mức luồng"
+    },
+    {
+      "id": "CAP-ENV-001-B",
+      "topicId": "TOP-ENV-001",
+      "description": "Phân biệt lỗi compile và runtime qua output; xác định phiên bản Java đang dùng"
+    },
+    {
+      "id": "CAP-ENV-002-A",
+      "topicId": "TOP-ENV-002",
+      "description": "Xác định đúng file bằng path tương đối/tuyệt đối và encoding; thao tác trong thư mục lab"
+    },
+    {
+      "id": "CAP-ENV-002-B",
+      "topicId": "TOP-ENV-002",
+      "description": "Tìm process/port và đọc env của ví dụ; giải thích cấu hình đang tác động ở đâu mà không in secret"
+    },
+    {
+      "id": "CAP-ENV-003-A",
+      "topicId": "TOP-ENV-003",
+      "description": "Xem diff, tạo commit có nội dung rõ và đọc lịch sử thay đổi"
+    },
+    {
+      "id": "CAP-ENV-003-B",
+      "topicId": "TOP-ENV-003",
+      "description": "Phân biệt untracked/staged/committed; loại file build/secret khỏi phần định lưu"
+    },
+    {
+      "id": "CAP-ENV-004-A",
+      "topicId": "TOP-ENV-004",
+      "description": "Build/run/test project mẫu bằng một build tool và giải thích vai trò dependency"
+    },
+    {
+      "id": "CAP-ENV-004-B",
+      "topicId": "TOP-ENV-004",
+      "description": "Đọc lỗi dependency/config và làm lại thao tác từ hướng dẫn trên checkout/thư mục mẫu"
+    },
+    {
+      "id": "CAP-JAVA-001-A",
+      "topicId": "TOP-JAVA-001",
+      "description": "Chọn kiểu và tính kết quả biểu thức với input thông thường"
+    },
+    {
+      "id": "CAP-JAVA-001-B",
+      "topicId": "TOP-JAVA-001",
+      "description": "Nhận ra chuyển kiểu mất thông tin, phép chia nguyên và giá trị ngoài miền qua ca biên"
+    },
+    {
+      "id": "CAP-JAVA-002-A",
+      "topicId": "TOP-JAVA-002",
+      "description": "Viết method với tham số/kết quả và nhánh/vòng lặp đáp ứng yêu cầu nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-002-B",
+      "topicId": "TOP-JAVA-002",
+      "description": "Lần theo scope/control flow và sửa lỗi điều kiện dừng/off-by-one bằng ví dụ phản chứng"
+    },
+    {
+      "id": "CAP-JAVA-003-A",
+      "topicId": "TOP-JAVA-003",
+      "description": "Duyệt/tìm phần tử array và xử lý String trong yêu cầu nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-003-B",
+      "topicId": "TOP-JAVA-003",
+      "description": "Xử lý rỗng/index biên và phân biệt thao tác tạo String mới với thay đổi phần tử array"
+    },
+    {
+      "id": "CAP-JAVA-004-A",
+      "topicId": "TOP-JAVA-004",
+      "description": "Lần theo biến/reference khi gán và gọi method, giải thích truyền giá trị"
+    },
+    {
+      "id": "CAP-JAVA-004-B",
+      "topicId": "TOP-JAVA-004",
+      "description": "Phân biệt đổi reference với đổi object dùng chung; nhận biết null và tình huống dereference lỗi"
+    },
+    {
+      "id": "CAP-JAVA-005-A",
+      "topicId": "TOP-JAVA-005",
+      "description": "Tạo class/constructor, field/method, access modifier và invariant nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-005-B",
+      "topicId": "TOP-JAVA-005",
+      "description": "Phân biệt instance/static, final và tính bất biến; giải thích trạng thái thay đổi ở object nào"
+    },
+    {
+      "id": "CAP-JAVA-006-A",
+      "topicId": "TOP-JAVA-006",
+      "description": "Thay implementation qua interface và gọi đúng hành vi trong bài nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-006-B",
+      "topicId": "TOP-JAVA-006",
+      "description": "Chọn composition cho việc kết hợp trách nhiệm; giải thích override so với overload ở ví dụ có sẵn"
+    },
+    {
+      "id": "CAP-JAVA-007-A",
+      "topicId": "TOP-JAVA-007",
+      "description": "Phân biệt input không hợp lệ với lỗi xử lý, trả/báo lỗi theo contract nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-007-B",
+      "topicId": "TOP-JAVA-007",
+      "description": "Bắt hoặc truyền tiếp exception có chủ đích; không nuốt lỗi và không coi input rỗng/sai là thành công"
+    },
+    {
+      "id": "CAP-JAVA-008-A",
+      "topicId": "TOP-JAVA-008",
+      "description": "Tạo ca tái hiện ổn định và đặt breakpoint/step/watch để tìm vị trí sai"
+    },
+    {
+      "id": "CAP-JAVA-008-B",
+      "topicId": "TOP-JAVA-008",
+      "description": "Đối chiếu expected/actual và chứng minh cách sửa bằng chạy lại ca đã lỗi"
+    },
+    {
+      "id": "CAP-JAVA-009-A",
+      "topicId": "TOP-JAVA-009",
+      "description": "Viết test input/expected/actual cho một method, gồm ca đúng và biên"
+    },
+    {
+      "id": "CAP-JAVA-009-B",
+      "topicId": "TOP-JAVA-009",
+      "description": "Tạo một thay đổi sai khiến test fail rồi sửa; phân biệt lỗi test với lỗi logic"
+    },
+    {
+      "id": "CAP-JAVA-010-A",
+      "topicId": "TOP-JAVA-010",
+      "description": "Phân biệt identity và equality, giải thích hợp đồng equals/hashCode qua object nhỏ"
+    },
+    {
+      "id": "CAP-JAVA-010-B",
+      "topicId": "TOP-JAVA-010",
+      "description": "Nhận biết rủi ro thay đổi field dùng cho equality/hash và chọn biểu diễn khóa ổn định"
+    },
+    {
+      "id": "CAP-COL-001-A",
+      "topicId": "TOP-COL-001",
+      "description": "Đọc và dùng collection có type parameter, tránh raw type/cast không cần thiết"
+    },
+    {
+      "id": "CAP-COL-001-B",
+      "topicId": "TOP-COL-001",
+      "description": "Phân biệt kiểu interface và implementation trong khai báo/khởi tạo và đọc chữ ký thao tác đơn giản"
+    },
+    {
+      "id": "CAP-COL-002-A",
+      "topicId": "TOP-COL-002",
+      "description": "Thêm/đọc/sửa/xóa List, phân biệt vị trí và giá trị, giữ đúng phần tử trùng"
+    },
+    {
+      "id": "CAP-COL-002-B",
+      "topicId": "TOP-COL-002",
+      "description": "Chọn List cho yêu cầu thứ tự/vị trí và xử lý danh sách rỗng hoặc index không hợp lệ"
+    },
+    {
+      "id": "CAP-COL-003-A",
+      "topicId": "TOP-COL-003",
+      "description": "Loại phần tử trùng theo equality và giải thích vì sao chúng được coi là cùng phần tử"
+    },
+    {
+      "id": "CAP-COL-003-B",
+      "topicId": "TOP-COL-003",
+      "description": "Chọn Set có đặc tính thứ tự phù hợp; không suy mọi Set giữ thứ tự chèn"
+    },
+    {
+      "id": "CAP-COL-004-A",
+      "topicId": "TOP-COL-004",
+      "description": "Tra cứu/cập nhật theo khóa, phân biệt khóa không có và giá trị theo contract đã chọn"
+    },
+    {
+      "id": "CAP-COL-004-B",
+      "topicId": "TOP-COL-004",
+      "description": "Giải thích thay thế giá trị khi trùng khóa và giữ khóa ổn định, dùng String ID cho ví dụ đầu"
+    },
+    {
+      "id": "CAP-COL-005-A",
+      "topicId": "TOP-COL-005",
+      "description": "Duyệt/lọc/xóa an toàn theo cách hỗ trợ của collection; không dựa vào hành vi sửa khi đang duyệt không hợp lệ"
+    },
+    {
+      "id": "CAP-COL-005-B",
+      "topicId": "TOP-COL-005",
+      "description": "Sắp xếp bằng tiêu chí rõ và phân biệt collection sửa được, view chỉ đọc và bản sao độc lập"
+    },
+    {
+      "id": "CAP-COL-006-A",
+      "topicId": "TOP-COL-006",
+      "description": "Chọn List/Set/Map cho tra cứu/loại trùng/đếm/nhóm và giải thích trade-off"
+    },
+    {
+      "id": "CAP-COL-006-B",
+      "topicId": "TOP-COL-006",
+      "description": "So sánh chi phí khi input lớn lên; phân biệt Big O với thời gian đo thực tế và nêu giả định lookup"
+    },
+    {
+      "id": "CAP-COL-007-A",
+      "topicId": "TOP-COL-007",
+      "description": "Tách đọc lệnh/in kết quả khỏi thao tác task, mô hình ID/tiêu đề/trạng thái bằng class/enum"
+    },
+    {
+      "id": "CAP-COL-007-B",
+      "topicId": "TOP-COL-007",
+      "description": "Bảo vệ tiêu đề hợp lệ, ID duy nhất, chuyển trạng thái hợp lệ và task không tồn tại bằng unit test nhỏ"
+    },
+    {
+      "id": "CAP-FILE-001-A",
+      "topicId": "TOP-FILE-001",
+      "description": "Đọc/ghi text đúng path/encoding và đóng resource kể cả khi lỗi"
+    },
+    {
+      "id": "CAP-FILE-001-B",
+      "topicId": "TOP-FILE-001",
+      "description": "Phân biệt file thiếu, lỗi đọc/ghi và dữ liệu hỏng; chọn phản hồi rõ thay vì coi tất cả là danh sách rỗng"
+    },
+    {
+      "id": "CAP-FILE-002-A",
+      "topicId": "TOP-FILE-002",
+      "description": "Chuyển task sang JSON và ngược lại, kiểm tra trường/kiểu/giá trị cần thiết"
+    },
+    {
+      "id": "CAP-FILE-002-B",
+      "topicId": "TOP-FILE-002",
+      "description": "Từ chối hoặc xử lý có chủ đích dữ liệu thiếu/sai/không tương thích; không deserialize object tùy ý"
+    },
+    {
+      "id": "CAP-FILE-003-A",
+      "topicId": "TOP-FILE-003",
+      "description": "Thay lưu trong bộ nhớ bằng adapter file qua interface, giữ contract logic task"
+    },
+    {
+      "id": "CAP-FILE-003-B",
+      "topicId": "TOP-FILE-003",
+      "description": "Lưu rồi nạp lại giữ ID/trạng thái; lỗi load/save không âm thầm ghi đè bản dữ liệu đang tốt"
+    },
+    {
+      "id": "CAP-FILE-004-A",
+      "topicId": "TOP-FILE-004",
+      "description": "Tạo test roundtrip, file thiếu/hỏng và regression nghiệp vụ với dữ liệu test riêng"
+    },
+    {
+      "id": "CAP-FILE-004-B",
+      "topicId": "TOP-FILE-004",
+      "description": "Chạy test độc lập thứ tự, dọn file tạm trong vùng test và phân biệt unit với integration file"
+    },
+    {
+      "id": "CAP-FILE-005-A",
+      "topicId": "TOP-FILE-005",
+      "description": "Ghi log có operation/context/error đủ để lần theo lỗi trong CLI"
+    },
+    {
+      "id": "CAP-FILE-005-B",
+      "topicId": "TOP-FILE-005",
+      "description": "Loại secret/dữ liệu không cần thiết khỏi log; phân biệt log chẩn đoán với phản hồi người dùng"
+    },
+    {
+      "id": "CAP-FILE-006-A",
+      "topicId": "TOP-FILE-006",
+      "description": "Chọn cách biểu diễn ngày/giờ hoặc thời điểm theo yêu cầu và giải thích vai trò zone"
+    },
+    {
+      "id": "CAP-FILE-006-B",
+      "topicId": "TOP-FILE-006",
+      "description": "Parse/format theo format rõ, xử lý input thời gian sai và kiểm tra chuyển đổi zone ở ví dụ nhỏ"
+    },
+    {
+      "id": "CAP-FILE-007-A",
+      "topicId": "TOP-FILE-007",
+      "description": "Viết lại một thao tác lọc/nhóm bằng lambda/Stream và so với vòng lặp"
+    },
+    {
+      "id": "CAP-FILE-007-B",
+      "topicId": "TOP-FILE-007",
+      "description": "Dùng Optional để biểu diễn có/không theo contract; nhận ra side effect và lạm dụng chuỗi thao tác"
+    },
+    {
+      "id": "CAP-HTTP-001-A",
+      "topicId": "TOP-HTTP-001",
+      "description": "Lần theo tên miền, IP, kết nối và server xử lý trong một request; phân biệt vai trò DNS/TCP/TLS"
+    },
+    {
+      "id": "CAP-HTTP-001-B",
+      "topicId": "TOP-HTTP-001",
+      "description": "Phân biệt lỗi phân giải tên, kết nối/port và lỗi HTTP bằng dấu hiệu; không coi mọi lỗi là server 500"
+    },
+    {
+      "id": "CAP-HTTP-002-A",
+      "topicId": "TOP-HTTP-002",
+      "description": "Đọc/tạo request và giải thích method, path/query, header/body, status/response"
+    },
+    {
+      "id": "CAP-HTTP-002-B",
+      "topicId": "TOP-HTTP-002",
+      "description": "Chọn semantics phù hợp cho thao tác đọc/ghi và giải thích safe/idempotent trong tình huống lặp request"
+    },
+    {
+      "id": "CAP-HTTP-003-A",
+      "topicId": "TOP-HTTP-003",
+      "description": "Mô tả resource task và contract JSON cho thao tác, tách dữ liệu client với model nội bộ"
+    },
+    {
+      "id": "CAP-HTTP-003-B",
+      "topicId": "TOP-HTTP-003",
+      "description": "Xác định field cần/được phép, cách biểu diễn tài nguyên thiếu và thay đổi contract có thể làm hỏng client"
+    },
+    {
+      "id": "CAP-HTTP-004-A",
+      "topicId": "TOP-HTTP-004",
+      "description": "Theo dõi cookie và origin qua request/browser, phân biệt CORS với việc server kiểm tra quyền"
+    },
+    {
+      "id": "CAP-HTTP-004-B",
+      "topicId": "TOP-HTTP-004",
+      "description": "Vẽ trust boundary đơn giản; phân biệt xác thực, phân quyền và mã hóa đường truyền; nhận ra cần kiểm tra input phía server"
+    },
+    {
+      "id": "CAP-HTTP-005-A",
+      "topicId": "TOP-HTTP-005",
+      "description": "Thiết kế validation/error payload và status nhất quán cho input sai, tài nguyên thiếu và lỗi nội bộ"
+    },
+    {
+      "id": "CAP-HTTP-005-B",
+      "topicId": "TOP-HTTP-005",
+      "description": "Mô tả filter/sort/pagination có giới hạn và thứ tự ổn định; tạo contract/API docs và bộ request ví dụ"
+    },
+    {
+      "id": "CAP-SQL-001-A",
+      "topicId": "TOP-SQL-001",
+      "description": "Phân biệt mô hình quan hệ/document/key-value và lựa chọn theo yêu cầu task, không xếp product thành các loại loại trừ tuyệt đối"
+    },
+    {
+      "id": "CAP-SQL-001-B",
+      "topicId": "TOP-SQL-001",
+      "description": "Kết nối một RDBMS lab, xác định database/schema/table và tách dữ liệu lab khỏi dữ liệu cá nhân"
+    },
+    {
+      "id": "CAP-SQL-002-A",
+      "topicId": "TOP-SQL-002",
+      "description": "Thiết kế task/user có PK/FK/unique/not-null và kiểu phù hợp; giải thích quan hệ và normalization đủ dùng"
+    },
+    {
+      "id": "CAP-SQL-002-B",
+      "topicId": "TOP-SQL-002",
+      "description": "Chứng minh constraint từ chối dữ liệu sai; phân biệt ràng buộc DB với validation giao diện"
+    },
+    {
+      "id": "CAP-SQL-003-A",
+      "topicId": "TOP-SQL-003",
+      "description": "Viết CRUD/WHERE/ORDER/LIMIT với tập dữ liệu cho trước và chỉ đúng phạm vi sửa/xóa"
+    },
+    {
+      "id": "CAP-SQL-003-B",
+      "topicId": "TOP-SQL-003",
+      "description": "Xử lý NULL và điều kiện kết hợp bằng expected rows; phát hiện thao tác UPDATE/DELETE thiếu điều kiện trong lab"
+    },
+    {
+      "id": "CAP-SQL-004-A",
+      "topicId": "TOP-SQL-004",
+      "description": "Viết JOIN/GROUP/HAVING/subquery cho câu hỏi dữ liệu; giải thích khác biệt JOIN với nối tập kết quả"
+    },
+    {
+      "id": "CAP-SQL-004-B",
+      "topicId": "TOP-SQL-004",
+      "description": "Phát hiện dòng bị nhân/thiếu do quan hệ hoặc NULL; đối chiếu kết quả với dataset có edge case"
+    },
+    {
+      "id": "CAP-SQL-005-A",
+      "topicId": "TOP-SQL-005",
+      "description": "Nhóm thay đổi trong transaction và xác minh commit/rollback bằng trạng thái dữ liệu"
+    },
+    {
+      "id": "CAP-SQL-005-B",
+      "topicId": "TOP-SQL-005",
+      "description": "Quan sát hai phiên cập nhật và giải thích isolation/lock ở tình huống cụ thể, không hứa mọi mức isolation ngăn mọi anomaly"
+    },
+    {
+      "id": "CAP-SQL-006-A",
+      "topicId": "TOP-SQL-006",
+      "description": "Đọc execution plan cơ bản, chọn index cho một truy vấn và kiểm tra trước/sau trên dữ liệu xác định"
+    },
+    {
+      "id": "CAP-SQL-006-B",
+      "topicId": "TOP-SQL-006",
+      "description": "Giải thích chi phí ghi/dung lượng và giới hạn kết luận từ số đo; không thêm index mọi cột theo thói quen"
+    },
+    {
+      "id": "CAP-SQL-007-A",
+      "topicId": "TOP-SQL-007",
+      "description": "Dùng tài khoản lab với quyền cần thiết và phân biệt quyền ứng dụng với quyền quản trị"
+    },
+    {
+      "id": "CAP-SQL-007-B",
+      "topicId": "TOP-SQL-007",
+      "description": "Backup rồi restore vào nơi riêng, kiểm tra dữ liệu phục hồi thay vì chỉ thấy có file backup"
+    },
+    {
+      "id": "CAP-SPR-001-A",
+      "topicId": "TOP-SPR-001",
+      "description": "Tách dependency qua constructor/interface và lắp các thành phần bằng DI"
+    },
+    {
+      "id": "CAP-SPR-001-B",
+      "topicId": "TOP-SPR-001",
+      "description": "Giải thích thành phần nào do container quản lý, cách chọn implementation/config và lỗi thiếu dependency"
+    },
+    {
+      "id": "CAP-SPR-002-A",
+      "topicId": "TOP-SPR-002",
+      "description": "Build/start ứng dụng Boot, theo request từ web server tới handler và xác định port/config"
+    },
+    {
+      "id": "CAP-SPR-002-B",
+      "topicId": "TOP-SPR-002",
+      "description": "Phân biệt cấu hình theo môi trường, vai trò auto-configuration và cấu hình ghi đè; chẩn đoán lỗi startup có hướng"
+    },
+    {
+      "id": "CAP-SPR-003-A",
+      "topicId": "TOP-SPR-003",
+      "description": "Map route/DTO và gọi service giữ quy tắc task; repository là ranh giới lưu trữ"
+    },
+    {
+      "id": "CAP-SPR-003-B",
+      "topicId": "TOP-SPR-003",
+      "description": "Tái sử dụng logic đã test và tách lỗi HTTP khỏi nghiệp vụ; không để controller sở hữu toàn bộ dữ liệu/logic"
+    },
+    {
+      "id": "CAP-SPR-004-A",
+      "topicId": "TOP-SPR-004",
+      "description": "Hiện thực validation và error handler theo contract, tránh trả stack trace/dữ liệu nội bộ cho client"
+    },
+    {
+      "id": "CAP-SPR-004-B",
+      "topicId": "TOP-SPR-004",
+      "description": "Chứng minh CRUD/filter/pagination đúng status/body ở ca đúng/sai/không tồn tại bằng bộ request chạy lại được"
+    },
+    {
+      "id": "CAP-SPR-005-A",
+      "topicId": "TOP-SPR-005",
+      "description": "Nhận ra shared mutable state và tái hiện race ở thao tác tạo/cập nhật task trong bộ nhớ"
+    },
+    {
+      "id": "CAP-SPR-005-B",
+      "topicId": "TOP-SPR-005",
+      "description": "Chọn cơ chế bảo vệ toàn thao tác nghiệp vụ; giải thích concurrent map không tự làm chuỗi check-then-act thành atomic"
+    },
+    {
+      "id": "CAP-SPR-006-A",
+      "topicId": "TOP-SPR-006",
+      "description": "Viết test API cho contract và lỗi, tách với unit test service theo mục tiêu"
+    },
+    {
+      "id": "CAP-SPR-006-B",
+      "topicId": "TOP-SPR-006",
+      "description": "Kiểm tra request đồng thời có kiểm soát, reset dữ liệu test và phân biệt mock với server/API được chạy thật"
+    },
+    {
+      "id": "CAP-SPR-007-A",
+      "topicId": "TOP-SPR-007",
+      "description": "Đưa config/secret ra đúng chỗ, giới hạn lab local và giải thích cấu hình CORS theo client"
+    },
+    {
+      "id": "CAP-SPR-007-B",
+      "topicId": "TOP-SPR-007",
+      "description": "Gắn ngữ cảnh/correlation cho log request và lỗi mà không ghi secret/body nhạy cảm; truy lần một request lỗi"
+    },
+    {
+      "id": "CAP-DATA-001-A",
+      "topicId": "TOP-DATA-001",
+      "description": "Thực hiện truy vấn bằng JDBC/prepared statement với parameter và đọc result/resource lifecycle"
+    },
+    {
+      "id": "CAP-DATA-001-B",
+      "topicId": "TOP-DATA-001",
+      "description": "Phân biệt connection/pool/transaction scope; không nối input vào SQL và không để rò connection khi lỗi"
+    },
+    {
+      "id": "CAP-DATA-002-A",
+      "topicId": "TOP-DATA-002",
+      "description": "Dựng schema bằng migration có version trên DB trống và nâng một phiên bản lab có dữ liệu"
+    },
+    {
+      "id": "CAP-DATA-002-B",
+      "topicId": "TOP-DATA-002",
+      "description": "Tách database/config test, phát hiện migration lỗi và mô tả phục hồi phù hợp; không sửa lịch sử migration đã áp dụng tùy tiện"
+    },
+    {
+      "id": "CAP-DATA-003-A",
+      "topicId": "TOP-DATA-003",
+      "description": "Phân biệt JPA/Hibernate/Spring Data và map entity/relationship theo schema đã học"
+    },
+    {
+      "id": "CAP-DATA-003-B",
+      "topicId": "TOP-DATA-003",
+      "description": "Theo dõi entity lifecycle và truy vấn phát sinh, giữ DTO/API contract riêng; không coi repository method là không có SQL"
+    },
+    {
+      "id": "CAP-DATA-004-A",
+      "topicId": "TOP-DATA-004",
+      "description": "Nhận diện N+1/fetch thừa qua query count/log và thay kế hoạch fetch phù hợp"
+    },
+    {
+      "id": "CAP-DATA-004-B",
+      "topicId": "TOP-DATA-004",
+      "description": "Giữ đúng số phần tử/thứ tự khi paging/filter; kiểm tra truy vấn và hành vi lazy theo transaction/context"
+    },
+    {
+      "id": "CAP-DATA-005-A",
+      "topicId": "TOP-DATA-005",
+      "description": "Đặt transaction quanh thay đổi nghiệp vụ và kiểm tra lỗi giữa chừng rollback đúng"
+    },
+    {
+      "id": "CAP-DATA-005-B",
+      "topicId": "TOP-DATA-005",
+      "description": "Giải thích exception/boundary ảnh hưởng rollback trong cấu hình chọn cho bài; không cấp thành công khi chỉ một phần thay đổi được ghi"
+    },
+    {
+      "id": "CAP-DATA-006-A",
+      "topicId": "TOP-DATA-006",
+      "description": "Tái hiện lost update và phát hiện xung đột bằng version/optimistic locking"
+    },
+    {
+      "id": "CAP-DATA-006-B",
+      "topicId": "TOP-DATA-006",
+      "description": "Trả kết quả xung đột theo contract, kiểm tra dữ liệu cuối và tránh retry mù làm lặp tác dụng phụ"
+    },
+    {
+      "id": "CAP-DATA-007-A",
+      "topicId": "TOP-DATA-007",
+      "description": "Chạy integration test với DB thật riêng cho migration/constraint/rollback và cập nhật xung đột"
+    },
+    {
+      "id": "CAP-DATA-007-B",
+      "topicId": "TOP-DATA-007",
+      "description": "Kiểm tra restart giữ dữ liệu, cô lập/reset fixture và giữ API contract cũ khi thay repository; ghi rõ môi trường và phần chỉ mock"
+    },
+    {
+      "id": "CAP-SEC-001-A",
+      "topicId": "TOP-SEC-001",
+      "description": "Vẽ luồng input qua client/API/service/DB, xác định trust boundary và điểm cần validate"
+    },
+    {
+      "id": "CAP-SEC-001-B",
+      "topicId": "TOP-SEC-001",
+      "description": "Tạo ca input bất thường và phân biệt lỗi input, lỗi auth, lỗi server; không log/trả thông tin nội bộ không cần thiết"
+    },
+    {
+      "id": "CAP-SEC-002-A",
+      "topicId": "TOP-SEC-002",
+      "description": "Tạo/tìm tài khoản có định danh duy nhất và lưu password bằng hàm hash dành cho password theo cấu hình được chọn"
+    },
+    {
+      "id": "CAP-SEC-002-B",
+      "topicId": "TOP-SEC-002",
+      "description": "Phân biệt password hash với hash thông thường, encryption và signature; không lưu/trả raw password và xử lý trùng tài khoản"
+    },
+    {
+      "id": "CAP-SEC-003-A",
+      "topicId": "TOP-SEC-003",
+      "description": "Thiết lập đăng nhập/đăng xuất bằng session với cookie và tái hiện trạng thái hết hạn/chưa đăng nhập"
+    },
+    {
+      "id": "CAP-SEC-003-B",
+      "topicId": "TOP-SEC-003",
+      "description": "Phân biệt authentication với authorization; request không có phiên không được coi là người đã đăng nhập"
+    },
+    {
+      "id": "CAP-SEC-004-A",
+      "topicId": "TOP-SEC-004",
+      "description": "Kiểm tra quyền trên từng task theo owner ở service/query phù hợp, không tin owner ID do client tự nhận"
+    },
+    {
+      "id": "CAP-SEC-004-B",
+      "topicId": "TOP-SEC-004",
+      "description": "Chứng minh người dùng A không đọc/sửa/xóa task của B; phân biệt 401/403/404 theo policy công bố mà không lộ tài nguyên"
+    },
+    {
+      "id": "CAP-SEC-005-A",
+      "topicId": "TOP-SEC-005",
+      "description": "Giải thích cookie và CSRF trong luồng session, chứng minh request thay đổi trạng thái được bảo vệ theo client đã chọn"
+    },
+    {
+      "id": "CAP-SEC-005-B",
+      "topicId": "TOP-SEC-005",
+      "description": "Cấu hình CORS phù hợp origin/credential; chứng minh origin policy không cấp quyền đọc/sửa dữ liệu của người khác"
+    },
+    {
+      "id": "CAP-SEC-006-A",
+      "topicId": "TOP-SEC-006",
+      "description": "Đặt secret ngoài source/artifact, không log password/token; chỉ định quyền tối thiểu cho DB và runtime"
+    },
+    {
+      "id": "CAP-SEC-006-B",
+      "topicId": "TOP-SEC-006",
+      "description": "Phân biệt hash/password hash/encryption/TLS theo mục đích; mô tả cách thay secret trong lab và kiểm tra giá trị cũ không bị in ra"
+    },
+    {
+      "id": "CAP-SEC-007-A",
+      "topicId": "TOP-SEC-007",
+      "description": "Giới hạn yêu cầu gây lạm dụng theo bài lab và xử lý lỗi không lộ stack/chi tiết nội bộ cho client"
+    },
+    {
+      "id": "CAP-SEC-007-B",
+      "topicId": "TOP-SEC-007",
+      "description": "Thử input sai, yêu cầu quá nhiều và trạng thái lỗi; log đủ để chẩn đoán mà không tiết lộ dữ liệu nhạy cảm"
+    },
+    {
+      "id": "CAP-SEC-008-A",
+      "topicId": "TOP-SEC-008",
+      "description": "Chạy test âm cho anonymous, wrong user, logout/expired session và truy cập trực tiếp ID tài nguyên"
+    },
+    {
+      "id": "CAP-SEC-008-B",
+      "topicId": "TOP-SEC-008",
+      "description": "Kiểm tra CSRF/CORS theo client, quyền qua API thật và dữ liệu cuối sau request bị từ chối; không chấm pass chỉ bằng UI ẩn nút"
+    },
+    {
+      "id": "CAP-CTR-001-A",
+      "topicId": "TOP-CTR-001",
+      "description": "Giải thích image, container, runtime process và khác biệt cơ bản với VM trên sơ đồ/lab"
+    },
+    {
+      "id": "CAP-CTR-001-B",
+      "topicId": "TOP-CTR-001",
+      "description": "Tạo container từ image và chỉ ra thứ được lưu trong image, trạng thái container và thứ ở host"
+    },
+    {
+      "id": "CAP-CTR-002-A",
+      "topicId": "TOP-CTR-002",
+      "description": "Tạo image app từ context có Dockerfile/layer phù hợp và chạy bằng config bên ngoài"
+    },
+    {
+      "id": "CAP-CTR-002-B",
+      "topicId": "TOP-CTR-002",
+      "description": "Giải thích cache build, tag/digest và chọn runtime image thích hợp; không đưa secret vào layer"
+    },
+    {
+      "id": "CAP-CTR-003-A",
+      "topicId": "TOP-CTR-003",
+      "description": "Start/stop/recreate, xem log/exit code và phân biệt lifecycle container với process trong container"
+    },
+    {
+      "id": "CAP-CTR-003-B",
+      "topicId": "TOP-CTR-003",
+      "description": "Chẩn đoán container không chạy do command/config và chứng minh reset/restart khác remove/recreate"
+    },
+    {
+      "id": "CAP-CTR-004-A",
+      "topicId": "TOP-CTR-004",
+      "description": "Phân biệt host port, container port, localhost theo vị trí và service name trong network Compose"
+    },
+    {
+      "id": "CAP-CTR-004-B",
+      "topicId": "TOP-CTR-004",
+      "description": "Sửa case app không nối DB do sai host/port/network bằng dấu hiệu từ log/connection test"
+    },
+    {
+      "id": "CAP-CTR-005-A",
+      "topicId": "TOP-CTR-005",
+      "description": "Chọn bind mount/volume cho dữ liệu và chỉ ra dữ liệu còn/mất sau recreate"
+    },
+    {
+      "id": "CAP-CTR-005-B",
+      "topicId": "TOP-CTR-005",
+      "description": "Thử có/không volume trên DB lab, phân biệt recreate với xóa volume; không xóa dữ liệu ngoài lab"
+    },
+    {
+      "id": "CAP-CTR-006-A",
+      "topicId": "TOP-CTR-006",
+      "description": "Dựng app + DB bằng Compose trên môi trường lab sạch với config riêng, kiểm tra hai service giao tiếp"
+    },
+    {
+      "id": "CAP-CTR-006-B",
+      "topicId": "TOP-CTR-006",
+      "description": "Chẩn đoán DB chưa sẵn sàng và restart service mà vẫn giữ dữ liệu; không dựa vào thứ tự start là bảo đảm readiness"
+    },
+    {
+      "id": "CAP-CTR-007-A",
+      "topicId": "TOP-CTR-007",
+      "description": "Dùng health/readiness phản ánh khả năng phục vụ thực, phân biệt với process chỉ đang sống"
+    },
+    {
+      "id": "CAP-CTR-007-B",
+      "topicId": "TOP-CTR-007",
+      "description": "Thử DB lỗi và shutdown, quan sát tín hiệu/trạng thái; xử lý request/connection đang dở theo phạm vi lab"
+    },
+    {
+      "id": "CAP-CTR-008-A",
+      "topicId": "TOP-CTR-008",
+      "description": "Chạy runtime không dùng quyền cao không cần thiết, đưa secret/config đúng kênh và đặt giới hạn tài nguyên"
+    },
+    {
+      "id": "CAP-CTR-008-B",
+      "topicId": "TOP-CTR-008",
+      "description": "Chứng minh cấu hình khác nhau không đòi rebuild image; phát hiện image/log chứa secret hoặc lỗi thiếu tài nguyên trong lab"
+    },
+    {
+      "id": "CAP-OPS-001-A",
+      "topicId": "TOP-OPS-001",
+      "description": "Pipeline chạy build/test/package, lưu artifact có version/digest và truy dấu commit tạo bản"
+    },
+    {
+      "id": "CAP-OPS-001-B",
+      "topicId": "TOP-OPS-001",
+      "description": "Tạo ca test fail ngăn bước phát hành; chứng minh deploy cùng artifact đã kiểm tra thay vì rebuild tùy tiện"
+    },
+    {
+      "id": "CAP-OPS-002-A",
+      "topicId": "TOP-OPS-002",
+      "description": "Cấu hình domain/TLS, runtime secret và quyền cần thiết cho một môi trường lab triển khai"
+    },
+    {
+      "id": "CAP-OPS-002-B",
+      "topicId": "TOP-OPS-002",
+      "description": "Chẩn đoán sai config/cert/secret và không in bí mật trong log, artifact hoặc bản báo cáo"
+    },
+    {
+      "id": "CAP-OPS-003-A",
+      "topicId": "TOP-OPS-003",
+      "description": "Phát hành bản có artifact xác định, kiểm tra migration/order và thực hiện smoke trên môi trường đích"
+    },
+    {
+      "id": "CAP-OPS-003-B",
+      "topicId": "TOP-OPS-003",
+      "description": "Thử bản lỗi trong lab, chỉ ra trạng thái đang triển khai/đã phục vụ/thất bại và đường khôi phục"
+    },
+    {
+      "id": "CAP-OPS-004-A",
+      "topicId": "TOP-OPS-004",
+      "description": "Phân loại migration tương thích/không tương thích khi code cũ và mới cùng tồn tại"
+    },
+    {
+      "id": "CAP-OPS-004-B",
+      "topicId": "TOP-OPS-004",
+      "description": "Diễn tập rollback ứng dụng theo kế hoạch, xác định trường hợp cần forward fix/restore dữ liệu riêng; không hứa rollback image đảo migration"
+    },
+    {
+      "id": "CAP-OPS-005-A",
+      "topicId": "TOP-OPS-005",
+      "description": "Theo một request qua structured log/correlation ID và chỉ ra một metric, health và trace có ý nghĩa"
+    },
+    {
+      "id": "CAP-OPS-005-B",
+      "topicId": "TOP-OPS-005",
+      "description": "Phân biệt tín hiệu “đang chạy” với lỗi người dùng gặp; tạo trường hợp lỗi có thể phát hiện mà không lộ dữ liệu nhạy cảm"
+    },
+    {
+      "id": "CAP-OPS-006-A",
+      "topicId": "TOP-OPS-006",
+      "description": "Đặt điều kiện cảnh báo có hành động cho một sự cố lab và viết bước xử lý/leo thang trong runbook"
+    },
+    {
+      "id": "CAP-OPS-006-B",
+      "topicId": "TOP-OPS-006",
+      "description": "Đi qua ca cảnh báo giả lập, đối chiếu log/metric với nguyên nhân rồi ghi sự cố và việc theo dõi; không tuyên bố SLO đo thật nếu chưa đo"
+    },
+    {
+      "id": "CAP-OPS-007-A",
+      "topicId": "TOP-OPS-007",
+      "description": "Backup DB theo quy trình lab và restore vào môi trường riêng, kiểm tra record/constraint sau phục hồi"
+    },
+    {
+      "id": "CAP-OPS-007-B",
+      "topicId": "TOP-OPS-007",
+      "description": "Ghi thời điểm backup, phần dữ liệu có thể mất và quan hệ với rollback app; không dùng file backup tồn tại làm bằng chứng đã restore được"
+    },
+    {
+      "id": "CAP-OPS-008-A",
+      "topicId": "TOP-OPS-008",
+      "description": "Chạy smoke sau deploy cho API/ownership và tải nhỏ trên môi trường ghi rõ, báo latency/throughput theo phép đo"
+    },
+    {
+      "id": "CAP-OPS-008-B",
+      "topicId": "TOP-OPS-008",
+      "description": "Nhận diện bottleneck/giới hạn và phân biệt số đo lab với mục tiêu sản phẩm; regression test fail chặn release"
+    },
+    {
+      "id": "CAP-ENV-005-A",
+      "topicId": "TOP-ENV-005",
+      "description": "Xác định owner/group/mode, quản lý user/quyền trên vùng lab và giải thích quyền truy cập SSH"
+    },
+    {
+      "id": "CAP-ENV-005-B",
+      "topicId": "TOP-ENV-005",
+      "description": "Cài package, quản lý service/process/log và chẩn đoán quyền sai hoặc disk/memory thiếu trong Linux lab; không mở quyền toàn hệ thống để né lỗi"
+    },
+    {
+      "id": "CAP-ENV-006-A",
+      "topicId": "TOP-ENV-006",
+      "description": "Viết script nhận tham số/env, dùng quoting/pipe/redirection và trả exit code theo kết quả"
+    },
+    {
+      "id": "CAP-ENV-006-B",
+      "topicId": "TOP-ENV-006",
+      "description": "Thử input có khoảng trắng, thiếu biến, command fail và chạy lặp; dừng đúng lỗi, cleanup trong vùng lab, không in secret"
+    },
+    {
+      "id": "CAP-ENV-007-A",
+      "topicId": "TOP-ENV-007",
+      "description": "Tạo branch, xem diff và xử lý conflict nhỏ qua workflow review"
+    },
+    {
+      "id": "CAP-ENV-007-B",
+      "topicId": "TOP-ENV-007",
+      "description": "Giải thích merge/rebase và khôi phục thay đổi lab có chủ đích; không ghi đè lịch sử dùng chung tùy tiện"
+    },
+    {
+      "id": "CAP-NET-001-A",
+      "topicId": "TOP-NET-001",
+      "description": "Vẽ IP/subnet/default route/DNS, phân biệt TCP/UDP, port và NAT trong một đường kết nối"
+    },
+    {
+      "id": "CAP-NET-001-B",
+      "topicId": "TOP-NET-001",
+      "description": "Dựa bảng route/connection test xác định lỗi địa chỉ, đường đi hoặc port, không kết luận lỗi ứng dụng chỉ từ timeout"
+    },
+    {
+      "id": "CAP-NET-002-A",
+      "topicId": "TOP-NET-002",
+      "description": "Cấu hình lab reverse proxy, đường TLS và firewall theo luồng vào/ra xác định"
+    },
+    {
+      "id": "CAP-NET-002-B",
+      "topicId": "TOP-NET-002",
+      "description": "Chẩn đoán DNS sai, cert/hostname sai, upstream lỗi hoặc rule chặn; phân biệt proxy/load balancer, không mở mọi port để sửa"
+    },
+    {
+      "id": "CAP-SEC-009-A",
+      "topicId": "TOP-SEC-009",
+      "description": "Phân biệt user/service identity, authentication và policy resource; thiết kế quyền tối thiểu cho workload mẫu"
+    },
+    {
+      "id": "CAP-SEC-009-B",
+      "topicId": "TOP-SEC-009",
+      "description": "Kiểm tra allow/deny đúng resource, luân chuyển credential và quan sát audit không lộ secret; không dùng account quản trị cho runtime"
+    },
+    {
+      "id": "CAP-SEC-010-A",
+      "topicId": "TOP-SEC-010",
+      "description": "Theo dấu source/dependency/image tới artifact, đọc kết quả scan và phân loại việc cần xử lý"
+    },
+    {
+      "id": "CAP-SEC-010-B",
+      "topicId": "TOP-SEC-010",
+      "description": "Thiết lập gate thử nghiệm cho artifact lỗi/không rõ nguồn; đối chiếu digest/provenance trước promotion, không coi scan sạch là hết rủi ro"
+    },
+    {
+      "id": "CAP-CLD-001-A",
+      "topicId": "TOP-CLD-001",
+      "description": "So sánh VM/PaaS/managed container, compute/block/object storage và network theo workload mẫu"
+    },
+    {
+      "id": "CAP-CLD-001-B",
+      "topicId": "TOP-CLD-001",
+      "description": "Dựng môi trường thử theo sơ đồ, kiểm network/quyền và nêu phần trách nhiệm provider/người vận hành; mô phỏng local không chứng minh đã vận hành cloud thật"
+    },
+    {
+      "id": "CAP-CLD-002-A",
+      "topicId": "TOP-CLD-002",
+      "description": "Lập inventory/tag/owner và ước lượng các thành phần chi phí theo bảng giá của lab được chọn"
+    },
+    {
+      "id": "CAP-CLD-002-B",
+      "topicId": "TOP-CLD-002",
+      "description": "Phát hiện resource bỏ quên, kiểm cảnh báo và teardown đúng phạm vi; phân biệt ước tính với hóa đơn, không giả budget alert tự ngắt mọi chi phí"
+    },
+    {
+      "id": "CAP-IAC-001-A",
+      "topicId": "TOP-IAC-001",
+      "description": "Diễn giải resource/dependency/state và đọc plan trước apply vào vùng lab"
+    },
+    {
+      "id": "CAP-IAC-001-B",
+      "topicId": "TOP-IAC-001",
+      "description": "Thử cạnh tranh ghi state bằng backend hỗ trợ locking, bảo vệ state/secret và xử lý apply lỗi; không dùng force unlock khi chưa biết chủ lock"
+    },
+    {
+      "id": "CAP-IAC-002-A",
+      "topicId": "TOP-IAC-002",
+      "description": "Tách input/output/module và môi trường/state đúng phạm vi"
+    },
+    {
+      "id": "CAP-IAC-002-B",
+      "topicId": "TOP-IAC-002",
+      "description": "Phát hiện drift, review replacement/destruction và thử phục hồi thay đổi lỗi; không coi chạy apply luôn an toàn hoặc luôn đảo ngược được"
+    },
+    {
+      "id": "CAP-IAC-003-A",
+      "topicId": "TOP-IAC-003",
+      "description": "Biểu diễn package/config/service ở desired state, phân biệt provision hạ tầng với cấu hình host"
+    },
+    {
+      "id": "CAP-IAC-003-B",
+      "topicId": "TOP-IAC-003",
+      "description": "Chạy cấu hình lại không gây thay đổi ngoài dự kiến, thử host lỗi từng phần và xác định retry/rollback; không dùng script chạy lặp làm bằng chứng idempotence nếu chưa kiểm"
+    },
+    {
+      "id": "CAP-OPS-009-A",
+      "topicId": "TOP-OPS-009",
+      "description": "Chạy app mẫu từ hướng dẫn, xác định config/secret/port/health/dependency và hợp đồng schema/migration"
+    },
+    {
+      "id": "CAP-OPS-009-B",
+      "topicId": "TOP-OPS-009",
+      "description": "Chạy bộ test có sẵn gồm smoke/ownership/migration trong DB lab riêng, tạo ca fail và đọc kết quả; không cần tự viết Spring hay ORM"
+    },
+    {
+      "id": "CAP-OPS-010-A",
+      "topicId": "TOP-OPS-010",
+      "description": "Chọn SLI theo hành vi người dùng, xác định cửa sổ/SLO/error budget từ dataset có nguồn"
+    },
+    {
+      "id": "CAP-OPS-010-B",
+      "topicId": "TOP-OPS-010",
+      "description": "Đối chiếu latency/error/saturation dưới tải có giới hạn, đề xuất hành động/alert và ghi giới hạn đo; không lấy uptime process làm trải nghiệm người dùng"
+    },
+    {
+      "id": "CAP-KUB-001-A",
+      "topicId": "TOP-KUB-001",
+      "description": "Giải thích control plane/node, desired state, Pod/workload và yêu cầu scheduling/resource"
+    },
+    {
+      "id": "CAP-KUB-001-B",
+      "topicId": "TOP-KUB-001",
+      "description": "Chạy workload trên cluster lab, quan sát restart/reschedule và chẩn đoán Pending/CrashLoop theo dấu hiệu"
+    },
+    {
+      "id": "CAP-KUB-002-A",
+      "topicId": "TOP-KUB-002",
+      "description": "Nối Service/ingress tới workload, cấu hình config/secret và storage với phạm vi quyền rõ"
+    },
+    {
+      "id": "CAP-KUB-002-B",
+      "topicId": "TOP-KUB-002",
+      "description": "Thử lỗi discovery/readiness hoặc volume, phân biệt dữ liệu còn/mất; không coi có Secret resource là đủ toàn bộ bảo vệ dữ liệu"
+    },
+    {
+      "id": "CAP-KUB-003-A",
+      "topicId": "TOP-KUB-003",
+      "description": "Thực hiện rollout/scale và quan sát readiness/traffic trên cluster thử"
+    },
+    {
+      "id": "CAP-KUB-003-B",
+      "topicId": "TOP-KUB-003",
+      "description": "Tạo rollout lỗi, dừng/khôi phục theo runbook và kiểm dịch vụ/dữ liệu; scale nhiều replica không tự chứng minh HA"
+    }
+  ],
+  "placements": [
+    {
+      "roadmap": "java-backend",
+      "stage": "S00",
+      "topicId": "TOP-ENV-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S00",
+      "topicId": "TOP-ENV-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S00",
+      "topicId": "TOP-ENV-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S00",
+      "topicId": "TOP-ENV-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-008"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-009"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S01",
+      "topicId": "TOP-JAVA-010"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S02",
+      "topicId": "TOP-COL-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S03",
+      "topicId": "TOP-FILE-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S04",
+      "topicId": "TOP-HTTP-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S04",
+      "topicId": "TOP-HTTP-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S04",
+      "topicId": "TOP-HTTP-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S04",
+      "topicId": "TOP-HTTP-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S04",
+      "topicId": "TOP-HTTP-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S05",
+      "topicId": "TOP-SQL-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S06",
+      "topicId": "TOP-SPR-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S07",
+      "topicId": "TOP-DATA-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S08",
+      "topicId": "TOP-SEC-008"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S09",
+      "topicId": "TOP-CTR-008"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-001"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-002"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-003"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-004"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-005"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-006"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-007"
+    },
+    {
+      "roadmap": "java-backend",
+      "stage": "S10",
+      "topicId": "TOP-OPS-008"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS00",
+      "topicId": "TOP-ENV-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS00",
+      "topicId": "TOP-ENV-005"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS01",
+      "topicId": "TOP-HTTP-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS01",
+      "topicId": "TOP-HTTP-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS01",
+      "topicId": "TOP-NET-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS01",
+      "topicId": "TOP-NET-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS02",
+      "topicId": "TOP-ENV-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS02",
+      "topicId": "TOP-ENV-004"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS02",
+      "topicId": "TOP-ENV-006"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS02",
+      "topicId": "TOP-ENV-007"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-004"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-005"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-006"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-007"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS03",
+      "topicId": "TOP-CTR-008"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS04",
+      "topicId": "TOP-OPS-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS04",
+      "topicId": "TOP-OPS-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS04",
+      "topicId": "TOP-OPS-004"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS04",
+      "topicId": "TOP-SEC-010"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS05",
+      "topicId": "TOP-CLD-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS05",
+      "topicId": "TOP-CLD-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS05",
+      "topicId": "TOP-SEC-009"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS05",
+      "topicId": "TOP-OPS-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS06",
+      "topicId": "TOP-IAC-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS06",
+      "topicId": "TOP-IAC-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS06",
+      "topicId": "TOP-IAC-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS07",
+      "topicId": "TOP-OPS-005"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS07",
+      "topicId": "TOP-OPS-006"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS07",
+      "topicId": "TOP-OPS-008"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS07",
+      "topicId": "TOP-OPS-010"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-SQL-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-SQL-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-SQL-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-SQL-005"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-SQL-007"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-OPS-004"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-OPS-007"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS08",
+      "topicId": "TOP-OPS-009"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS09",
+      "topicId": "TOP-KUB-001"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS09",
+      "topicId": "TOP-KUB-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS09",
+      "topicId": "TOP-KUB-003"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-ENV-005"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-SEC-006"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-SEC-009"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-SEC-010"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-CTR-008"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS10",
+      "topicId": "TOP-NET-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS11",
+      "topicId": "TOP-CLD-002"
+    },
+    {
+      "roadmap": "devops",
+      "stage": "DS11",
+      "topicId": "TOP-OPS-010"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "DP0",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-004"
+        }
+      ]
+    },
+    {
+      "id": "DP1",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CTR-008"
+        }
+      ]
+    },
+    {
+      "id": "DP2",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-004"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-008"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-SEC-010"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-ENV-007"
+        }
+      ]
+    },
+    {
+      "id": "DP3",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-IAC-002"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-IAC-003"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-CLD-002"
+        }
+      ]
+    },
+    {
+      "id": "DP4",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-007"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-006"
+        },
+        {
+          "kind": "topic",
+          "id": "TOP-OPS-010"
+        }
+      ]
+    },
+    {
+      "id": "DP5",
+      "readiness": [
+        {
+          "kind": "topic",
+          "id": "TOP-KUB-003"
+        }
+      ]
+    }
+  ],
+  "units": [],
+  "packages": [],
+  "aliases": []
+}

@@ -1,0 +1,9 @@
+# Normalize repository text while leaving detected binary content untouched.
+* text=auto
+
+# Keep vendor wrapper bytes reproducible across Windows and Unix checkouts.
+backend/mvnw text eol=lf
+backend/mvnw.cmd text eol=crlf
+
+# Design review screenshots are intentional binary evidence.
+*.png binary

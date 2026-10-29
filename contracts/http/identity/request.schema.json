@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Identity request bodies, including opt-in R04d reauth adapter (runtime qualification separate)",
+  "definitions": {
+    "context": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "text": {"type": "string", "minLength": 1, "maxLength": 256},
+    "password": {"type": "string", "minLength": 1, "maxLength": 512}
+  },
+  "oneOf": [
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}}},
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}}},
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId", "loginName", "password"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}, "loginName": {"$ref": "#/definitions/text"}, "password": {"$ref": "#/definitions/password"}}},
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId", "token", "newPassword"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}, "token": {"type": "string", "minLength": 1, "maxLength": 128}, "newPassword": {"$ref": "#/definitions/password"}}},
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId", "reauthProof"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}, "reauthProof": {"$ref": "#/definitions/text"}}},
+    {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId", "reauthProof", "newPassword"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}, "reauthProof": {"$ref": "#/definitions/text"}, "newPassword": {"$ref": "#/definitions/password"}}},
+      {"type": "object", "additionalProperties": false, "required": ["schemaVersion", "expectedContextId", "password", "purpose", "intentHash"], "properties": {"schemaVersion": {"const": 1, "type": "integer"}, "expectedContextId": {"$ref": "#/definitions/context"}, "password": {"$ref": "#/definitions/password"}, "purpose": {"enum": ["LEARNING_RESET", "LOGOUT_ALL", "PASSWORD_CHANGE"]}, "intentHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+  ]
+}

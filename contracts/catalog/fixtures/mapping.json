@@ -1,0 +1,20 @@
+{
+  "unit": {
+    "id": "UNIT-CATALOG-FIXTURE",
+    "version": 1,
+    "status": "draft",
+    "topicIds": ["TOP-COL-002", "TOP-COL-003"],
+    "competencyIds": ["CAP-COL-002-A", "CAP-COL-003-A"],
+    "canonicalTopicId": "TOP-COL-002",
+    "viewedTopicIds": ["TOP-COL-002"],
+    "title": {"vi": "Fixture chỉ dùng kiểm thử mapping", "en": "Mapping test fixture only"},
+    "blocks": [{"kind": "paragraph", "text": {"vi": "Đây không phải bài học đã xuất bản.", "en": "This is not a published lesson."}}]
+  },
+  "privateCase": {
+    "schemaVersion": 2,
+    "id": "CASE-CATALOG-FIXTURE",
+    "unitId": "UNIT-CATALOG-FIXTURE",
+    "expected": {"sentinel": "PRIVATE_EXPECTED_MUST_NOT_REACH_PUBLIC_OUTLINE"},
+    "rubricTargets": ["CAP-COL-002-A"]
+  }
+}

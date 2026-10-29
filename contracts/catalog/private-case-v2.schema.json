@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://backend-lab.invalid/contracts/catalog/private-case-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "unitId",
+    "expected",
+    "rubricTargets"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^CASE-[A-Z0-9-]+$"
+    },
+    "unitId": {
+      "type": "string",
+      "pattern": "^UNIT-[A-Z0-9-]+$"
+    },
+    "expected": {
+      "type": "object"
+    },
+    "rubricTargets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/capId"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "definitions": {
+    "capId": {
+      "type": "string",
+      "pattern": "^CAP-[A-Z]+-[0-9]{3}-[A-Z]$"
+    }
+  }
+}

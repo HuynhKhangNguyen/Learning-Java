@@ -1,0 +1,42 @@
+{
+  "name": "backend-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": "^22.22.0 || >=24.0.0",
+    "npm": ">=8.5.0"
+  },
+  "scripts": {
+    "predev": "node scripts/check-runtime.mjs",
+    "dev": "vite",
+    "validate:content": "node scripts/validate-content.ts",
+    "test:content": "node --test --test-isolation=none tests/content-schema.test.ts",
+    "check": "node scripts/check-runtime.mjs && npm run validate:content && tsc -b && eslint . --max-warnings 0",
+    "build": "node scripts/check-runtime.mjs && tsc -b && vite build",
+    "preview": "node scripts/check-runtime.mjs && vite preview",
+    "test:smoke": "playwright test",
+    "test:all": "npm run test:content && npm run check && npm run build && npm run test:smoke"
+  },
+  "dependencies": {
+    "lucide-react": "1.47.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-router": "8.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.13.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "eslint": "10.11.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.12.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0",
+    "vite": "8.3.0"
+  }
+}

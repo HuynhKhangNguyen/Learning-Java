@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:backend-lab:opaque-wire-fields:1",
+  "$defs": {
+    "idempotencyKey": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "cursor": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[!-~]+$",
+      "description": "Opaque wire shape only; signing/owner/epoch semantics required by R21"
+    }
+  }
+}

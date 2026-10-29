@@ -1,0 +1,23 @@
+:root {
+  color-scheme: light dark;
+  --background: light-dark(#f4f5f1, #141c20);
+  --surface: light-dark(#fff, #1c272d);
+  --text: light-dark(#192e36, #e8f0ef);
+  --muted: light-dark(#53666d, #b1c0c6);
+  --border: light-dark(#d6dfdc, #405258);
+  --soft: light-dark(#e7eeea, #293a3e);
+  --accent: light-dark(#11675a, #8dd5c0);
+  --on-accent: light-dark(#fff, #102d26);
+  --accent-soft: light-dark(#e3f1e9, #223f36);
+  --error: light-dark(#a93225, #ffb7ab);
+  --error-soft: light-dark(#fff0eb, #442e2c);
+  --warning: light-dark(#79540d, #ecd293);
+  --warning-soft: light-dark(#fff6da, #3e3929);
+  --code-background: #16262e;
+  --code-text: #e3eee9;
+  --font-sans: 'Segoe UI', Arial, sans-serif;
+  --font-mono: Consolas, 'Courier New', monospace;
+  --radius-panel: 16px;
+  --radius-control: 8px;
+  --space-section: 24px;
+}

@@ -1,0 +1,24 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Backend Lab vẫn cho phép delegation, nhưng giới hạn fan-out để tránh nhiều
+# agent đọc lại cùng context. Task ngắn tiếp tục do main agent xử lý trực tiếp.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2
+
+# Các plugin tạo Office artifact không thuộc workflow của repository này.
+# Chỉ tắt ở project; cấu hình global và các plugin code/browser vẫn giữ nguyên.
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = false
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = false

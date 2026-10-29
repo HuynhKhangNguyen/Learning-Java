@@ -1,0 +1,7 @@
+{
+  "scope": "Public non-secret examples only; placeholders are not live credentials",
+  "bootstrap": {"schemaVersion": 1},
+  "logout": {"schemaVersion": 1, "expectedContextId": "00000000-0000-0000-0000-000000000001"},
+  "pending": {"schemaVersion": 1, "state": "PENDING_FENCES", "operationId": "00000000-0000-0000-0000-000000000002", "statusPath": "/api/v1/auth/operations/00000000-0000-0000-0000-000000000002"},
+  "error": {"schemaVersion": 1, "code": "CSRF_DENIED", "traceId": "00000000-0000-0000-0000-000000000003", "messageKey": "identity.auth.csrf_denied"}
+}

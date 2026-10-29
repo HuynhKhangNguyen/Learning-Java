@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Identity public responses; opt-in proof issuance is not distributed completion or learning reset",
+  "type": "object",
+  "required": ["schemaVersion"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "state": {"enum": ["ANONYMOUS", "ACTIVE", "REVOKING", "EXPIRED", "REVOKED", "ACTIVATED", "PENDING_FENCES", "ISSUED", "COMPLETED"]},
+    "sessionContextId": {"type": "string", "format": "uuid"},
+    "csrfToken": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+    "userId": {"type": "string", "format": "uuid"},
+    "credentialEpoch": {"type": "string", "pattern": "^[1-9][0-9]*$"},
+    "operationId": {"type": "string", "format": "uuid"},
+    "statusPath": {"type": "string", "pattern": "^/api/v1/auth/operations/[0-9a-f-]{36}$"},
+    "capabilities": {"type": "object", "required": ["reauth", "globalRevocationCompletion"], "properties": {"reauth": {"type": "boolean"}, "identitySensitiveReauth": {"type": "boolean"}, "globalRevocationCompletion": {"type": "boolean"}}},
+    "proof": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+    "grantRef": {"type": "string", "format": "uuid"},
+    "expiresAt": {"type": "string", "format": "date-time"},
+    "purpose": {"enum": ["LEARNING_RESET", "LOGOUT_ALL", "PASSWORD_CHANGE"]},
+    "operationKey": {"type": "string", "format": "uuid"},
+    "intentHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "code": {"type": "string", "pattern": "^[A-Z_]+$"},
+    "traceId": {"type": "string", "format": "uuid"},
+    "messageKey": {"type": "string"}
+  },
+  "oneOf": [{"required": ["state"], "not": {"required": ["code"]}}, {"required": ["code", "traceId", "messageKey"], "not": {"required": ["state"]}}],
+  "additionalProperties": true
+}

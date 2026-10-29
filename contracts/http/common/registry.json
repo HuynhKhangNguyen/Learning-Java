@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "scope": "R02b common wire/receiver foundation only; full endpoint/owner/receipt/cursor/FE/edge assertions require their owners",
+  "cases": [
+    {
+      "id": "WIRE-01",
+      "layer": "bigint decimal shape/range/exact roundtrip",
+      "remainingOwners": [
+        "BL-R09",
+        "BL-R24a"
+      ]
+    },
+    {
+      "id": "WIRE-02",
+      "layer": "strict UTF8/JSON duplicate/surrogate/unknown fields/route",
+      "remainingOwners": [
+        "BL-R07",
+        "BL-R09"
+      ]
+    },
+    {
+      "id": "WIRE-03",
+      "layer": "error/status/redaction and pending enum",
+      "remainingOwners": [
+        "BL-R04a",
+        "BL-R24a",
+        "BL-R31a"
+      ]
+    },
+    {
+      "id": "WIRE-04",
+      "layer": "UUID key/intent shape only; no receipt semantics",
+      "remainingOwners": [
+        "BL-R09",
+        "BL-R11",
+        "BL-R24a"
+      ]
+    },
+    {
+      "id": "WIRE-05",
+      "layer": "cursor bounded opaque shape only; no authentication/owner/paging semantics",
+      "remainingOwners": [
+        "BL-R21a",
+        "BL-R21b"
+      ]
+    },
+    {
+      "id": "WIRE-06",
+      "layer": "version/additive-response/unknown state fail closed",
+      "remainingOwners": [
+        "BL-R24a",
+        "BL-R31c"
+      ]
+    }
+  ]
+}

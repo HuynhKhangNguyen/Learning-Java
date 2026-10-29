@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>lab.backend</groupId>
+    <artifactId>backend-lab-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>identity-service</artifactId>
+  <packaging>jar</packaging>
+  <name>Backend Lab Identity service</name>
+  <description>Identity bootstrap, trusted transport, credentials and canonical session authority.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- JDBC supports own-DB transport clock and R03 credentials; Flyway remains test-scoped. -->
+    <dependency>
+      <groupId>org.postgresql</groupId><artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId><artifactId>spring-security-crypto</artifactId>
+    </dependency>
+    <!-- MS04 selected backing store; canonical authority is not a framework flush. -->
+    <dependency>
+      <groupId>org.springframework.session</groupId><artifactId>spring-session-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId><artifactId>bcprov-jdk18on</artifactId><version>1.86</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId><artifactId>flyway-core</artifactId><scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId><artifactId>flyway-database-postgresql</artifactId><scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <testResources><testResource><directory>src/test/resources</directory></testResource><testResource><directory>../../../contracts/http/common</directory><targetPath>contracts/common</targetPath></testResource></testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>lab.backend.identity.IdentityApplication</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>db-it</id>
+      <build><plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.5.6</version>
+          <configuration>
+            <includes><include>**/DatabaseIsolationIT.java</include><include>**/IdentityCredentialWorkflowIT.java</include><include>**/CredentialPackagedIT.java</include><include>**/IdentitySessionAuthorityIT.java</include></includes>
+            <runOrder>reversealphabetical</runOrder>
+            <failIfNoTests>true</failIfNoTests><testFailureIgnore>false</testFailureIgnore>
+            <systemPropertyVariables><lab.config>${lab.config}</lab.config></systemPropertyVariables>
+          </configuration>
+          <executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions>
+        </plugin>
+      </plugins></build>
+    </profile>
+    <profile><id>trust-it</id><properties><trust.case></trust.case><trust.artifact>false</trust.artifact></properties><build><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.6</version><configuration><includes><include>**/TransportTrustIT.java</include><include>**/WireContractIT.java</include><include>**/SessionRuntimeIT.java</include></includes><groups>${trust.case}</groups><runOrder>alphabetical</runOrder><failIfNoTests>true</failIfNoTests><testFailureIgnore>false</testFailureIgnore><systemPropertyVariables><lab.config>${lab.config}</lab.config><trust.config>${trust.config}</trust.config><trust.artifact>${trust.artifact}</trust.artifact></systemPropertyVariables></configuration><executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions></plugin></plugins></build></profile>
+<profile><id>credential-it</id><properties><credential.case></credential.case></properties><build><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.6</version><configuration><includes><include>**/DatabaseIsolationIT.java</include><include>**/IdentityCredentialWorkflowIT.java</include><include>**/CredentialPackagedIT.java</include></includes><groups>${credential.case}</groups><runOrder>reversealphabetical</runOrder><failIfNoTests>true</failIfNoTests><testFailureIgnore>false</testFailureIgnore><systemPropertyVariables><lab.config>${lab.config}</lab.config></systemPropertyVariables></configuration><executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions></plugin></plugins></build></profile>
+    <profile><id>delivery-it</id><build><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.6</version><configuration><includes><include>**/DeliveryStoreIT.java</include></includes><failIfNoTests>true</failIfNoTests><testFailureIgnore>false</testFailureIgnore><systemPropertyVariables><lab.config>${lab.config}</lab.config></systemPropertyVariables></configuration><executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions></plugin></plugins></build></profile>
+    <profile><id>relay-it</id><build><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.6</version><configuration><includes><include>**/DeliveryRuntimeIT.java</include></includes><failIfNoTests>true</failIfNoTests><testFailureIgnore>false</testFailureIgnore><systemPropertyVariables><lab.config>${lab.config}</lab.config><trust.config>${trust.config}</trust.config></systemPropertyVariables></configuration><executions><execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution></executions></plugin></plugins></build></profile>
+  </profiles>
+</project>

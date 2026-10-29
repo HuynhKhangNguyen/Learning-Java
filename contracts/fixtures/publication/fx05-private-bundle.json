@@ -1,0 +1,1 @@
+{"schemaVersion":2,"id":"CASE-CATALOG-FIXTURE","unitId":"UNIT-CATALOG-FIXTURE","expected":{"sentinel":"PRIVATE_EXPECTED_MUST_NOT_REACH_PUBLIC_OUTLINE"},"rubricTargets":["CAP-COL-002-A"]}
