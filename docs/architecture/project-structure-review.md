@@ -110,7 +110,7 @@ Các test bám phần sở hữu: logic/HTTP adapter unit và DB/service IT ở 
 
 | Finding | Disposition hiện hành | Source và bước còn lại |
 |---|---|---|
-| STR-01 | OPEN | Git baseline vẫn chưa tạo. BL-R00a đã có brief/owner nhưng còn chờ explicit stage/commit authorization và quyết định integration branch; chỉ đóng sau khi initial commit/evidence được Control Center review. |
+| STR-01 | CLOSED | BL-R00a đã tạo reviewed root commit `5afd0a197f5471b6095be470ccfb1c4128ecca6f` trên integration branch `main`: 559 file, root-parent proof, inventory/ignore/secret/binary/EOL/mode/staged review và revision-bound validation đạt. Không có remote/push/PR/tag/release. |
 | STR-02 | CLOSED | `.gitignore` có `__pycache__/` và `*.py[cod]`; bytecode ở scripts/nested package được ignore, helper `.py/.mjs` vẫn được phát hiện. Không xóa cache. |
 | STR-03 | CLOSED trong phạm vi hướng dẫn | [Browser prerequisite](../platform/environment/identity-browser-qualification.md) là source duy nhất; backend/service/feature entrypoints link tới nó. Ghi đúng launcher Node path, FE lockfile modules và installed Edge. Launcher vẫn có giới hạn Windows/current user cache; portability còn task riêng nếu được giao. |
 | STR-04 | CLOSED cho convention | [Architecture BE §2/2.1](backend.md#21-cấp-feature-và-layer) thống nhất feature ở cấp đầu, layer khi cần. AGENTS dẫn source này. Áp dụng dần theo leaf, source qualified hiện tại không bị chuyển package. |
@@ -157,3 +157,11 @@ index đã normalize LF và wrapper/PNG attributes đúng policy. `git diff --ca
 còn 3 trailing-whitespace và 45 blank-at-EOF finding có sẵn, được classify là hygiene
 nợ không P0/P1 ngoài write scope baseline. STR-01 vẫn `OPEN`, `HEAD` chưa tồn tại;
 không commit hoặc đổi branch trước quyết định/authorization riêng của user.
+
+User sau đó cấp quyền local Git để hoàn tất BL-R00a; Control Center chốt `main` và
+nghiệm thu staged inventory. Root commit `5afd0a197f5471b6095be470ccfb1c4128ecca6f`
+được tạo với 559 file/60291 insertions; parent list chỉ có chính commit nên root-parent
+proof đạt. Content 8/8, FE check, Maven parent validate, JSON/XML và owner-link checks
+được chạy lại trên revision này và đạt. Working tree sau root commit không có staged,
+unstaged hoặc visible-untracked file; remote vẫn 0. STR-01 chuyển `CLOSED`; hygiene
+whitespace P3 đã được Control Center chấp nhận cho baseline, không giả thành cleanup.
