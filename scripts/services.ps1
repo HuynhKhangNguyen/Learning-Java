@@ -9,9 +9,9 @@ param(
   [string]$JavaHome,
   [string]$LabConfig,
   [string]$TrustConfig,
-  [ValidateSet('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-06','SEC-07','SEC-08','SEC-09','SEC-10','SEC-11','SEC-12','SEC-14','SEC-15','SEC-16','SEC-19','SEC-20','SEC-22','SEC-23','WIRE-01','WIRE-02','WIRE-03','WIRE-04','WIRE-05','WIRE-06','DATA-01','DATA-02','DATA-03','DATA-04','DATA-05','DATA-06','DATA-07','DATA-10','DATA-11','DATA-12','DATA-13','DATA-14','DATA-15')]
+  [ValidateSet('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-06','SEC-07','SEC-08','SEC-09','SEC-10','SEC-11','SEC-12','SEC-14','SEC-15','SEC-16','SEC-19','SEC-20','SEC-22','SEC-23','SEC-25','SEC-28','WIRE-01','WIRE-02','WIRE-03','WIRE-04','WIRE-05','WIRE-06','DATA-01','DATA-02','DATA-03','DATA-04','DATA-05','DATA-06','DATA-07','DATA-10','DATA-11','DATA-12','DATA-13','DATA-14','DATA-15')]
   [string]$Case,
-  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c')]
+  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c','R07')]
   [string]$EvidenceTask,
   [switch]$Offline
 )
@@ -168,6 +168,7 @@ $canonicalRuntimeCases = @{
 $canonicalBrowserCases=@('browser-A-active','host-secure-httponly-cookie','browser-js-cannot-read-cookie','second-tab-A-binding','natural-origin-sensitive-proof','pending-without-cookie','pending-bootstrap-locked','pending-blocks-new-credential-flow','browser-B-independent-owner','late-A-no-cookie-B-survives','cross-cookie-retry-denied','cross-cookie-status-denied','second-tab-observes-B','old-CSRF-cannot-mint-under-B','Back-focus-no-cookie-renewal','initiating-status-completed-only','wrong-context-status-denied','original-bound-sensitive-retry-completed','old-A-cookie-never-resurrects','completed-A-does-not-revoke-B','foreign-origin-denied','no-status-proof-sensitive-cookie-emission','no-browser-runtime-errors')
 [string[]]$canonicalRequiredMethods=if($Task -eq 'fault' -and $canonicalRuntime){@($canonicalCaseMap[$Case])}else{@($canonicalRuntimeCases.Keys | Sort-Object)}
 $canonicalNeedsBrowser='azActualSensitiveBrowserCookieReorderAndMultiTab' -in $canonicalRequiredMethods
+$r07Runtime = $EvidenceTask -eq 'R07' -and $Service -eq 'content' -and $Task -in @('contract','fault')
 
 try {
   # Chỉ mở hai layer có suite riêng; không gắn nhãn canonical cho fixture cũ.
@@ -189,6 +190,11 @@ try {
       throw 'R06c CMD-05 requires an implemented DATA selector.'
     }
   }
+  if ($EvidenceTask -eq 'R07') {
+    if ($Service -ne 'content' -or $Task -notin @('db','contract','fault')) { throw 'R07 supports Content CMD-03/04/05 only.' }
+    if ($Task -in @('db','contract') -and $Case) { throw 'R07 CMD-03/04 require the full named baseline.' }
+    if ($Task -eq 'fault' -and $Case -notin @('SEC-16','SEC-25','SEC-28')) { throw 'R07 CMD-05 requires SEC-16, SEC-25 or SEC-28.' }
+  }
   if ($Task -eq 'relay' -and $Case -and -not $relayCaseMap.ContainsKey($Case)) { throw 'FX04 relay has no implemented case selector for that case.' }
   if ($EvidenceTask -notin @('R06b','R06c') -and -not $canonicalRuntime -and $Case -like 'DATA-*' -and $Task -ne 'relay') { throw 'DATA foundation selectors require relay.' }
   if ($Task -eq 'relay') {
@@ -196,7 +202,7 @@ try {
     $relayRequiredCases = if ($Case) { @($relayCaseMap[$Case]) } else { @($relayBaseCases) }
     if (-not $Case -and $Service -in @('content','learning')) { $relayRequiredCases += 'aeAuthLanePassesActualInt02WhileStrictPoisonRemains' }
   }
-  if ($EvidenceTask -notin @('R06b','R06c') -and -not $canonicalRuntime -and -not $canonicalCoreFault -and $Task -eq 'fault' -and $Case -notin @('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-09','SEC-12','SEC-14','SEC-15','SEC-20','SEC-22')) { throw 'fault requires an implemented case; other layers are pending.' }
+  if ($EvidenceTask -notin @('R06b','R06c','R07') -and -not $canonicalRuntime -and -not $canonicalCoreFault -and $Task -eq 'fault' -and $Case -notin @('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-09','SEC-12','SEC-14','SEC-15','SEC-20','SEC-22')) { throw 'fault requires an implemented case; other layers are pending.' }
   if (-not $canonicalRuntime -and $Case -in @('SEC-01','SEC-03','SEC-05') -and ($Task -ne 'fault' -or $Service -ne 'learning')) { throw 'Mutation admission selectors require fault and the Learning receiver.' }
   if ($Case -in @('SEC-02','SEC-04','SEC-09') -and ($Task -ne 'fault' -or $Service -notin @('content','learning'))) { throw 'Admission receiver selectors require fault and Content or Learning.' }
   $receiverDbFault = -not $canonicalRuntime -and $Task -eq 'fault' -and $Case -in @('SEC-03','SEC-04')
@@ -331,6 +337,9 @@ try {
       if ($LASTEXITCODE -eq 0 -and $EvidenceTask -eq 'R06b') {
         & $wrapper @mavenArguments -pl $modulePath -am verify -Ppublication-db-it "-Dlab.config=$resolvedConfig"
       }
+      if ($LASTEXITCODE -eq 0 -and $EvidenceTask -eq 'R07') {
+        & $wrapper @mavenArguments -pl $modulePath -am verify -Pbrowser-db-it "-Dlab.config=$resolvedConfig"
+      }
       break
     }
     { $canonicalRuntime -and $_ -in @('contract','fault') } {
@@ -374,6 +383,58 @@ try {
       & $wrapper @mavenArguments @coordinatorSelector @coordinatorCaseProperty -pl $modulePath -am clean verify -Pcoordinator-it '-Dtest=PublicationCoordinatorWireTests' "-Dtrust.config=$resolvedTrust" "-Dlab.config=$resolvedConfig"
       break
     }
+    { $r07Runtime } {
+      $browserNodeCandidates = @()
+      $browserInstalledNode = Get-Command node.exe -ErrorAction SilentlyContinue
+      if ($browserInstalledNode) { $browserNodeCandidates += $browserInstalledNode.Source }
+      if ($env:USERPROFILE) {
+        $browserNodeCandidates += Join-Path $env:USERPROFILE (
+          '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe'
+        )
+      }
+      $browserNode = $browserNodeCandidates | Where-Object {
+        if (Test-Path -LiteralPath $_ -PathType Leaf) {
+          $browserVersion = & $_ --version
+          $LASTEXITCODE -eq 0 -and $browserVersion -match '^v(2[4-9]|[3-9][0-9])\.'
+        }
+      } | Select-Object -First 1
+      if (-not $browserNode) {
+        throw 'R07 contract requires existing Node24+; no runtime is downloaded.'
+      }
+      & $browserNode (Join-Path $PSScriptRoot 'browser/contract.mjs')
+      if ($LASTEXITCODE -ne 0) {
+        throw 'R07 public response schema/example gate failed.'
+      }
+      if ($Task -eq 'contract' -or $Case -eq 'SEC-16') {
+        # API-C03 canonical case chạy packaged Identity thật; build peer trước
+        # Content để driver không dùng artifact còn lại từ evidence cũ.
+        & $wrapper @mavenArguments `
+          -pl 'services/identity-service' `
+          -am clean verify
+        if ($LASTEXITCODE -ne 0) {
+          throw 'Required R07 packaged canonical Identity build failed; not PASS.'
+        }
+      }
+      [string[]]$browserCase = @()
+      if ($Task -eq 'fault') {
+        $browserCase = @("-Dbrowser.case=$Case")
+      }
+      [string[]]$browserRuntimeSelector = @(
+        '-Dit.test=BrowserCanonicalIdentityIT,BrowserRuntimeIT'
+      )
+      if ($Task -eq 'fault' -and $Case -ne 'SEC-16') {
+        $browserRuntimeSelector = @('-Dit.test=BrowserRuntimeIT')
+      }
+      & $wrapper @mavenArguments @browserCase `
+        @browserRuntimeSelector `
+        -pl $modulePath `
+        -am clean verify `
+        -Pbrowser-it `
+        '-Dtest=BrowserSnapshotTests,BrowserHandlerTests' `
+        "-Dtrust.config=$resolvedTrust" `
+        "-Dlab.config=$resolvedConfig"
+      break
+    }
     'contract' {
       if($EvidenceTask -eq 'R06a'){
         & $wrapper @mavenArguments -pl $modulePath -am clean verify -Ptrust-it '-Dtest=CandidateValidatorTests' '-Dit.test=PublicationRuntimeIT' "-Dtrust.config=$resolvedTrust" "-Dlab.config=$resolvedConfig"
@@ -414,12 +475,20 @@ try {
         throw 'R06c coordinator unit suite missing or unexpected; not PASS.'
       }
     }
+    if ($EvidenceTask -eq 'R07' -and $Task -in @('contract','fault')) {
+      $expectedBrowserUnitNames=@(
+        'TEST-lab.backend.content.browser.BrowserHandlerTests.xml',
+        'TEST-lab.backend.content.browser.BrowserSnapshotTests.xml'
+      )
+      if($reports.Count -ne $expectedBrowserUnitNames.Count -or @($reports | Where-Object Name -NotIn $expectedBrowserUnitNames).Count){throw 'R07 browser unit suite missing or unexpected; not PASS.'}
+    }
     $dbTests = 0
     if ($databaseQualification) {
       $dbReports = @(Get-ChildItem -LiteralPath (Join-Path $backendDirectory "$modulePath/target/failsafe-reports") -Filter 'TEST-*.xml' -File -ErrorAction SilentlyContinue)
       $requiredDbReports = @("TEST-lab.backend.$Service.database.DatabaseIsolationIT.xml")
       $requiredDbReports += "TEST-lab.backend.$Service.delivery.DeliveryStoreIT.xml"
       if ($EvidenceTask -eq 'R06b') { $requiredDbReports += 'TEST-lab.backend.learning.contentreplica.PublicationStoreIT.xml' }
+      if ($EvidenceTask -eq 'R07') { $requiredDbReports += 'TEST-lab.backend.content.browser.BrowserStoreIT.xml' }
       if ($Service -eq 'identity') { $requiredDbReports += @('TEST-lab.backend.identity.credential.IdentityCredentialWorkflowIT.xml','TEST-lab.backend.identity.credential.CredentialPackagedIT.xml','TEST-lab.backend.identity.credential.IdentitySessionAuthorityIT.xml') }
       if ($Service -in @('content','learning')) { $requiredDbReports += "TEST-lab.backend.$Service.identityaccess.AdmissionGateIT.xml" }
       if ($dbReports.Count -ne $requiredDbReports.Count -or @($dbReports | Where-Object Name -NotIn $requiredDbReports).Count) {
@@ -435,6 +504,11 @@ try {
         $expectedTrustNames = @('TEST-lab.backend.learning.contentreplica.PublicationRuntimeIT.xml')
       } elseif ($EvidenceTask -eq 'R06c') {
         $expectedTrustNames = @('TEST-lab.backend.content.publication.PublicationCoordinatorRuntimeIT.xml')
+      } elseif ($EvidenceTask -eq 'R07') {
+        $expectedTrustNames = @('TEST-lab.backend.content.browser.BrowserRuntimeIT.xml')
+        if ($Task -eq 'contract' -or $Case -eq 'SEC-16') {
+          $expectedTrustNames += 'TEST-lab.backend.content.browser.BrowserCanonicalIdentityIT.xml'
+        }
       } elseif ($canonicalRuntime) {
         $expectedTrustNames = @('TEST-lab.backend.learning.identityaccess.CanonicalThreeServiceRuntimeIT.xml')
       } elseif ($Task -eq 'relay') {
@@ -452,6 +526,45 @@ try {
       }
       if ($trustReports.Count -ne $expectedTrustNames.Count -or @($trustReports | Where-Object Name -NotIn $expectedTrustNames).Count) { throw 'Required trust/wire suite missing; not PASS.' }
       $reports += $trustReports
+      if ($EvidenceTask -eq 'R07') {
+        $browserRuntimeReports = @(
+          $trustReports | Where-Object Name -In $expectedTrustNames
+        )
+        if ($browserRuntimeReports.Count -ne $expectedTrustNames.Count) {
+          throw 'R07 browser runtime report missing; not PASS.'
+        }
+        $browserRuntimeNodes = @()
+        foreach ($browserRuntimeReport in $browserRuntimeReports) {
+          [xml]$browserRuntimeXml = Get-Content -LiteralPath $browserRuntimeReport.FullName -Raw
+          $currentNodes = @($browserRuntimeXml.testsuite.testcase)
+          if ($currentNodes.Count -ne [long]$browserRuntimeXml.testsuite.tests) {
+            throw 'R07 browser runtime XML test count mismatch; not PASS.'
+          }
+          $browserRuntimeNodes += $currentNodes
+        }
+        $browserRuntimeNames = @($browserRuntimeNodes | ForEach-Object { $_.name })
+        $browserRuntimeCases=@{
+          'SEC-16'='protectedBodyUsesFreshAdmissionAndPrivateNoStore'
+          'SEC-25'='ambiguousRoutesAndForgedBrowserAuthorityFailBeforeBody'
+          'SEC-28'='anonymousCatalogAndOutlineAreRevisionBoundAndPrivateFree'
+        }
+        $canonicalBrowserCase = 'actualIdentityProtectsBodyAcrossRestartAndLogoutFenceRace'
+        $expectedBrowserRuntimeNames = if ($Task -eq 'fault') {
+          if ($Case -eq 'SEC-16') {
+            @($browserRuntimeCases[$Case], $canonicalBrowserCase)
+          } else {
+            @($browserRuntimeCases[$Case])
+          }
+        } else {
+          @($browserRuntimeCases.Values) + $canonicalBrowserCase
+        }
+        $expectedBrowserRuntimeNames = @($expectedBrowserRuntimeNames | Sort-Object)
+        if(@($browserRuntimeNames | Select-Object -Unique).Count -ne $browserRuntimeNames.Count -or
+            @($browserRuntimeNodes | Where-Object {$_.SelectNodes('failure|error|skipped').Count}).Count -or
+            @((Compare-Object $browserRuntimeNames $expectedBrowserRuntimeNames -CaseSensitive)).Count){
+          throw 'R07 browser runtime case set missing, skipped or unexpected; not PASS.'
+        }
+      }
     }
     $executedTests = 0
     foreach ($report in $reports) {
@@ -608,10 +721,10 @@ try {
           @((Compare-Object $publicationCases $publicationRuntimeCases -CaseSensitive)).Count){throw 'Invalid R06a publication runtime case report; not PASS.'}
       foreach($requiredValidatorCase in $publicationValidatorCases){if($requiredValidatorCase -cnotin $validatorCases){throw "Required R06a validator case missing: $requiredValidatorCase; not PASS."}}
       foreach($requiredPublicationCase in $publicationRuntimeCases){if($requiredPublicationCase -cnotin $publicationCases){throw "Required R06a runtime case missing: $requiredPublicationCase; not PASS."}}
-    } elseif ($EvidenceTask -notin @('R06b','R06c') -and "TEST-lab.backend.$Service.delivery.DeliveryWireTests.xml" -notin $reports.Name) { throw 'Required delivery wire suite missing; not PASS.' }
+    } elseif ($EvidenceTask -notin @('R06b','R06c','R07') -and "TEST-lab.backend.$Service.delivery.DeliveryWireTests.xml" -notin $reports.Name) { throw 'Required delivery wire suite missing; not PASS.' }
     # Config sai phải bị chặn trước DB; thiếu suite kiểm ranh giới này không được tính PASS.
-    if ($EvidenceTask -notin @('R06a','R06b','R06c') -and "TEST-lab.backend.$Service.delivery.DeliveryRuntimeConfigTests.xml" -notin $reports.Name) { throw 'Required delivery config suite missing; not PASS.' }
-    if ($EvidenceTask -notin @('R06a','R06b','R06c') -and $Service -in @('content','learning') -and "TEST-lab.backend.$Service.identityaccess.AdmissionWireTests.xml" -notin $reports.Name) {
+    if ($EvidenceTask -notin @('R06a','R06b','R06c','R07') -and "TEST-lab.backend.$Service.delivery.DeliveryRuntimeConfigTests.xml" -notin $reports.Name) { throw 'Required delivery config suite missing; not PASS.' }
+    if ($EvidenceTask -notin @('R06a','R06b','R06c','R07') -and $Service -in @('content','learning') -and "TEST-lab.backend.$Service.identityaccess.AdmissionWireTests.xml" -notin $reports.Name) {
       throw "Required $Service admission wire suite missing; not PASS."
     }
     if ($Service -eq 'identity' -and 'TEST-lab.backend.identity.session.SessionHttpHandlerTests.xml' -notin $reports.Name) {
@@ -668,7 +781,7 @@ try {
         if ($requiredCase -notin $canonicalCases) { throw "Required canonical own-DB case missing: $requiredCase; not PASS." }
       }
     }
-    if ($EvidenceTask -notin @('R06a','R06b','R06c') -and $Service -in @('content','learning')) {
+    if ($EvidenceTask -notin @('R06a','R06b','R06c','R07') -and $Service -in @('content','learning')) {
       $requiredCases = @{}
       if ($Task -eq 'db' -or $receiverDbFault) {
         $transactionCase = if ($Service -eq 'learning') { 'twoReplicasFenceWaitsForMutationTransactionCommit' } else { 'twoReplicasFenceWaitsForReadTransactionCommit' }

@@ -1,6 +1,9 @@
 package lab.backend.content.configuration;
 
 import java.util.Arrays;
+import lab.backend.content.delivery.DeliveryRuntime;
+import lab.backend.content.identityaccess.AdmissionRuntime;
+import lab.backend.content.transport.TransportSettings;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -12,20 +15,29 @@ public final class BootstrapListenerGuard
   @Override
   public void initialize(ConfigurableApplicationContext context) {
     ConfigurableEnvironment environment = context.getEnvironment();
-    boolean admission=Arrays.equals(environment.getActiveProfiles(),new String[]{"admission"});
-    boolean delivery=Arrays.equals(environment.getActiveProfiles(),new String[]{"delivery"});
-    boolean canonical=Arrays.equals(environment.getActiveProfiles(),new String[]{"canonical"});
-    boolean publication=Arrays.equals(environment.getActiveProfiles(),new String[]{"publication"});
-    if (publication || canonical || delivery || admission || Arrays.equals(environment.getActiveProfiles(), new String[] {"transport"})) {
-      var settings = lab.backend.content.transport.TransportSettings.load(environment);
+    boolean admission = active(environment, "admission");
+    boolean delivery = active(environment, "delivery");
+    boolean canonical = active(environment, "canonical");
+    boolean browser = active(environment, "browser");
+    boolean publication = active(environment, "publication");
+    if (publication || browser || canonical || delivery || admission || active(environment, "transport")) {
+      TransportSettings settings = TransportSettings.load(environment);
       context.getBeanFactory().registerSingleton("transportSettings", settings);
-      if(delivery)context.getBeanFactory().registerSingleton("deliveryRuntime",lab.backend.content.delivery.DeliveryRuntime.load(environment,settings));
-      // Canonical chỉ own admission/fence gate, không learner domain endpoint
-      // hoặc delivery LAB_APPLY adapter. Startup không provision/migrate own DB.
-      if(admission||canonical)context.getBeanFactory().registerSingleton("admissionRuntime",lab.backend.content.identityaccess.AdmissionRuntime.load(environment,settings));
+      if (delivery) {
+        context
+            .getBeanFactory()
+            .registerSingleton("deliveryRuntime", DeliveryRuntime.load(environment, settings));
+      }
+      // Canonical/browser chỉ own admission/fence gate; startup không tự
+      // provision hoặc migrate DB và không mở delivery LAB_APPLY adapter.
+      if (admission || canonical || browser) {
+        context
+            .getBeanFactory()
+            .registerSingleton("admissionRuntime", AdmissionRuntime.load(environment, settings));
+      }
       return;
     }
-    if (!Arrays.equals(environment.getActiveProfiles(), new String[] {"bootstrap"})) {
+    if (!active(environment, "bootstrap")) {
       throw new IllegalStateException(
           "R01c bootstrap requires only the explicit 'bootstrap' profile; trusted profiles belong to R02b.");
     }
@@ -44,5 +56,9 @@ public final class BootstrapListenerGuard
       throw new IllegalStateException(
           "R01c bootstrap allows one loopback HTTP servlet listener; TLS/management listeners belong to later tasks.");
     }
+  }
+
+  private static boolean active(ConfigurableEnvironment environment, String profile) {
+    return Arrays.equals(environment.getActiveProfiles(), new String[] {profile});
   }
 }

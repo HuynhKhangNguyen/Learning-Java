@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "roadmaps": [
+    {"id": "JAVA_BACKEND", "title": "Java Backend", "status": "PUBLISHED", "topicIds": ["TOP-JAVA-01", "TOP-SHARED-01"], "placementTopicIds": ["TOP-JAVA-01"]},
+    {"id": "DEVOPS", "title": "DevOps", "status": "PUBLISHED", "topicIds": ["TOP-OPS-01", "TOP-SHARED-01"], "placementTopicIds": ["TOP-OPS-01"]}
+  ],
+  "topics": [
+    {"id": "TOP-JAVA-01", "aliases": ["java-start"], "title": "Java foundations", "status": "PUBLISHED", "capabilityIds": ["CAP-JAVA-01"], "prerequisiteTopicIds": [], "units": [{"id": "UNIT-JAVA-01", "title": "Types", "status": "PUBLISHED", "blocks": [{"type": "paragraph", "text": "Java uses static types.", "language": "en", "url": null}]}]},
+    {"id": "TOP-OPS-01", "aliases": [], "title": "Containers", "status": "PLANNED", "capabilityIds": ["CAP-OPS-01"], "prerequisiteTopicIds": [], "units": []},
+    {"id": "TOP-SHARED-01", "aliases": [], "title": "HTTP", "status": "PUBLISHED", "capabilityIds": ["CAP-SHARED-01"], "prerequisiteTopicIds": ["TOP-JAVA-01"], "units": [{"id": "UNIT-HTTP-01", "title": "Requests", "status": "PUBLISHED", "blocks": [{"type": "link", "text": "HTTP semantics", "language": "en", "url": "https://www.rfc-editor.org/rfc/rfc9110"}]}]}
+  ]
+}

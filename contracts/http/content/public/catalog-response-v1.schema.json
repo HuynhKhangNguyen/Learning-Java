@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://backend-lab.local/contracts/content/public/catalog-response-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "canonicalRevision", "appliedRevision", "asOf", "learningSyncPending", "roadmaps"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "canonicalRevision": {"type": "string", "pattern": "^[1-9][0-9]{0,18}$"},
+    "appliedRevision": {"type": "string", "pattern": "^[1-9][0-9]{0,18}$"},
+    "asOf": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "learningSyncPending": {"type": "boolean"},
+    "roadmaps": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "title", "status", "topicIds", "placementTopicIds", "topics"],
+        "properties": {
+          "id": {"$ref": "#/definitions/id"}, "title": {"type": "string", "minLength": 1, "maxLength": 160},
+          "status": {"$ref": "#/definitions/status"},
+          "topicIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+          "placementTopicIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+          "topics": {
+            "type": "array", "uniqueItems": true,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["id", "title", "status", "capabilityIds"],
+              "properties": {
+                "id": {"$ref": "#/definitions/id"},
+                "title": {"type": "string", "minLength": 1, "maxLength": 160},
+                "status": {"$ref": "#/definitions/status"},
+                "capabilityIds": {
+                  "type": "array", "uniqueItems": true,
+                  "items": {"$ref": "#/definitions/id"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,95}$"},
+    "status": {"enum": ["PUBLISHED", "PLANNED", "WITHDRAWN"]}
+  }
+}

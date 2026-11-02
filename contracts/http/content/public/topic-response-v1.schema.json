@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://backend-lab.local/contracts/content/public/topic-response-v1.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "canonicalRevision", "appliedRevision", "asOf", "learningSyncPending", "topic"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "canonicalRevision": {"$ref": "#/definitions/revision"},
+    "appliedRevision": {"$ref": "#/definitions/revision"}, "asOf": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "learningSyncPending": {"type": "boolean"},
+    "topic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "title", "status", "capabilityIds", "prerequisiteTopicIds", "units"],
+      "properties": {
+        "id": {"$ref": "#/definitions/id"}, "title": {"type": "string", "minLength": 1, "maxLength": 160},
+        "status": {"$ref": "#/definitions/status"},
+        "capabilityIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+        "prerequisiteTopicIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+        "units": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "title", "status"], "properties": {"id": {"$ref": "#/definitions/id"}, "title": {"type": "string", "minLength": 1, "maxLength": 160}, "status": {"$ref": "#/definitions/status"}}}}
+      }
+    }
+  },
+  "definitions": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,95}$"}, "revision": {"type": "string", "pattern": "^[1-9][0-9]{0,18}$"}, "status": {"enum": ["PUBLISHED", "PLANNED", "WITHDRAWN"]}}
+}

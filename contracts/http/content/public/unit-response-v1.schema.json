@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://backend-lab.local/contracts/content/public/unit-response-v1.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "canonicalRevision", "appliedRevision", "asOf", "learningSyncPending", "unit"],
+  "properties": {
+    "schemaVersion": {"const": 1}, "canonicalRevision": {"$ref": "#/definitions/revision"},
+    "appliedRevision": {"$ref": "#/definitions/revision"}, "asOf": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "learningSyncPending": {"type": "boolean"},
+    "unit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "topicId", "title", "status", "blocks"],
+      "properties": {
+        "id": {"$ref": "#/definitions/id"}, "topicId": {"$ref": "#/definitions/id"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 160}, "status": {"const": "PUBLISHED"},
+        "blocks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["type", "text"], "properties": {"type": {"enum": ["paragraph", "heading", "code", "link"]}, "text": {"type": "string", "minLength": 1, "maxLength": 32000}, "language": {"type": "string", "minLength": 1, "maxLength": 40}, "url": {"type": "string", "format": "uri", "pattern": "^https?://"}}}}
+      }
+    }
+  },
+  "definitions": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,95}$"}, "revision": {"type": "string", "pattern": "^[1-9][0-9]{0,18}$"}}
+}

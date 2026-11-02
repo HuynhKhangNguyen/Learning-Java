@@ -78,7 +78,7 @@ class DatabaseIsolationIT {
 
   @Test
   void aaVersionDatabaseAndFreshMigrationsAreReal() throws Exception {
-    assertThat(initialMigrations).isEqualTo(6); // five production migrations plus test-only fixture
+    assertThat(initialMigrations).isEqualTo(7); // six production migrations plus test-only fixture
     try (Connection connection = connect("app", SERVICE + "_db")) {
       assertThat(text(connection, "SHOW server_version")).isEqualTo("18.6");
       assertThat(text(connection, "SELECT current_database()")).isEqualTo(SERVICE + "_db");

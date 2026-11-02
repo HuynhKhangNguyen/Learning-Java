@@ -104,7 +104,7 @@ def main():
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--task", choices=["db","contract","fault","relay"], default="db")
     parser.add_argument("--case")
-    parser.add_argument("--evidence-task", choices=["R02a","R02b","R02c","R03","R04a","R04b","R04c","R04d","R06a","R06b","R06c"])
+    parser.add_argument("--evidence-task", choices=["R02a","R02b","R02c","R03","R04a","R04b","R04c","R04d","R06a","R06b","R06c","R07"])
     parser.add_argument("--fail-before-build", action="store_true",
                         help="R02a cleanup fixture: fail after provisioning, without running Maven")
     args = parser.parse_args()
@@ -133,13 +133,17 @@ def main():
         parser.error("R06c supports Content CMD-03/04/05 only")
     if args.evidence_task == "R06c" and ((args.task in {"db", "contract"} and args.case) or (args.task == "fault" and args.case not in coordinator_faults) or args.fail_before_build):
         parser.error("R06c baseline takes no case; CMD-05 requires DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, DATA-07 or DATA-14")
+    if args.evidence_task == "R07" and (args.service != "content" or args.task not in {"db", "contract", "fault"}):
+        parser.error("R07 supports Content CMD-03/04/05 only")
+    if args.evidence_task == "R07" and ((args.task in {"db", "contract"} and args.case) or (args.task == "fault" and args.case not in {"SEC-16", "SEC-25", "SEC-28"}) or args.fail_before_build):
+        parser.error("R07 baseline takes no case; CMD-05 requires SEC-16, SEC-25 or SEC-28")
     if args.evidence_task == "R04d" and not ((args.task == "db" and args.service == "identity") or canonical_runtime or canonical_core_fault):
         parser.error("R04d requires db Identity or contract Learning canonical driver; other layers pending")
     if canonical_runtime and args.task == "contract" and args.case:
         parser.error("R04d contract requires the full baseline; use fault for implemented canonical selectors")
-    if args.case and args.case not in canonical_selectors | {"SEC-02","SEC-04","SEC-09","SEC-10","SEC-12","SEC-14","SEC-15","SEC-16","SEC-22","WIRE-01","WIRE-02","WIRE-03","WIRE-04","WIRE-05","WIRE-06","DATA-01","DATA-02","DATA-03","DATA-04","DATA-05","DATA-06","DATA-07","DATA-10","DATA-11","DATA-12","DATA-13","DATA-14","DATA-15"}:
+    if args.case and args.case not in canonical_selectors | {"SEC-02","SEC-04","SEC-09","SEC-10","SEC-12","SEC-14","SEC-15","SEC-16","SEC-22","SEC-25","SEC-28","WIRE-01","WIRE-02","WIRE-03","WIRE-04","WIRE-05","WIRE-06","DATA-01","DATA-02","DATA-03","DATA-04","DATA-05","DATA-06","DATA-07","DATA-10","DATA-11","DATA-12","DATA-13","DATA-14","DATA-15"}:
         parser.error("Unknown receiver/common-wire case")
-    if args.evidence_task not in {"R06b","R06c"} and not canonical_runtime and not canonical_core_fault and args.task == "fault" and args.case not in {"SEC-01","SEC-02","SEC-03","SEC-04","SEC-05","SEC-09","SEC-12","SEC-14","SEC-15","SEC-20","SEC-22"}:
+    if args.evidence_task not in {"R06b","R06c","R07"} and not canonical_runtime and not canonical_core_fault and args.task == "fault" and args.case not in {"SEC-01","SEC-02","SEC-03","SEC-04","SEC-05","SEC-09","SEC-12","SEC-14","SEC-15","SEC-20","SEC-22"}:
         parser.error("Fault requires an implemented SEC case")
     if not canonical_runtime and args.case in {"SEC-01","SEC-03","SEC-05"} and (args.task != "fault" or args.service != "learning"):
         parser.error("Mutation admission selectors require fault and Learning")
@@ -315,6 +319,31 @@ def main():
                     )]
                 if args.evidence_task == "R06c":
                     inputs += [p for p in (ROOT / "contracts/http/learning/internal/publication").rglob("*") if p.is_file()]
+                if args.evidence_task == "R07":
+                    inputs += [
+                        p
+                        for p in (ROOT / "contracts/http/content/public").rglob("*")
+                        if p.is_file()
+                    ]
+                    inputs += [
+                        ROOT / "scripts/browser/contract.mjs",
+                        ROOT / "frontend/package.json",
+                        ROOT / "frontend/package-lock.json",
+                    ]
+                    if args.task == "contract" or args.case == "SEC-16":
+                        identity_root = ROOT / "backend/services/identity-service"
+                        inputs += [identity_root / "pom.xml"]
+                        inputs += [
+                            p for p in (identity_root / "src").rglob("*") if p.is_file()
+                        ]
+                        inputs += [
+                            p for p in (ROOT / "ops/identity").rglob("*") if p.is_file()
+                        ]
+                        inputs += [
+                            p
+                            for p in (ROOT / "contracts/http/identity").rglob("*")
+                            if p.is_file()
+                        ]
             if name == "learning":
                 inputs += [p for p in (ROOT / "ops/learning").rglob("*") if p.is_file()]
                 inputs += [p for p in (ROOT / "contracts/http/admission").rglob("*") if p.is_file()]
@@ -345,7 +374,7 @@ def main():
             # observation attempt253.98s), ngoài fresh three-app build/browser.
             # Full contract cho headroom bounded1200s để thu đủ XML; selected
             # layers/core giữ900s. Không nới per-test/HTTP/KDF/SQL/retry budget.
-            verification_budget = 1200 if canonical_runtime and args.task == "contract" else 900 if canonical_runtime or canonical_core_fault or (args.evidence_task == "R04d" and args.task == "db" and name == "identity") or (args.evidence_task == "R06b" and args.task in {"contract","fault"}) or (args.evidence_task == "R06c" and args.task in {"contract","fault"}) else 600
+            verification_budget = 1200 if canonical_runtime and args.task == "contract" else 900 if canonical_runtime or canonical_core_fault or (args.evidence_task == "R04d" and args.task == "db" and name == "identity") or (args.evidence_task == "R06b" and args.task in {"contract","fault"}) or (args.evidence_task == "R06c" and args.task in {"contract","fault"}) or (args.evidence_task == "R07" and args.task in {"contract","fault"}) else 600
             run(command, env=environment, log=evidence / (name + "-verify.log"), timeout=verification_budget)
             if any(hashlib.sha256((ROOT / p).read_bytes()).hexdigest()!=digest for p,digest in input_hashes.items()):
                 raise RuntimeError("Build inputs changed during verification; repeat the affected service, no PASS")
@@ -371,6 +400,18 @@ def main():
                 shutil.copyfile(peer_artifact, peer_destination)
                 outcomes[-1]["peers"] = [{"service": "learning", "artifactSha256": hashlib.sha256(peer_artifact.read_bytes()).hexdigest(),
                                            "reports": retain_reports("learning", evidence, None)}]
+            if args.evidence_task == "R07" and (
+                args.task == "contract" or args.case == "SEC-16"
+            ):
+                peer_artifact = ROOT / "backend/services/identity-service/target/identity-service-0.1.0-SNAPSHOT.jar"
+                peer_destination = evidence / "identity/qualified-artifact.jar"
+                peer_destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(peer_artifact, peer_destination)
+                outcomes[-1]["peers"] = [{
+                    "service": "identity",
+                    "artifactSha256": hashlib.sha256(peer_artifact.read_bytes()).hexdigest(),
+                    "reports": retain_reports("identity", evidence, None),
+                }]
             if canonical_runtime:
                 # Driver chạy ba JAR fresh; giữ cả hai peers và unit reports,
                 # không lấy qualifiedDeliveryCandidate cũ làm current artifact.

@@ -40,3 +40,18 @@ replica/history của operation cũ. CMD-03/04/05 managed runner dùng `Evidence
 R06c`; CMD-05 chỉ nhận DATA-02–07/14 và mỗi selector bắt buộc exact named report.
 DATA-02/06/07 ở đây chỉ chứng minh lớp coordinator/manifest, không thay learner
 T1/T2 hoặc current-overlay owner.
+# Content operations
+
+`install-browser-snapshot.sql` installs the exact public browser projection for
+an active immutable publication operation. Run it only as `content_migrator`
+with the six `backend_lab.browser_*` session settings documented in the script.
+The snapshot digest must equal the reviewed `PUBLIC-BROWSER-SNAPSHOT` catalog
+component in that operation's candidate. Installation is exact-retry idempotent
+only before canonical commit and rejects a conflicting, aborted, unrelated, or
+already-canonical operation. The FENCE transaction creates the immutable
+canonical binding; the application role has SELECT only on both tables.
+
+The projection must exist before its revision becomes canonical. Missing or
+invalid data keeps API-C01–03 closed; the service never regenerates it from
+authoring files or private bundle bytes. R30 remains responsible for actual
+production catalog preparation and publication qualification.
