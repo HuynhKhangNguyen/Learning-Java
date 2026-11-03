@@ -14,8 +14,9 @@
 - Goal: Learning cấp attempt do server chọn case/mode/version, giữ owner/epoch và exposure floor;
   API-L01/L02 chỉ tiết lộ assigned prompt khi JRN-01 có verified receipt và auth/publication recheck
   đạt. Cùng request retry không tạo attempt hoặc exposure operation mới.
-- Mode B: một chat Backend/Platform implementation riêng; Control Center giữ brief/review/nghiệm thu.
-  Không dùng subagent, không tự tạo chat. Không mở R09/R10/R11 hoặc sibling khác.
+- Mode A theo chỉ dẫn người dùng mới nhất: Control Center tự điều phối native executor trong cùng
+  workspace, giữ brief/registry/review/nghiệm thu. Một executor writer cho implementation, không tạo
+  chat người dùng hoặc mở R09/R10/R11/sibling khác. Checkpoint lịch sử Mode B không còn hiện hành.
 - Git: nhánh `codex/bl-r08-learning-allocation`, base `41aff92`. Đây là stacked branch trên R28a/R07
   chưa merge integration branch. Theo Git workflow thường trực, mỗi lượt implement/fix validation xong
   tự tạo commit mới rồi bàn giao; không amend candidate đã review. Commit không tự đổi task thành DONE.
@@ -281,3 +282,13 @@ disclosure theo AC01–07. Chỉ sửa scope brief đã mở rộng; không hard
 lấy expected làm prompt. Chuyển IN_PROGRESS khi code; validation, checkpoint và commit mỗi lượt.
 Candidate sẵn sàng chờ Control Center review thì NEED_REVIEW; không tự DONE hoặc mở task khác.
 ```
+
+## Checkpoint điều phối native executor — 03/11/2026
+
+- Người dùng yêu cầu Control Center tự điều phối thay manual paste. Chuyển Mode B sang Mode A;
+  goal/write scope/AC không đổi. Registry IN_PROGRESS khi giao implementation.
+- Control Center sở hữu file task và registry; native Backend/Platform executor là writer duy nhất
+  cho source/contracts/helpers/fixtures trong scope. Executor được commit phần implementation sau
+  validation theo Git workflow, trả candidate/validation/findings/limits để main review.
+- Executor không sửa registry/task file, không DONE/integrate hoặc mở task khác. Main cập nhật
+  checkpoint/NEED_REVIEW từ evidence thật, review candidate và điều phối fix tới nghiệm thu.
