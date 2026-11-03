@@ -428,3 +428,30 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   cấp, không phải off-host evidence. Không claim provider/IAM/encryption/retention/disaster safety.
   Bước tiếp theo duy nhất là staged review, commit fix riêng rồi Control Center review; không
   push/merge/deploy, đổi `DONE` hoặc mở BL-R28b/BL-R08.
+
+## Checkpoint Control Center nghiệm thu candidate 2d0d2da — 03/11/2026
+
+- **Kết luận:** chưa đủ DoD, giữ `IN_PROGRESS`. Candidate `2d0d2da`, parent `b60c3a2`;
+  working tree sạch lúc review bắt đầu. Không mở task khác hoặc sửa source implementation.
+- **Khép blocker partial head:** staged complete head được fsync trước atomic rename dưới
+  publication lock và compare expected/current head. Crash fixtures nay gọi actual adapter, chặn
+  các boundary bằng test-owned locks và kiểm restart/retry giữ acknowledged seed prefix. Cửa sổ
+  canonical head rỗng do CREATE_NEW của candidate trước đã được loại khỏi publish path.
+- **Validation:** helper actual rerun exit0 trên run `20261103T084449186Z`, kiểm current input hashes,
+  exact cases, XML/JAR và retained regressions; qualification/unknown profile gates đạt. Report giữ
+  local-host limitation; không claim full service/network/provider qualification.
+- **P1 mới / AC03, AC07:** cả hai adapter dùng `FileChannel.lock()` ở `publishHeadCas` và
+  `readPublishedHead`, nhưng chưa serialize các overlapping locks trong cùng JVM. Java file lock
+  không block thread khác trong cùng JVM như process khác: nó ném unchecked
+  `OverlappingFileLockException`, vượt JournalException taxonomy. Backend nhiều request threads
+  cùng namespace/root gặp failure thay vì CAS loser/retry hội tụ; current suite chỉ kiểm cross-process.
+- **Reproduction thật:** pinned Java21 chạy ignored diagnostic
+  `artifacts/quality/R28a/ReviewThreads.java` với current Identity `target/classes`; seed một prefix,
+  release barrier cho12 threads append12 IDs khác nhau vào cùng store. Kết quả actual4 ACK và8
+  OverlappingFileLockException. Diagnostic exit0 chỉ xác nhận tái hiện, không là suite PASS.
+  Learning có cùng lock path nên cần fix/conformance cả hai service.
+- **Bước tiếp theo:** bổ sung coordination trong JVM theo resolved root/namespace/path, bao phủ cả
+  append và inventory/read-head, kể cả nhiều adapter instances cùng root; vẫn giữ cross-process
+  lock/CAS. Không chỉ catch exception thành success hoặc spin vô hạn. Thêm deterministic concurrent
+  threads + cross-instance/append-inventory regression, rồi rerun affected CMD-06/helper/evidence và
+  tạo commit fix mới trên cùng branch. Registry chưa chuyển DONE/integrate.
