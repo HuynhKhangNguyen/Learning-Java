@@ -489,3 +489,30 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   retention/disaster safety.
 - **Bước tiếp theo:** staged review, tạo candidate commit rồi Control Center nghiệm thu lại. Không
   push/merge/deploy, đổi registry sang `DONE` hoặc mở BL-R28b/BL-R08.
+
+## Checkpoint Control Center nghiệm thu candidate 26875e3 — 03/11/2026
+
+- **Kết luận hiện hành:** BL-R28a `DONE` trong phạm vi local-host lab. Candidate `26875e3`, parent
+  `5b0a4f3`, branch `codex/bl-r28a-journal-lab-adapter`; working tree sạch trước review. Checkpoint
+  này thay trạng thái IN_PROGRESS và finding mở ở các checkpoint trước. R28 parent chưa DONE vì
+  R28b còn riêng; không mở task kế tiếp hoặc tự merge/deploy trong lượt nghiệm thu.
+- **Khép P1 same-JVM:** static fair coordination stripes theo resolved namespace bao phủ toàn bộ
+  append/inventory, dùng chung giữa các instances; OS publication/head locks giữ cross-process
+  authority. Review diff/parity hai adapter đạt. Diagnostic `ReviewThreads.java` từng tái hiện lỗi
+  nay chạy lại bằng pinned Java21/current Identity target/classes, kết quả12/12 ACK và không exception.
+- **Validation thật:** rerun `pwsh -NoProfile -File scripts/tests/journal-lab.Tests.ps1` exit0, bind
+  current manifest/XML/JAR, exact named cases và retained regression của run `20261103T091945685Z`.
+  Journal9 cases/service, affected regression Identity321/Learning127, failures/errors/skips0;
+  cleanup18 fixture roots và child exits được kiểm. Qualification/unknown/malformed gates đạt.
+  `git diff 5b0a4f3..26875e3 --check` sạch. Không rerun full lab vì current evidence còn khớp và
+  diagnostic/required added same-JVM case đã khép concern còn lại.
+- **AC/DoD:** AC01 port/artifact/service-local contract, AC02 owned immutable paths, AC03 process
+  CAS + same-JVM multi-instance coordination, AC04 actual-adapter crash/retry và seed prefix,
+  AC05 corruption/fixed-head/orphan, AC06 strict lab/current evidence và AC07 affected regression/
+  format/privacy được chấp nhận cùng các lớp review đã ghi ở checkpoint trước. DONE-01–05 đạt với
+  candidate commit thật; không còn P0/P1 mở trong supported task scope.
+- **Giới hạn:** bằng chứng local Windows host, không chứng minh off-host/provider/IAM/encryption/
+  retention/disaster safety, business journal gates hoặc full network service suites. Những giới hạn
+  này thuộc task owners sau và không được nâng thành claim production-qualified.
+- **Git handoff:** commit lượt này chỉ ghi kết quả nghiệm thu/registry; implementation candidate vẫn
+  là `26875e3`. Branch còn stacked trên BL-R07; chưa push/merge, không rewrite candidate history.
