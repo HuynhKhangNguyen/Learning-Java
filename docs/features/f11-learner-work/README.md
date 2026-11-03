@@ -26,7 +26,7 @@ Hợp đồng bài làm đã thiết kế; chưa work/submission runtime. [Trạ
 
 | Task | Đọc và cập nhật ở đâu |
 |---|---|
-| BL-R08 | [Registry: scope, dependency và acceptance](../../delivery-backlog.md) |
+| BL-R08 | [Brief, acceptance và checkpoint](tasks/BL-R08.md) |
 | BL-R09 | [Registry: scope, dependency và acceptance](../../delivery-backlog.md) |
 | BL-R10 | [Registry: scope, dependency và acceptance](../../delivery-backlog.md) |
 
