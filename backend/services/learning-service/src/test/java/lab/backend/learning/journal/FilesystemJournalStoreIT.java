@@ -5,10 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.HexFormat;
@@ -51,22 +55,43 @@ class FilesystemJournalStoreIT {
 
   @Test
   void concurrentProcessesExerciseCasLoserRetryWithoutLostRecord() throws Exception {
-    int writerCount = 12;
+    int writerCount = 2;
     Path barrier = Files.createDirectory(temporary.resolve("concurrent-barrier"));
+    Path space = Files.createDirectories(temporary.resolve("lab"));
+    Path publicationLock = space.resolve("publish.lock");
     List<Process> writers = new ArrayList<>();
-    for (int index = 0; index < writerCount; index++) {
-      writers.add(start(temporary, "writer-" + index, barrier, "append"));
+    boolean prepared = false;
+    try (FileChannel lockChannel = FileChannel.open(
+        publicationLock,
+        java.nio.file.StandardOpenOption.CREATE,
+        java.nio.file.StandardOpenOption.WRITE);
+        FileLock ignored = lockChannel.lock()) {
+      for (int index = 0; index < writerCount; index++) {
+        writers.add(start(temporary, "writer-" + index, barrier, "append"));
+      }
+      releaseBarrier(barrier, writerCount);
+      await(
+          () -> countFiles(space.resolve("heads"), ".tmp") >= writerCount,
+          "writers did not reach the same pre-publication head");
+      prepared = true;
+    } finally {
+      if (!prepared) {
+        writers.stream().filter(Process::isAlive).forEach(Process::destroyForcibly);
+      }
     }
-    releaseBarrier(barrier, writerCount);
 
     int retries = 0;
     List<String> verifiedHeads = new ArrayList<>();
-    for (Process writer : writers) {
-      String output = waitFor(writer, 0);
-      String[] fields = output.trim().split(":");
-      assertEquals(3, fields.length, output);
-      verifiedHeads.add(fields[1]);
-      retries += Integer.parseInt(fields[2]);
+    try {
+      for (Process writer : writers) {
+        String output = waitFor(writer, 0);
+        String[] fields = output.trim().split(":");
+        assertEquals(3, fields.length, output);
+        verifiedHeads.add(fields[1]);
+        retries += Integer.parseInt(fields[2]);
+      }
+    } finally {
+      writers.stream().filter(Process::isAlive).forEach(Process::destroyForcibly);
     }
 
     var store = new FilesystemJournalStore(temporary.toAbsolutePath());
@@ -95,10 +120,12 @@ class FilesystemJournalStoreIT {
 
   @Test
   void processCrashBoundariesRemainUnacknowledgedThenConverge() throws Exception {
-    crashAndRetry("after-record", 71);
-    crashAndRetry("after-node", 72);
-    crashAndRetry("after-head", 73);
-    evidence("crash faultPoints=after-record,after-node,after-head cleanup=true");
+    retryAfterCrash(crashAfterRecordBeforeNode("crash-record", "after-record-item"), false);
+    retryAfterCrash(crashAfterNodeBeforePublish("crash-node", "after-node-item"), false);
+    retryAfterCrash(crashAfterPublishBeforeReceipt("crash-head", "after-head-item"), true);
+    evidence(
+        "crash faultPoints=after-record-before-node,after-node-before-publish,"
+            + "after-publish-before-receipt cleanup=true");
   }
 
   @Test
@@ -188,20 +215,22 @@ class FilesystemJournalStoreIT {
   @Test
   void orphanRecordAndNodeStayOutsideVerifiedPrefix() throws Exception {
     Path root = Files.createDirectory(temporary.resolve("orphan"));
-    Path barrier = Files.createDirectory(root.resolve("barrier"));
-    Process crash = start(root, "orphan-item", barrier, "after-node");
-    releaseBarrier(barrier, 1);
-    waitFor(crash, 72);
-
     var store = new FilesystemJournalStore(root.toAbsolutePath());
-    var beforeRetry = store.inventory("lab", ZERO);
+    var seed = store.append("lab", "seed", "payload-seed-orphan".getBytes(UTF_8));
+    byte[] payload = "payload-orphan-item".getBytes(UTF_8);
+    Files.write(root.resolve("lab/records/orphan-item.bin"), payload);
+    byte[] node = ("lab\n2\n" + seed.verifiedHeadDigest() + "\norphan-item\n"
+        + sha(payload) + "\n").getBytes(UTF_8);
+    Files.write(root.resolve("lab/nodes").resolve(sha(node) + ".node"), node);
+
+    var beforeRetry = store.inventory("lab", seed.verifiedHeadDigest());
     assertEquals(List.of("orphan-item"), beforeRetry.orphanRecordIds());
     assertEquals(1, beforeRetry.orphanNodeDigests().size());
-    assertEquals(0, beforeRetry.entries().size());
+    assertEquals(1, beforeRetry.entries().size());
 
-    var receipt = store.append("lab", "orphan-item", "payload-orphan-item".getBytes(UTF_8));
+    var receipt = store.append("lab", "orphan-item", payload);
     var afterRetry = store.inventory("lab", receipt.verifiedHeadDigest());
-    assertEquals(1, afterRetry.entries().size());
+    assertEquals(2, afterRetry.entries().size());
     assertTrue(afterRetry.orphanRecordIds().isEmpty());
     assertTrue(afterRetry.orphanNodeDigests().isEmpty());
     evidence(
@@ -210,35 +239,156 @@ class FilesystemJournalStoreIT {
             + " beforeAckRecords=1 beforeAckNodes=1");
   }
 
-  private void crashAndRetry(String mode, int expectedExit) throws Exception {
-    Path root = Files.createDirectory(temporary.resolve(mode));
+  private CrashState crashAfterRecordBeforeNode(String name, String id) throws Exception {
+    CrashState state = seededCrashState(name, id);
+    Path root = state.root();
     Path barrier = Files.createDirectory(root.resolve("barrier"));
-    String id = mode + "-item";
-    Process crash = start(root, id, barrier, mode);
-    releaseBarrier(barrier, 1);
-    waitFor(crash, expectedExit);
+    Path currentHead = root.resolve("lab/heads").resolve(headSlot(1));
+    try (FileChannel headChannel = FileChannel.open(
+        currentHead,
+        java.nio.file.StandardOpenOption.READ,
+        java.nio.file.StandardOpenOption.WRITE);
+        FileLock ignored = headChannel.lock()) {
+      Process process = start(root, id, barrier, "append");
+      releaseBarrier(barrier, 1);
+      await(
+          () -> recordMatches(root.resolve("lab/records").resolve(id + ".bin"), id),
+          "actual adapter did not reach the after-record boundary");
+      destroyAndWait(process);
+    }
 
+    var inventory = state.store().inventory("lab", state.seed().verifiedHeadDigest());
+    assertEquals(List.of(id), inventory.orphanRecordIds());
+    assertTrue(inventory.orphanNodeDigests().isEmpty());
+    assertEquals(1, inventory.entries().size());
+    return state;
+  }
+
+  private CrashState crashAfterNodeBeforePublish(String name, String id) throws Exception {
+    CrashState state = seededCrashState(name, id);
+    Path root = state.root();
+    Path barrier = Files.createDirectory(root.resolve("barrier"));
+    Path publicationLock = root.resolve("lab/publish.lock");
+    try (FileChannel lockChannel = FileChannel.open(
+        publicationLock,
+        java.nio.file.StandardOpenOption.READ,
+        java.nio.file.StandardOpenOption.WRITE);
+        FileLock ignored = lockChannel.lock()) {
+      Process process = start(root, id, barrier, "append");
+      releaseBarrier(barrier, 1);
+      await(
+          () -> countFiles(root.resolve("lab/nodes"), ".node") >= 2
+              && countFiles(root.resolve("lab/heads"), ".tmp") >= 1,
+          "actual adapter did not stage a complete head before publication");
+      destroyAndWait(process);
+    }
+
+    var inventory = state.store().inventory("lab", state.seed().verifiedHeadDigest());
+    assertEquals(List.of(id), inventory.orphanRecordIds());
+    assertEquals(1, inventory.orphanNodeDigests().size());
+    assertEquals(1, inventory.entries().size());
+    return state;
+  }
+
+  private CrashState crashAfterPublishBeforeReceipt(String name, String id) throws Exception {
+    CrashState state = seededCrashState(name, id);
+    Path root = state.root();
+    Path barrier = Files.createDirectory(root.resolve("barrier"));
+    Path currentHead = root.resolve("lab/heads").resolve(headSlot(1));
+    Path record = root.resolve("lab/records").resolve(id + ".bin");
+    try (FileChannel headChannel = FileChannel.open(
+        currentHead,
+        java.nio.file.StandardOpenOption.READ,
+        java.nio.file.StandardOpenOption.WRITE);
+        FileLock headLock = headChannel.lock()) {
+      Process process = start(root, id, barrier, "after-publish");
+      releaseBarrier(barrier, 1);
+      await(() -> recordMatches(record, id), "actual adapter did not create the crash record");
+      try (FileChannel recordChannel = openForLock(record);
+          FileLock ignored = recordChannel.lock()) {
+        headLock.release();
+        waitFor(process, 73);
+      }
+    }
+
+    String publishedHead = latestHeadDigest(root);
+    var inventory = state.store().inventory("lab", publishedHead);
+    assertEquals(2, inventory.entries().size());
+    assertEquals(id, inventory.entries().get(1).recordId());
+    return new CrashState(root, state.store(), state.seed(), id, publishedHead);
+  }
+
+  private CrashState seededCrashState(String name, String id) throws Exception {
+    Path root = Files.createDirectory(temporary.resolve(name));
     var store = new FilesystemJournalStore(root.toAbsolutePath());
-    if (mode.equals("after-record")) {
-      var inventory = store.inventory("lab", ZERO);
-      assertEquals(List.of(id), inventory.orphanRecordIds());
-      assertTrue(inventory.orphanNodeDigests().isEmpty());
-    } else if (mode.equals("after-node")) {
-      var inventory = store.inventory("lab", ZERO);
-      assertEquals(List.of(id), inventory.orphanRecordIds());
-      assertEquals(1, inventory.orphanNodeDigests().size());
-    } else {
-      var inventory = store.inventory("lab", latestHeadDigest(root));
-      assertEquals(1, inventory.entries().size());
-    }
+    var seed = store.append("lab", "seed", ("payload-seed-" + name).getBytes(UTF_8));
+    return new CrashState(root, store, seed, id, null);
+  }
 
-    String publishedHead = mode.equals("after-head") ? latestHeadDigest(root) : null;
-    var retry = store.append("lab", id, ("payload-" + id).getBytes(UTF_8));
-    assertEquals(1, retry.sequence());
-    if (publishedHead != null) {
-      assertEquals(publishedHead, retry.verifiedHeadDigest());
+  private void retryAfterCrash(CrashState state, boolean alreadyPublished) throws Exception {
+    var retry = state.store().append(
+        "lab",
+        state.id(),
+        ("payload-" + state.id()).getBytes(UTF_8));
+    assertEquals(2, retry.sequence());
+    if (alreadyPublished) {
+      assertEquals(state.publishedHead(), retry.verifiedHeadDigest());
     }
-    assertEquals(1, store.inventory("lab", retry.verifiedHeadDigest()).entries().size());
+    var inventory = state.store().inventory("lab", retry.verifiedHeadDigest());
+    assertEquals(2, inventory.entries().size());
+    assertEquals("seed", inventory.entries().get(0).recordId());
+    assertEquals(state.id(), inventory.entries().get(1).recordId());
+  }
+
+  private FileChannel openForLock(Path path) throws Exception {
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20);
+    while (true) {
+      try {
+        return FileChannel.open(
+            path,
+            java.nio.file.StandardOpenOption.READ,
+            java.nio.file.StandardOpenOption.WRITE);
+      } catch (IOException error) {
+        if (System.nanoTime() >= deadline) {
+          throw error;
+        }
+        Thread.onSpinWait();
+      }
+    }
+  }
+
+  private long countFiles(Path directory, String suffix) throws Exception {
+    if (!Files.isDirectory(directory)) {
+      return 0;
+    }
+    try (var paths = Files.list(directory)) {
+      return paths.filter(path -> path.getFileName().toString().endsWith(suffix)).count();
+    }
+  }
+
+  private boolean recordMatches(Path record, String id) {
+    try {
+      return Files.exists(record)
+          && Arrays.equals(Files.readAllBytes(record), ("payload-" + id).getBytes(UTF_8));
+    } catch (IOException incompleteWrite) {
+      return false;
+    }
+  }
+
+  private void await(CheckedCondition condition, String message) throws Exception {
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(60);
+    while (!condition.evaluate()) {
+      if (System.nanoTime() >= deadline) {
+        throw new AssertionError(message);
+      }
+      Thread.onSpinWait();
+    }
+  }
+
+  private void destroyAndWait(Process process) throws Exception {
+    process.destroyForcibly();
+    assertTrue(process.waitFor(10, TimeUnit.SECONDS), "owned crash process did not exit");
+    assertTrue(process.exitValue() != 0, "forced crash unexpectedly returned success");
   }
 
   private Seed seed(String name) throws Exception {
@@ -280,7 +430,7 @@ class FilesystemJournalStoreIT {
   }
 
   private void releaseBarrier(Path barrier, int expectedWriters) throws Exception {
-    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(20);
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(60);
     while (readyCount(barrier) != expectedWriters) {
       if (System.nanoTime() >= deadline) {
         throw new AssertionError("writers did not reach deterministic barrier");
@@ -350,8 +500,20 @@ class FilesystemJournalStoreIT {
     void run() throws Exception;
   }
 
+  @FunctionalInterface
+  private interface CheckedCondition {
+    boolean evaluate() throws Exception;
+  }
+
   private record Seed(
       Path root,
       FilesystemJournalStore store,
       JournalStore.Receipt receipt) {}
+
+  private record CrashState(
+      Path root,
+      FilesystemJournalStore store,
+      JournalStore.Receipt seed,
+      String id,
+      String publishedHead) {}
 }

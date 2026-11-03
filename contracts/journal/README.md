@@ -7,9 +7,10 @@ phải business API. Canonical payload được lưu nguyên byte, tên record/n
 Mỗi index node là UTF-8 với sáu dòng: namespace, sequence thập phân, previous node SHA-256,
 record ID, record SHA-256 và dòng rỗng kết thúc. Mỗi immutable head file gồm sequence, node
 SHA-256, previous head SHA-256 và newline kết thúc; tên slot là sequence 19 chữ số. Writer dùng
-create-if-absent của slot kế tiếp làm local filesystem CAS. CAS loser đọc slot thắng, verify head
-mới rồi retry cùng record. Sequence đầu là 1, predecessor đầu là 64 ký tự `0`. Digest inventory
-bind namespace, fixed head và từng entry theo sequence.
+publication lock để compare current head, sau đó atomic rename candidate đã ghi/fsync hoàn chỉnh
+sang slot kế tiếp. CAS loser đọc slot thắng, verify head mới rồi retry cùng record; process crash
+chỉ có thể để slot chưa tồn tại hoặc hoàn chỉnh. Sequence đầu là 1, predecessor đầu là 64 ký tự
+`0`. Digest inventory bind namespace, fixed head và từng entry theo sequence.
 
 Create cùng ID/cùng bytes là idempotent; cùng ID/khác bytes là `CONFLICT`. Missing/malformed,
 wrong predecessor/namespace/sequence, head gap hoặc digest mismatch là `CORRUPT`, không trả

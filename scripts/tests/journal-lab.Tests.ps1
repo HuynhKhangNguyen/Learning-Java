@@ -256,6 +256,7 @@ function Assert-Report {
       'type=snapshot',
       'type=concurrency',
       'type=crash',
+      'after-record-before-node,after-node-before-publish,after-publish-before-receipt',
       'missing-record,missing-node',
       'malformed-sequence,wrong-namespace,wrong-predecessor',
       'forged-head,head-gap',

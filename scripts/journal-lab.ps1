@@ -84,7 +84,10 @@ function Assert-ServiceEvidence {
       throw "$Service evidence is missing required fragment: $fragment"
     }
   }
-  if ($joined -notmatch 'faultPoints=after-record,after-node,after-head cleanup=true') {
+  if ($joined -notmatch (
+      'faultPoints=after-record-before-node,after-node-before-publish,' +
+      'after-publish-before-receipt cleanup=true'
+  )) {
     throw "$Service crash/process cleanup evidence is incomplete."
   }
   if ($joined -notmatch 'type=concurrency[^\r\n]*casRetries=([1-9][0-9]*)') {

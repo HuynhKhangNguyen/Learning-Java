@@ -1,8 +1,11 @@
 package lab.backend.identity.journal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.DSYNC;
+import static java.nio.file.StandardOpenOption.READ;
 import static java.nio.file.StandardOpenOption.WRITE;
 
 import java.io.IOException;
@@ -23,10 +26,11 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
- * Local-host lab adapter. Mỗi immutable head slot là một filesystem CAS:
- * writer chỉ thắng khi tạo mới được slot của sequence kế tiếp.
+ * Local-host lab adapter. Head candidate được ghi hoàn chỉnh trước khi publication lock
+ * thực hiện compare-and-swap và atomic rename sang immutable sequence slot.
  */
 public final class FilesystemJournalStore implements JournalStore {
   private static final String ZERO = "0".repeat(64);
@@ -90,7 +94,7 @@ public final class FilesystemJournalStore implements JournalStore {
       createNode(nodes.resolve(nodeDigest + ".node"), nodeBytes);
 
       Head next = new Head(sequence, nodeDigest, head.digest());
-      if (!publishHeadCas(space, next)) {
+      if (!publishHeadCas(space, head, next)) {
         casRetries++;
         continue;
       }
@@ -274,62 +278,65 @@ public final class FilesystemJournalStore implements JournalStore {
     }
   }
 
-  private boolean publishHeadCas(Path space, Head head) throws JournalException {
+  private boolean publishHeadCas(Path space, Head expected, Head next) throws JournalException {
     Path heads = ensureDirectory(space.resolve("heads"));
-    byte[] bytes = headBytes(head);
-    Path slot = owned(heads.resolve(headSlot(head.sequence())));
-    try (FileChannel channel = FileChannel.open(
-        slot,
-        CREATE_NEW,
+    Path candidate = owned(heads.resolve(
+        "." + headSlot(next.sequence()) + "." + UUID.randomUUID() + ".tmp"));
+    Path slot = owned(heads.resolve(headSlot(next.sequence())));
+    Path publicationLock = owned(space.resolve("publish.lock"));
+    writeNew(candidate, headBytes(next), ErrorCode.IO_FAILURE, "Cannot stage complete head");
+
+    try (FileChannel lockChannel = FileChannel.open(
+        publicationLock,
+        CREATE,
         WRITE,
-        DSYNC,
         LinkOption.NOFOLLOW_LINKS);
-        FileLock ignored = channel.lock()) {
-      ByteBuffer buffer = ByteBuffer.wrap(bytes);
-      while (buffer.hasRemaining()) {
-        channel.write(buffer);
+        FileLock ignored = lockChannel.lock()) {
+      owned(publicationLock);
+      Head observed = readHead(space);
+      if (!observed.equals(expected)) {
+        return false;
       }
-      channel.force(true);
+
+      // Candidate đã fsync; atomic move làm canonical slot chỉ có hai trạng thái:
+      // chưa tồn tại hoặc chứa trọn vẹn head. Process crash không để lại partial slot.
+      Files.move(candidate, slot, ATOMIC_MOVE);
+      owned(slot);
       forceDirectory(heads);
       return true;
-    } catch (FileAlreadyExistsException conflict) {
-      Head published = readPublishedHead(slot);
-      if (published.sequence() != head.sequence()) {
-        throw failure(ErrorCode.CORRUPT, "published head sequence changed");
-      }
-      return false;
     } catch (IOException error) {
       throw failure(ErrorCode.IO_FAILURE, "Head CAS failed", error);
+    } finally {
+      try {
+        Files.deleteIfExists(candidate);
+      } catch (IOException ignored) {
+        // Stale staging file không thuộc verified prefix; retention/GC nằm ngoài R28a.
+      }
     }
   }
 
   private Head readPublishedHead(Path requested) throws JournalException {
     Path slot = owned(requested);
-    JournalException lastMalformed = null;
-    for (int attempt = 0; attempt < 1_000; attempt++) {
-      try (FileChannel channel = FileChannel.open(
-          slot,
-          java.nio.file.StandardOpenOption.READ,
-          WRITE,
-          LinkOption.NOFOLLOW_LINKS);
-          FileLock ignored = channel.lock()) {
-        long size = channel.size();
-        if (size <= 0 || size > MAX_HEAD_BYTES) {
-          throw failure(ErrorCode.CORRUPT, "malformed head size");
-        }
-        ByteBuffer buffer = ByteBuffer.allocate((int) size);
-        while (buffer.hasRemaining() && channel.read(buffer) >= 0) {
-          // Đọc hết immutable slot sau khi CAS winner nhả lock.
-        }
-        return parseHead(buffer.array());
-      } catch (JournalException malformed) {
-        lastMalformed = malformed;
-      } catch (IOException error) {
-        throw failure(ErrorCode.IO_FAILURE, "Cannot read published head", error);
+    try (FileChannel channel = FileChannel.open(
+        slot,
+        READ,
+        WRITE,
+        LinkOption.NOFOLLOW_LINKS);
+        FileLock ignored = channel.lock()) {
+      long size = channel.size();
+      if (size <= 0 || size > MAX_HEAD_BYTES) {
+        throw failure(ErrorCode.CORRUPT, "malformed head size");
       }
-      Thread.yield();
+      ByteBuffer buffer = ByteBuffer.allocate((int) size);
+      while (buffer.hasRemaining() && channel.read(buffer) >= 0) {
+        // Canonical slot chỉ xuất hiện sau atomic rename của candidate hoàn chỉnh.
+      }
+      return parseHead(buffer.array());
+    } catch (JournalException error) {
+      throw error;
+    } catch (IOException error) {
+      throw failure(ErrorCode.IO_FAILURE, "Cannot read published head", error);
     }
-    throw failure(ErrorCode.CORRUPT, "published head remained incomplete", lastMalformed);
   }
 
   private Head readHead(Path space) throws JournalException {
@@ -343,6 +350,11 @@ public final class FilesystemJournalStore implements JournalStore {
       for (Path path : paths.toList()) {
         owned(path);
         String name = path.getFileName().toString();
+        if (name.matches("\\.[0-9]{19}\\.head\\.[0-9a-f-]{36}\\.tmp")) {
+          // Process crash có thể để lại candidate hoàn chỉnh; candidate chưa publish
+          // không phải canonical head và không được đi vào verified prefix.
+          continue;
+        }
         if (!name.matches("[0-9]{19}\\.head")) {
           throw failure(ErrorCode.CORRUPT, "malformed head filename");
         }

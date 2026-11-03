@@ -394,3 +394,37 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
 - **Bước tiếp theo:** executor sửa publication/crash fixtures trên cùng branch, rerun affected
   CMD-06/helper/regression và tạo commit fix mới. Các report PASS hiện hành chỉ chứng minh case đã
   chạy, chưa chứng minh cửa sổ crash vừa tái hiện. Chưa đủ DoD để DONE/integration.
+
+## Checkpoint fix atomic head publication — 03/11/2026
+
+- **Trạng thái/phạm vi:** giữ `IN_PROGRESS`; branch `codex/bl-r28a-journal-lab-adapter`, parent
+  `b60c3a2`. Working tree trước commit chỉ có sáu Java journal source/test/fixture, contract journal,
+  hai journal scripts và checkpoint này trong write scope; candidate revision được báo trong Git
+  handoff. Không sửa workflow business, Content, provider/S3 hoặc task khác.
+- **Khép P1 review:** cả hai adapter ghi và fsync head candidate hoàn chỉnh trong `heads`, sau đó giữ
+  publication lock, so current head với expected head và atomic rename sang canonical sequence slot.
+  Crash không còn để lại canonical slot rỗng/partial; staging file còn sót không thuộc verified prefix.
+  CAS loser đọc head thắng rồi retry. Contract chung được cập nhật đúng giới hạn local-host.
+- **Crash/concurrency thật:** fixture gọi actual `FilesystemJournalStore.append` tại cả ba boundary:
+  sau record trước node, sau node trước publish, và sau publish trước receipt. Mỗi case giữ acknowledged
+  seed prefix, process mới retry hội tụ về sequence 2; hai writer process cùng expected head tạo một
+  CAS loser/retry (`casRetries=1`) ở mỗi service. Fault control chỉ nằm trong test artifact.
+- **CMD-06 current inputs:**
+  `pwsh -NoProfile -File scripts/services.ps1 -Task journal -Profile lab -Offline` PASS run
+  `20261103T084449186Z`, input manifest SHA-256
+  `6868460f185060c2cafdbc6357b6c4f696a3f76b90fd3e3fc13c6f2db6e2c058`. Affected regression
+  Identity `321` và Learning `127`; journal Identity/Learning cùng `8`, tất cả
+  failure/error/skip `0`. Cleanup xác nhận 16 fixture roots và mọi child process đã thoát. JAR SHA-256:
+  Identity `e7d54a2b771979de9e519674e44df00e56beb22b7eaf88a41f8db8014455aa30`, Learning
+  `2360d9a50d584a9a2f27b2d0b5bf9968e353d390eee7cac4adf06f5a9bd495a6`; main classes có mặt,
+  test/fault classes không lọt artifact.
+- **Gates khác:** helper `scripts/tests/journal-lab.Tests.ps1` PASS trên report current; qualification
+  run `20261103T085507888Z` trả exit `3`/`NOT_QUALIFIED`, unknown profile fail closed. PowerShell
+  parse, Identity/Learning parity, privacy scan và `git diff --check` sạch; không còn Java process hay
+  log JVM test-generated. Executor review hiện tại P0=0, P1=0, P2=0, P3=0; AC01–07 đạt theo evidence
+  local executor, chờ Control Center nghiệm thu candidate mới.
+- **Giới hạn/bước tiếp theo:** các attempt trong restricted AppContainer không hỗ trợ atomic rename
+  được giữ là failed diagnostics; authoritative PASS chạy trên cùng local Windows host với quyền đã
+  cấp, không phải off-host evidence. Không claim provider/IAM/encryption/retention/disaster safety.
+  Bước tiếp theo duy nhất là staged review, commit fix riêng rồi Control Center review; không
+  push/merge/deploy, đổi `DONE` hoặc mở BL-R28b/BL-R08.
