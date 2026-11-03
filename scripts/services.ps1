@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [Parameter(Mandatory)]
-  [ValidateSet('toolchain', 'validate', 'verify', 'db', 'contract', 'fault','relay')]
+  [ValidateSet('toolchain', 'validate', 'verify', 'db', 'contract', 'fault','relay','journal')]
   [string]$Task,
   [ValidateSet('identity', 'content', 'learning', 'all')]
   [string]$Service,
@@ -11,14 +11,24 @@ param(
   [string]$TrustConfig,
   [ValidateSet('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-06','SEC-07','SEC-08','SEC-09','SEC-10','SEC-11','SEC-12','SEC-14','SEC-15','SEC-16','SEC-19','SEC-20','SEC-22','SEC-23','SEC-25','SEC-28','WIRE-01','WIRE-02','WIRE-03','WIRE-04','WIRE-05','WIRE-06','DATA-01','DATA-02','DATA-03','DATA-04','DATA-05','DATA-06','DATA-07','DATA-10','DATA-11','DATA-12','DATA-13','DATA-14','DATA-15')]
   [string]$Case,
-  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c','R07')]
+  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c','R07','R28a')]
   [string]$EvidenceTask,
+  [ValidateSet('lab', 'qualification')]
+  [string]$Profile,
   [switch]$Offline
 )
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 $repoDirectory = Split-Path -Parent $PSScriptRoot
+if ($Task -eq 'journal') {
+  if (-not $Profile) { throw 'journal requires -Profile lab or qualification.' }
+  if ($Service -or $LabConfig -or $TrustConfig -or $Case) {
+    throw 'journal owns both Identity/Learning and does not accept service/DB/trust/case overrides.'
+  }
+  & (Join-Path $PSScriptRoot 'journal-lab.ps1') -Profile $Profile -Offline:$Offline
+  exit $LASTEXITCODE
+}
 # Catalog R05 độc lập với Java/PG/trust: branch explicit trước mọi bootstrap
 # bên dưới. Không đổi nghĩa CMD04 legacy, không gắn schema PASS thành HTTP PASS.
 if ($EvidenceTask -eq 'R05') {
