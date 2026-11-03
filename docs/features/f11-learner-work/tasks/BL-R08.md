@@ -292,3 +292,26 @@ Candidate sẵn sàng chờ Control Center review thì NEED_REVIEW; không tự 
   validation theo Git workflow, trả candidate/validation/findings/limits để main review.
 - Executor không sửa registry/task file, không DONE/integrate hoặc mở task khác. Main cập nhật
   checkpoint/NEED_REVIEW từ evidence thật, review candidate và điều phối fix tới nghiệm thu.
+
+## Checkpoint Control Center tiếp tục candidate e3d7c36 — 04/11/2026
+
+- Người dùng hỏi trạng thái và yêu cầu tiếp tục nếu chưa xong. R08 vẫn IN_PROGRESS; native executor
+  đã được giao tiếp phần AC còn thiếu, cùng writer/scope/branch. Không cần manual paste hoặc task mới.
+- Candidate `e3d7c36`, parent `0b15cc4`, working tree sạch lúc kiểm. Đã có Identity admission,
+  Content/Learning v3 compatibility và allocation PG/journal/API implementation; chưa đủ DoD.
+- Handoff ignored evidence:
+  `artifacts/quality/R08/d1fc28ed-3972-4cb7-a66c-7e4d900c4bd4/candidate-handoff.json`.
+  Main đọc và kiểm report hashes bốn runs khớp handoff: CMD03 `36704a09-f4ae-4330-81fb-e99d8e4afcaf`,
+  CMD04 `5bfbb98a-543e-4818-a2c7-d4f5d78bb761`, CMD05 `d1fc28ed-3972-4cb7-a66c-7e4d900c4bd4`,
+  CMD06 `20261103T161150466Z`. PASS chỉ áp dụng registered subset, không rollup AC/DONE toàn leaf.
+- Còn thiếu: exact ACK-before-final crash barrier (AC04); controlled auth/context/credential,
+  epoch/pending/deleted và publication ordering quanh journal/final/read (AC05); mở rộng metadata/
+  admission negatives, dedicated affected selectors và original R06c regressions (AC01–03/06–07).
+- Main source review bước đầu xác nhận coordinator journal ngoài local transaction, fresh admission
+  trước final callback; query bị deny ở boundary trước handler. Chưa nghiệm thu chỉ từ source.
+- Chấp nhận pool từ immutable RELEASED replicas cho single-case bundle, với current manifest gating
+  và absence fallback chỉ khi active v3 cùng rubricVersion/CAP. Executor phải bổ sung negative tests
+  v2/withdraw/unmatched-policy. Structural draft-07 subset là explicit compatibility limit; cần kiểm
+  malformed schema/keyword parity và không claim full runtime draft-07 implementation.
+- Bước tiếp theo đang giao executor: khép required matrix, validate candidate mới, commit riêng và
+  handoff để main review. Khi còn implementation/validation giữ IN_PROGRESS; đủ bàn giao mới NEED_REVIEW.
