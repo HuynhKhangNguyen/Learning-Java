@@ -131,7 +131,7 @@ Role dùng tool sẵn có của runtime và skill chỉ khi task thực sự kh�
 - Mỗi subtask phải ghi role, input, expected output, file được phép sửa, validation và khi nào phải escalation. Integrator sở hữu task file, registry và các file tích hợp dùng chung.
 - Chỉ chạy write song song khi các tập file không giao nhau. Một file có một writer tại một thời điểm; thay đổi phụ thuộc nhau làm tuần tự. Read-only discovery/review có thể chạy song song.
 - Agent trả kết quả không đồng nghĩa đã merge hoặc PASS. Integrator phải kiểm thay đổi, giải quyết xung đột về nghĩa và chạy cổng tích hợp bị ảnh hưởng.
-- Chỉ dùng branch/worktree khi repository có Git baseline đã review và task cho phép, theo [Git workflow](platform/repository/git-workflow.md). Khi chưa có baseline, không dựa vào worktree/diff để cô lập; giới hạn write vào các file rời nhau và giữ một integrator.
+- Dùng branch/worktree sau baseline theo quyền Git thường trực trong [Git workflow](platform/repository/git-workflow.md). Khi chưa có baseline, không dựa vào worktree/diff để cô lập; giới hạn write vào các file rời nhau và giữ một integrator.
 
 ### Mode B — manual chat coordination
 
@@ -141,7 +141,7 @@ Role dùng tool sẵn có của runtime và skill chỉ khi task thực sự kh�
 
 ### Git isolation và integration
 
-Git chỉ là cơ chế cô lập/integration sau khi repository có baseline hợp lệ; không thay source ownership, task acceptance hoặc checkpoint. Branch/worktree/commit cần quyền riêng ghi trong task; subagent mặc định không commit và integrator sở hữu integration. Khi chưa có `HEAD`, scope review dùng write scope, inventory/checksum và validation thật. Toàn bộ rule về initial baseline, branch naming, staged review, conflict, handoff, remote và thao tác nguy hiểm nằm tại [Git workflow](platform/repository/git-workflow.md), không lặp lại ở đây.
+Git chỉ là cơ chế cô lập/integration sau khi repository có baseline hợp lệ; không thay source ownership, task acceptance hoặc checkpoint. Quyền Git thường trực đã được cấp: mỗi task một nhánh, executor tạo commit mỗi lượt implement/fix rồi Control Center review theo commit; integrator sở hữu nghiệm thu/integration. Không xin lại quyền Git từng lượt. Khi chưa có `HEAD`, scope review dùng write scope, inventory/checksum và validation thật. Toàn bộ rule nằm tại [Git workflow](platform/repository/git-workflow.md).
 
 ## 11. Handoff bền qua session
 
@@ -149,7 +149,7 @@ File task là gói handoff duy nhất cho một leaf: brief/acceptance ở đầ
 
 Khi kết phiên, executor ghi các trường ở mẫu checkpoint mục 5, gồm role/mode/write scope, file thực sự đổi, lệnh và kết quả thật, giới hạn, finding chưa xử lý và bước tiếp theo. Integrator kiểm output trước khi đổi `REVIEW` hoặc `DONE`. Nếu chưa đạt, giữ `IN_PROGRESS`; nếu có điều kiện chặn cụ thể thì ghi `BLOCKED` cùng cách gỡ. Task `DONE` không tự cấp quyền hoặc tự bắt đầu task kế tiếp.
 
-Khi mở phiên mới, đi theo đường `registry → task file → checkpoint mới nhất → source được brief dẫn`; không yêu cầu người dùng chép lại lịch sử chat. Commit/branch/PR chỉ ghi khi thực sự tồn tại, không là điều kiện bắt buộc của handoff. Nếu có Git evidence, checkpoint phải gắn branch/base/commit/working-tree status và validation với revision thật theo [Git workflow](platform/repository/git-workflow.md).
+Khi mở phiên mới, đi theo đường `registry → task file → checkpoint mới nhất → source được brief dẫn`; không yêu cầu người dùng chép lại lịch sử chat. Mỗi lượt implement/fix bàn giao có candidate commit trên cùng task branch. Checkpoint phải gắn branch/base/commit/working-tree status và validation với revision thật theo [Git workflow](platform/repository/git-workflow.md). PR chỉ ghi khi thực sự tồn tại.
 
 ## 12. Ba prompt dùng ngay
 

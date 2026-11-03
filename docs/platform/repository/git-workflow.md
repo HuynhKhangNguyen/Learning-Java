@@ -2,7 +2,27 @@
 
 [Task initial baseline](tasks/BL-R00a.md) · [Execution model](../../execution-model.md) · [Quality process](../../quality-process.md) · [Finding STR-01](../../architecture/project-structure-review.md#3-findings-và-mức-ưu-tiên)
 
-File này là owner duy nhất của Git policy. `AGENTS.md` giữ rule bắt buộc ngắn; execution model chỉ giữ orchestration/integration và link về đây. Task/checkpoint ghi quyền và evidence của từng lượt, không sao chép policy.
+File này là owner duy nhất của Git policy. `AGENTS.md` giữ rule bắt buộc ngắn; execution model chỉ giữ orchestration/integration và link về đây. Task/checkpoint ghi revision và evidence của từng lượt, không sao chép policy.
+
+## Quyền thường trực — cập nhật 03/11/2026
+
+Người dùng đã cấp quyền dùng Git trong workflow được giao mà không xin lại: stage, commit, tạo/chuyển
+branch, worktree, fetch/pull, push, merge, tag và PR khi phục vụ task. Executor được tự commit;
+Control Center chịu trách nhiệm review và integration. Quyền này thay các điều khoản cũ trong
+brief/checkpoint yêu cầu chờ quyền Git riêng hoặc cấm executor commit. Không cần thêm một lần cấp
+quyền trong mỗi brief. Các gate initial baseline bên dưới là lịch sử; repository hiện đã có baseline.
+
+Mỗi task có một nhánh, dùng xuyên suốt các lượt implement → review → fix → review tới nghiệm thu.
+Mỗi lượt implement hoặc fix review hoàn tất phải tạo một commit riêng sau validation phù hợp;
+chưa đủ DoD vẫn commit phần việc bàn giao với trạng thái `IN_PROGRESS`. Commit là candidate để
+review, không tự chứng minh task DONE. Không amend/squash các candidate đã bàn giao để giữ lịch sử
+review; lượt fix tiếp theo tạo commit mới.
+
+Quyền Git không mở rộng write scope hoặc tự mở task kế tiếp, không cấp quyền deploy, công bố
+release hay đưa secret lên remote. Chỉ dùng remote đích đã xác minh; chưa có remote thì giữ local,
+không cần tạo remote chỉ để hoàn thành task. Push thông thường được phép nhưng không bắt buộc.
+Merge/integration chỉ sau Control Center nghiệm thu đủ DoD. Thao tác có nguy cơ mất dữ liệu vẫn
+tuân mục 5; quyền thường trực không cho phép xóa work của người khác hoặc force-push shared history.
 
 ## 1. Xác định giai đoạn từ repository thật
 
@@ -53,20 +73,21 @@ Sau commit, ghi commit ID, parent state (root commit), branch, exact staged summ
 
 ### Branch
 
-- Một leaf code hoặc docs đáng kể dùng task branch khi brief cho phép. Maintenance nhỏ có thể dùng checkout hiện tại nếu Control Center ghi branch không thêm giá trị.
+- Mỗi task dùng một task branch, kể cả task docs; tạo hoặc dùng lại branch của đúng task mà không xin quyền. Maintenance nhỏ ngoài backlog có thể dùng branch hiện tại với commit riêng, không trộn work đang dở.
 - Tên mặc định: `codex/<task-id-lowercase>-<short-slug>`, chỉ lowercase và dấu gạch ngang; ví dụ `codex/bl-e07b-http-flow-scene`.
-- Base/integration ref phải được task chỉ ra và resolve thật. Không tự đoán `main`, `master` hoặc remote default; không làm trực tiếp trên integration branch khi task yêu cầu branch riêng.
+- Base/integration ref phải resolve từ repository thật và ghi trong checkpoint. Khi brief chưa chỉ ra, tự chọn reviewed integration ref phù hợp; dependency chưa merge thì ghi rõ stacked base. Không implement trực tiếp trên integration branch.
 
 ### Worktree
 
-- Chỉ dùng khi có `HEAD`, task cho phép, công việc độc lập, write scope không giao nhau và integrator rõ.
+- Tự dùng khi có `HEAD`, công việc độc lập, write scope không giao nhau và integrator rõ.
 - Không dùng worktree để che conflict ownership/contract; một owner file chỉ có một writer.
 - Trước archive/remove, kiểm uncommitted/untracked/ignored artifact và bảo toàn phần cần giữ. Không xóa worktree/branch chứa work chưa tích hợp.
 
-### Commit authorization và nội dung
+### Commit mỗi lượt bàn giao
 
-- Quyền sửa không tự cấp quyền commit. Chỉ commit khi người dùng yêu cầu hoặc brief/checkpoint hiện hành ghi rõ.
-- Commit permission không bao gồm push, merge, tag, release hoặc deploy. Subagent không tự commit nếu assignment không ghi rõ; mặc định integrator sở hữu commit.
+- Executor tự stage và commit mỗi lượt implement/fix hoàn tất sau pre-commit review; không chờ Control Center nghiệm thu để tạo candidate commit.
+- Control Center review candidate theo base/commit thật. Nếu có finding, ghi finding cùng candidate revision và giao fix; executor tạo commit fix mới trên cùng nhánh. Lặp tới khi đủ DoD rồi Control Center cập nhật DONE và tích hợp.
+- Subagent chỉ commit khi assignment giao quyền sở hữu lượt bàn giao; không tạo commit đồng thời trong shared index/worktree.
 - Mỗi commit có một mục đích review được. Không trộn feature, refactor, formatting diện rộng và generated output.
 - Không commit secret, runtime/local data, dependency cache, generated build/test output, sensitive log, file cá nhân hoặc IDE state. Lockfile/migration/contract được commit khi task thật sự thay đổi chúng.
 - Commit không thay checkpoint hoặc validation evidence.
@@ -92,7 +113,7 @@ Type tối thiểu: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `build`,
 
 ### Handoff
 
-Task/checkpoint vẫn là handoff bền; không bắt commit chỉ để bàn giao. Chỉ ghi Git evidence khi thật sự tồn tại:
+Task/checkpoint vẫn là handoff bền; mỗi lượt implement/fix bàn giao phải có commit. Commit message chứa task ID, checkpoint ghi base/candidate revision và parent; có thể dùng HEAD của lượt bàn giao và đối chiếu hash sau commit để tránh tự ghi hash vào chính commit. Chỉ ghi Git evidence khi thật sự tồn tại:
 
 - branch và base revision;
 - commit revision;
@@ -110,10 +131,9 @@ Task/checkpoint vẫn là handoff bền; không bắt commit chỉ để bàn gi
 
 ### Remote, push và pull request
 
-- Local commit không cho phép push. Chỉ push khi người dùng/task cấp quyền rõ.
-- Không tự tạo/thay remote, không force-push mặc định.
-- Chỉ tạo PR khi được yêu cầu; PR mô tả behavior, scope, validation và limitation thật.
-- Không merge PR nếu chưa có quyền merge rõ.
+- Quyền thường trực cho phép push tới remote/branch đã xác minh; không cần hỏi lại. Không push secret, work ngoài scope hoặc dùng force-push mặc định.
+- Có thể tạo/cập nhật PR khi phục vụ review/integration task; PR mô tả behavior, scope, validation và limitation thật.
+- Chỉ merge sau Control Center nghiệm thu; resolve conflict và chạy affected validation trước integration. Không tự tạo/thay remote đích chưa xác định.
 
 ## 5. Thao tác có nguy cơ mất dữ liệu
 

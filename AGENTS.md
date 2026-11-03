@@ -23,9 +23,9 @@
 - Không dùng subagent cho task ngắn hoặc giao nhiều agent cùng một câu hỏi. Prompt chỉ gồm ID/path/AC/write scope; handoff chỉ gồm kết luận, file, validation, finding và giới hạn, không chép history/source/log.
 - Subagent dùng chung workspace và quyền với main session. Không coi role trong Markdown là agent chạy tự động, không giả chat khác chia sẻ live state, và không tự tạo chat người dùng.
 - Trạng thái Git phải được kiểm từ repository thật và tuân theo [Git workflow](docs/platform/repository/git-workflow.md). Khi chưa có baseline `HEAD` đã review, không dùng diff/branch/worktree để chứng minh scope; write song song phải tách file owner và được main review.
-- Quyền sửa file không tự cấp quyền stage/commit/branch/worktree/push/merge/tag. Chỉ thực hiện Git mutation khi người dùng hoặc brief/checkpoint hiện hành cấp đúng quyền; commit không bao gồm push hay merge.
+- Người dùng đã cấp quyền Git thường trực: tự dùng stage/commit/branch/worktree/pull/push/merge/tag trong workflow được giao, không xin lại từng thao tác. Mỗi task một nhánh; executor commit mỗi lượt implement/fix review trước handoff, Control Center review theo commit và tích hợp sau nghiệm thu. Chi tiết ở Git workflow; quyền Git không cấp quyền mở task khác hoặc deploy.
 - Không tự chạy thao tác có nguy cơ mất dữ liệu như `reset --hard`, `clean`, destructive checkout/restore, xóa branch/worktree, shared-history rebase, amend work người khác hoặc force-push. Handoff chỉ ghi branch/commit/PR khi chúng thật sự tồn tại.
-- Không commit, push, merge, deploy, cài dependency, đổi secret hoặc thực hiện thao tác phá huỷ nếu task hiện tại không yêu cầu rõ.
+- Không deploy, cài dependency, đổi secret hoặc thực hiện thao tác phá huỷ nếu task hiện tại không yêu cầu rõ. Không đưa thay đổi ngoài scope vào commit.
 
 ## Quy tắc sản phẩm và nội dung
 
