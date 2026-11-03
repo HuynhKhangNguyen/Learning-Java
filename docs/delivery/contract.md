@@ -41,6 +41,10 @@ D14 bổ sung: fixture/command/môi trường bắt buộc phải có từ depen
 
 DONE-02 chọn theo [quality process](../quality-process.md); docs thuần không cần app E2E. Không có test chạy được thì ghi chưa kiểm chứng, không PASS thay. Điều kiện không áp dụng ghi lý do cụ thể. Không tự miễn acceptance bắt buộc hoặc learner test để đóng task.
 
+Lượt implement/fix đã validation, có candidate commit và checkpoint chờ Control Center nghiệm thu
+dùng `NEED_REVIEW`. Còn implementation/validation/fix thì `IN_PROGRESS`; review yêu cầu sửa quay
+về `IN_PROGRESS`. NEED_REVIEW không đồng nghĩa đạt DoD; chỉ Control Center chấp nhận mới `DONE`.
+
 ## 4. DoD release và project
 
 | Mốc | Điều kiện nghiệm thu |
@@ -87,7 +91,7 @@ Collections hiện có hồ sơ thiết kế D06/D07; runtime còn ở BL-R. Cá
 
 ## 7. Session và context bàn giao
 
-Mở phiên: đọc AGENTS → task/brief/checkpoint → REQ/LLD/nguồn có liên quan → code hiện có. Ghi mục tiêu phiên bằng kết quả cần chứng minh. Kết phiên: ghi trạng thái, file, acceptance đã đạt/còn thiếu, kiểm tra/giới hạn, quyết định mới và bước tiếp theo. Nếu chưa xong, giữ IN_PROGRESS; session hết không tạo bằng chứng DONE.
+Mở phiên: đọc AGENTS → task/brief/checkpoint → REQ/LLD/nguồn có liên quan → code hiện có. Ghi mục tiêu phiên bằng kết quả cần chứng minh. Kết phiên: ghi trạng thái, file, acceptance đã đạt/còn thiếu, kiểm tra/giới hạn, quyết định mới và bước tiếp theo. Còn việc thì IN_PROGRESS; candidate đã validation/commit chờ review thì NEED_REVIEW. Session hết không tạo bằng chứng DONE.
 
 
 ## 8. Vị trí tài liệu từ04/10/2026

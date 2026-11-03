@@ -4,6 +4,10 @@
 
 BL-D11 · 30/09/2026. Điền khi task sắp bắt đầu, không tự tạo session hoặc goal công cụ. [Backlog](../delivery-backlog.md) là nguồn trạng thái; [delivery contract](contract.md) định Ready/Done. Không cần copy toàn bộ rule chung vào brief.
 
+Trạng thái bàn giao: implement/fix đã validation và commit candidate chờ Control Center review thì
+`NEED_REVIEW`; còn việc thì `IN_PROGRESS`. Review yêu cầu sửa quay về `IN_PROGRESS`, nghiệm thu đủ
+DoD mới `DONE`. NEED_REVIEW thay tên REVIEW trong lifecycle hiện hành.
+
 ## Mẫu dùng cho code, thiết kế và nội dung
 
 ```text

@@ -14,7 +14,9 @@ quyền trong mỗi brief. Các gate initial baseline bên dưới là lịch s�
 
 Mỗi task có một nhánh, dùng xuyên suốt các lượt implement → review → fix → review tới nghiệm thu.
 Mỗi lượt implement hoặc fix review hoàn tất phải tạo một commit riêng sau validation phù hợp;
-chưa đủ DoD vẫn commit phần việc bàn giao với trạng thái `IN_PROGRESS`. Commit là candidate để
+chưa đủ DoD vẫn commit phần việc bàn giao. Còn implementation/validation thì giữ `IN_PROGRESS`;
+lượt implement/fix đã validation và commit chờ Control Center review thì ghi `NEED_REVIEW` trong
+registry/checkpoint của candidate. Review yêu cầu sửa thì về `IN_PROGRESS`. Commit là candidate để
 review, không tự chứng minh task DONE. Không amend/squash các candidate đã bàn giao để giữ lịch sử
 review; lượt fix tiếp theo tạo commit mới.
 

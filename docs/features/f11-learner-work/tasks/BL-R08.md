@@ -128,7 +128,9 @@ không có concern mới; không chạy toàn repo vô điều kiện.
 DONE-01: AC01–05 có implementation và evidence đúng lớp; DONE-02: strict command/current-candidate
 bindings/cleanup AC06; DONE-03: AC07 review/regression/privacy đạt; DONE-04: owner docs/task/registry
 đồng bộ và limits đúng; DONE-05: staged review và candidate commit đúng Git workflow. Chỉ Control
-Center nghiệm thu DONE; chưa đủ giữ IN_PROGRESS, ghi AC thiếu và bước tiếp theo chính xác.
+Center nghiệm thu DONE. Executor đã validation/commit và bàn giao chờ review thì đổi registry và
+checkpoint sang NEED_REVIEW; còn implementation/validation/fix thì IN_PROGRESS, ghi AC thiếu và bước
+tiếp theo chính xác. Review yêu cầu sửa thì về IN_PROGRESS, fix xong lại commit và NEED_REVIEW.
 
 ## Checkpoint mở task — 03/11/2026
 
@@ -144,5 +146,6 @@ Thực hiện BL-R08 theo docs/features/f11-learner-work/tasks/BL-R08.md và reg
 Mục tiêu: server allocation API-L01/L02, pinned owner/case/version và verified JRN-01 trước prompt
 disclosure, đạt AC01–07 trong local lab. Chỉ sửa write scope trong brief trên branch
 codex/bl-r08-learning-allocation. Triển khai, validation và checkpoint; tự commit mỗi lượt implement/
-fix sau validation theo Git workflow, giữ IN_PROGRESS nếu chưa đủ DoD. Không mở task khác.
+fix sau validation theo Git workflow. Bàn giao candidate chờ review thì NEED_REVIEW; còn việc thì
+IN_PROGRESS. Chỉ Control Center nghiệm thu mới DONE. Không mở task khác.
 ```

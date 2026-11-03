@@ -45,9 +45,9 @@ Skill là quy trình tái sử dụng; rule là ràng buộc ổn định; requi
 
 ## 4. Trạng thái và điều kiện bắt đầu/kết thúc
 
-PLANNED → READY → IN_PROGRESS → REVIEW → DONE. BLOCKED ghi điều kiện chặn và cách gỡ. PLANNED nghĩa là đầu ra đã dự kiến nhưng còn phụ thuộc/phân rã; không phải đang làm. REVIEW là chờ hoàn tất review, không nhất thiết là chờ người dùng phê duyệt.
+PLANNED → READY → IN_PROGRESS → NEED_REVIEW → DONE. BLOCKED ghi điều kiện chặn và cách gỡ. PLANNED nghĩa là đầu ra đã dự kiến nhưng còn phụ thuộc/phân rã; không phải đang làm. Executor chuyển NEED_REVIEW khi lượt implement/fix đã validation, có candidate commit và checkpoint đủ để Control Center review. NEED_REVIEW không chứng minh đã đạt DoD. Review yêu cầu sửa thì quay về IN_PROGRESS; fix xong validation/commit lại chuyển NEED_REVIEW. Chỉ Control Center nghiệm thu mới đổi DONE.
 
-Trong thuật ngữ chung, `PLANNED` tương ứng Backlog và `REVIEW` tương ứng In Review. Không thêm alias vào registry để tránh hai lifecycle cạnh tranh.
+Trong thuật ngữ chung, `PLANNED` tương ứng Backlog và `NEED_REVIEW` tương ứng In Review. NEED_REVIEW thay tên REVIEW trong lifecycle hiện hành; không dùng hai alias song song. Checkpoint lịch sử giữ nguyên trạng thái đã ghi.
 
 **Ready:** đầu ra cụ thể; phạm vi loại trừ; requirements và dependency rõ; dữ liệu/ví dụ đầu vào đủ; tiêu chí đo được; biết cách xác minh; không còn quyết định sản phẩm ngăn việc thực hiện. Task triển khai còn cần chỉ dẫn cho phép chuyển sang code.
 
@@ -147,7 +147,7 @@ Git chỉ là cơ chế cô lập/integration sau khi repository có baseline h�
 
 File task là gói handoff duy nhất cho một leaf: brief/acceptance ở đầu, bảng DoD/evidence hiện hành và checkpoint mới nhất. Registry chỉ giữ trạng thái, dependency và link. Không tạo bản handoff cạnh tranh trong một chat hoặc file tổng hợp khác.
 
-Khi kết phiên, executor ghi các trường ở mẫu checkpoint mục 5, gồm role/mode/write scope, file thực sự đổi, lệnh và kết quả thật, giới hạn, finding chưa xử lý và bước tiếp theo. Integrator kiểm output trước khi đổi `REVIEW` hoặc `DONE`. Nếu chưa đạt, giữ `IN_PROGRESS`; nếu có điều kiện chặn cụ thể thì ghi `BLOCKED` cùng cách gỡ. Task `DONE` không tự cấp quyền hoặc tự bắt đầu task kế tiếp.
+Khi kết phiên, executor ghi các trường ở mẫu checkpoint mục 5, gồm role/mode/write scope, file thực sự đổi, lệnh và kết quả thật, giới hạn, finding chưa xử lý và bước tiếp theo. Lượt implement/fix đã validation và commit chờ nghiệm thu thì executor đổi registry/checkpoint sang `NEED_REVIEW`. Còn việc chưa hoàn thành thì giữ `IN_PROGRESS`; có điều kiện chặn cụ thể thì ghi `BLOCKED` cùng cách gỡ. Integrator review candidate: yêu cầu sửa thì về `IN_PROGRESS`, đủ DoD mới `DONE`. Task `DONE` không tự cấp quyền hoặc tự bắt đầu task kế tiếp.
 
 Khi mở phiên mới, đi theo đường `registry → task file → checkpoint mới nhất → source được brief dẫn`; không yêu cầu người dùng chép lại lịch sử chat. Mỗi lượt implement/fix bàn giao có candidate commit trên cùng task branch. Checkpoint phải gắn branch/base/commit/working-tree status và validation với revision thật theo [Git workflow](platform/repository/git-workflow.md). PR chỉ ghi khi thực sự tồn tại.
 
@@ -162,11 +162,11 @@ Khi mở phiên mới, đi theo đường `registry → task file → checkpoint
 ### Bắt đầu một task session
 
 ```text
-Thực hiện <TASK-ID> theo brief/checkpoint được registry link. Mục tiêu phiên là <KẾT-QUẢ-CẦN-CHỨNG-MINH>. Chỉ sửa <WRITE-SCOPE>; ngoài phạm vi: <OUT-OF-SCOPE>. Chọn role/mode nhỏ nhất phù hợp, triển khai và chạy các kiểm tra gắn với acceptance. Cập nhật evidence/checkpoint trước khi kết thúc; giữ IN_PROGRESS nếu chưa đủ DoD và không chuyển sang task khác.
+Thực hiện <TASK-ID> theo brief/checkpoint được registry link. Mục tiêu phiên là <KẾT-QUẢ-CẦN-CHỨNG-MINH>. Chỉ sửa <WRITE-SCOPE>; ngoài phạm vi: <OUT-OF-SCOPE>. Chọn role/mode nhỏ nhất phù hợp, triển khai và chạy các kiểm tra gắn với acceptance. Cập nhật evidence/checkpoint; validation và commit candidate xong chờ review thì NEED_REVIEW, còn việc thì IN_PROGRESS. Không tự đổi DONE hoặc chuyển sang task khác.
 ```
 
 ### Kết thúc và bàn giao task
 
 ```text
-Kết thúc lượt làm <TASK-ID>. Đối chiếu từng acceptance với file/hành vi và kết quả kiểm tra thật; review scope, finding và giới hạn còn lại. Cập nhật checkpoint trong file task và chỉ đổi registry sang REVIEW/DONE khi điều kiện tương ứng đạt. Báo ngắn: trạng thái, file đổi, quyết định chính, lệnh/kết quả, rủi ro hoặc blocker, bước tiếp theo chính xác và prompt để phiên mới tiếp tục. Không triển khai bước tiếp theo trong lượt này.
+Kết thúc lượt làm <TASK-ID>. Đối chiếu từng acceptance với file/hành vi và kết quả kiểm tra thật; review scope, finding và giới hạn còn lại. Cập nhật checkpoint và commit candidate; bàn giao chờ Control Center review thì đổi registry sang NEED_REVIEW, còn việc thì IN_PROGRESS. Chỉ Control Center nghiệm thu mới DONE. Báo ngắn: trạng thái, candidate commit, file đổi, validation, finding/giới hạn và bước tiếp theo. Không triển khai bước tiếp theo trong lượt này.
 ```
