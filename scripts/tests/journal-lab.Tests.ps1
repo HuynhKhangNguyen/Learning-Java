@@ -8,6 +8,7 @@ $runner = Join-Path $repo 'scripts/services.ps1'
 $requiredCases = @(
   'immutableIdempotentSnapshotAndCorruptionFailClosed',
   'concurrentProcessesExerciseCasLoserRetryWithoutLostRecord',
+  'sameJvmThreadsAcrossInstancesCoordinateAppendAndInventory',
   'processCrashBoundariesRemainUnacknowledgedThenConverge',
   'missingRecordAndNodeFailClosedAsTypedCorruption',
   'malformedSequenceNamespaceAndPredecessorFailClosed',
@@ -255,6 +256,7 @@ function Assert-Report {
     foreach ($fragment in @(
       'type=snapshot',
       'type=concurrency',
+      'type=threads writers=12 adapterInstances=14 appendInventory=true cleanup=true',
       'type=crash',
       'after-record-before-node,after-node-before-publish,after-publish-before-receipt',
       'missing-record,missing-node',

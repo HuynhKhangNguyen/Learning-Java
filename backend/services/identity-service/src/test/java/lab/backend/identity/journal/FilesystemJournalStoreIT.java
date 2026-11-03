@@ -17,6 +17,10 @@ import java.util.Base64;
 import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -116,6 +120,73 @@ class FilesystemJournalStoreIT {
             + " casRetries=" + retries
             + " orphanNodes=" + inventory.orphanNodeDigests().size()
             + " cleanup=true");
+  }
+
+  @Test
+  void sameJvmThreadsAcrossInstancesCoordinateAppendAndInventory() throws Exception {
+    int writerCount = 12;
+    Path root = temporary.toAbsolutePath();
+    var seedStore = new FilesystemJournalStore(root);
+    var seed = seedStore.append("lab", "thread-seed", "payload-thread-seed".getBytes(UTF_8));
+    CountDownLatch ready = new CountDownLatch(writerCount + 1);
+    CountDownLatch start = new CountDownLatch(1);
+    ExecutorService executor = Executors.newFixedThreadPool(writerCount + 1);
+    List<Future<JournalStore.Receipt>> writers = new ArrayList<>();
+
+    try {
+      for (int index = 0; index < writerCount; index++) {
+        int writer = index;
+        var store = new FilesystemJournalStore(root);
+        writers.add(executor.submit(() -> {
+          ready.countDown();
+          assertTrue(start.await(20, TimeUnit.SECONDS), "thread start barrier timed out");
+          return store.append(
+              "lab",
+              "thread-" + writer,
+              ("payload-thread-" + writer).getBytes(UTF_8));
+        }));
+      }
+
+      var reader = new FilesystemJournalStore(root);
+      Future<Integer> inventoryReads = executor.submit(() -> {
+        ready.countDown();
+        assertTrue(start.await(20, TimeUnit.SECONDS), "inventory start barrier timed out");
+        int completed = 0;
+        for (int attempt = 0; attempt < writerCount; attempt++) {
+          assertEquals(1, reader.inventory("lab", seed.verifiedHeadDigest()).entries().size());
+          completed++;
+        }
+        return completed;
+      });
+
+      assertTrue(ready.await(20, TimeUnit.SECONDS), "same-JVM workers were not ready");
+      start.countDown();
+      for (Future<JournalStore.Receipt> writer : writers) {
+        writer.get(60, TimeUnit.SECONDS);
+      }
+      assertEquals(writerCount, inventoryReads.get(60, TimeUnit.SECONDS));
+    } finally {
+      start.countDown();
+      executor.shutdownNow();
+      assertTrue(executor.awaitTermination(20, TimeUnit.SECONDS));
+    }
+
+    var finalInventory = seedStore.inventory("lab", latestHeadDigest(root));
+    assertEquals(writerCount + 1, finalInventory.entries().size());
+    assertEquals(
+        writerCount + 1,
+        finalInventory.entries().stream().map(JournalStore.Entry::recordId).distinct().count());
+    assertEquals(
+        writerCount,
+        writers.stream()
+            .map(Future::resultNow)
+            .map(JournalStore.Receipt::sequence)
+            .distinct()
+            .count());
+    evidence(
+        "threads writers=" + writerCount
+            + " adapterInstances=" + (writerCount + 2)
+            + " appendInventory=true cleanup=true");
   }
 
   @Test

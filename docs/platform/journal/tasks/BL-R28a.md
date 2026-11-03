@@ -455,3 +455,37 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   lock/CAS. Không chỉ catch exception thành success hoặc spin vô hạn. Thêm deterministic concurrent
   threads + cross-instance/append-inventory regression, rồi rerun affected CMD-06/helper/evidence và
   tạo commit fix mới trên cùng branch. Registry chưa chuyển DONE/integrate.
+
+## Checkpoint fix same-JVM coordination — 03/11/2026
+
+- **Trạng thái/phạm vi:** giữ `IN_PROGRESS`; branch `codex/bl-r28a-journal-lab-adapter`, parent
+  `5b0a4f3`. Lượt fix chỉ sửa hai adapter/test journal, contract, journal runner/helper và checkpoint
+  này; không chạm business workflow, Content, provider/S3 hoặc task khác. Candidate revision được
+  báo trong Git handoff sau commit riêng.
+- **Khép P1 review:** Identity/Learning dùng static fair coordination stripe theo canonical
+  root/namespace cho toàn bộ `append` và `inventory`, nên các adapter instance trong cùng JVM không
+  tạo overlapping `FileChannel.lock`. Filesystem publication/head locks vẫn giữ CAS authority giữa
+  các process; exception không bị catch thành success và không thêm spin retry.
+- **Conformance mới:** case
+  `sameJvmThreadsAcrossInstancesCoordinateAppendAndInventory` dùng barrier cho 12 writer threads,
+  14 adapter instances và fixed-head inventory đồng thời; mọi worker result được propagate, final
+  prefix có seed + 12 record với sequence duy nhất. Pinned diagnostic `ReviewThreads.java` từng tái
+  hiện finding nay trả 12/12 `ACK`, không có non-ACK; root diagnostic mới đã xóa sau kiểm tra.
+- **CMD-06 current inputs:**
+  `pwsh -NoProfile -File scripts/services.ps1 -Task journal -Profile lab -Offline` PASS run
+  `20261103T091945685Z`, manifest SHA-256
+  `6a0141d6cb5bf87cff4d291247a520532926089ed07d8dec96e08155e6aa66d4`. Affected regression
+  Identity `321` và Learning `127`; journal Identity/Learning cùng `9`, tất cả
+  failure/error/skip `0`; cross-process mỗi service vẫn có `casRetries=1`. Cleanup xác nhận 18
+  fixture roots và mọi child process đã thoát. JAR SHA-256: Identity
+  `c81cc49476839274c307dfaa01fbc91866a17983ae332f1610ff385488c7c231`, Learning
+  `8344c2a93987c43a4a14f9fba72952ca0b0174e5bfe43e39d90e200ccb0d03b4`.
+- **Gates/giới hạn:** helper PASS current report; qualification run `20261103T092455842Z` trả exit
+  `3`/`NOT_QUALIFIED`, unknown profile fail closed. PowerShell parse, implementation/test parity,
+  privacy scan và `git diff --check` sạch; Java process/JVM error log bằng 0. Một focused full-class
+  invocation thủ công thiếu runner-owned `journal.reparse.fixture` nên fail đúng fixture precondition;
+  targeted same-JVM case và official CMD-06 có fixture đầy đủ đều PASS. Executor finding hiện tại
+  P0=0, P1=0, P2=0, P3=0; vẫn chỉ claim local-host, không claim off-host/provider/IAM/encryption/
+  retention/disaster safety.
+- **Bước tiếp theo:** staged review, tạo candidate commit rồi Control Center nghiệm thu lại. Không
+  push/merge/deploy, đổi registry sang `DONE` hoặc mở BL-R28b/BL-R08.

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Local-host lab adapter. Head candidate được ghi hoàn chỉnh trước khi publication lock
@@ -38,6 +39,7 @@ public final class FilesystemJournalStore implements JournalStore {
   private static final String KEY_PATTERN = "[a-z0-9][a-z0-9._-]{0,127}";
   private static final int MAX_NODE_BYTES = 1_024;
   private static final int MAX_HEAD_BYTES = 256;
+  private static final ReentrantLock[] JVM_COORDINATION = coordinationStripes();
 
   private final Path root;
 
@@ -64,7 +66,22 @@ public final class FilesystemJournalStore implements JournalStore {
       throw failure(ErrorCode.INVALID_INPUT, "canonical bytes are required");
     }
 
-    Path space = ensureDirectory(root.resolve(namespace));
+    Path space = owned(root.resolve(namespace));
+    ReentrantLock coordination = coordinationFor(space);
+    coordination.lock();
+    try {
+      return appendCoordinated(space, namespace, recordId, bytes);
+    } finally {
+      coordination.unlock();
+    }
+  }
+
+  private Receipt appendCoordinated(
+      Path requestedSpace,
+      String namespace,
+      String recordId,
+      byte[] bytes) throws JournalException {
+    Path space = ensureDirectory(requestedSpace);
     Path records = ensureDirectory(space.resolve("records"));
     Path nodes = ensureDirectory(space.resolve("nodes"));
     ensureDirectory(space.resolve("heads"));
@@ -110,6 +127,19 @@ public final class FilesystemJournalStore implements JournalStore {
     validateKey(namespace, "namespace");
     validateDigest(fixedHeadDigest, "fixed head");
     Path space = owned(root.resolve(namespace));
+    ReentrantLock coordination = coordinationFor(space);
+    coordination.lock();
+    try {
+      return inventoryCoordinated(space, namespace, fixedHeadDigest);
+    } finally {
+      coordination.unlock();
+    }
+  }
+
+  private Inventory inventoryCoordinated(
+      Path space,
+      String namespace,
+      String fixedHeadDigest) throws JournalException {
     if (!Files.exists(space, LinkOption.NOFOLLOW_LINKS)) {
       if (!fixedHeadDigest.equals(ZERO)) {
         throw failure(ErrorCode.CORRUPT, "fixed head is not covered");
@@ -133,6 +163,19 @@ public final class FilesystemJournalStore implements JournalStore {
           List.of());
     }
     return inventory;
+  }
+
+  private static ReentrantLock[] coordinationStripes() {
+    ReentrantLock[] stripes = new ReentrantLock[64];
+    Arrays.setAll(stripes, ignored -> new ReentrantLock(true));
+    return stripes;
+  }
+
+  private static ReentrantLock coordinationFor(Path space) {
+    // Static fair stripe giữ mọi adapter instance trong cùng JVM khỏi tạo overlapping
+    // FileLock. OS lock bên dưới vẫn là authority giữa các process khác nhau.
+    int index = Math.floorMod(space.hashCode(), JVM_COORDINATION.length);
+    return JVM_COORDINATION[index];
   }
 
   private Inventory verify(Path space, String namespace, Head head) throws JournalException {

@@ -10,7 +10,9 @@ SHA-256, previous head SHA-256 và newline kết thúc; tên slot là sequence 1
 publication lock để compare current head, sau đó atomic rename candidate đã ghi/fsync hoàn chỉnh
 sang slot kế tiếp. CAS loser đọc slot thắng, verify head mới rồi retry cùng record; process crash
 chỉ có thể để slot chưa tồn tại hoặc hoàn chỉnh. Sequence đầu là 1, predecessor đầu là 64 ký tự
-`0`. Digest inventory bind namespace, fixed head và từng entry theo sequence.
+`0`. Các adapter instance trong cùng JVM coordinate append/inventory theo resolved namespace để
+không tạo overlapping file lock; filesystem lock/CAS vẫn giữ authority giữa các process. Digest
+inventory bind namespace, fixed head và từng entry theo sequence.
 
 Create cùng ID/cùng bytes là idempotent; cùng ID/khác bytes là `CONFLICT`. Missing/malformed,
 wrong predecessor/namespace/sequence, head gap hoặc digest mismatch là `CORRUPT`, không trả

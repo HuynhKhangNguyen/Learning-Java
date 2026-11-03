@@ -72,6 +72,7 @@ function Assert-ServiceEvidence {
   $requiredFragments = @(
     'type=snapshot',
     'type=concurrency',
+    'type=threads writers=12 adapterInstances=14 appendInventory=true cleanup=true',
     'type=crash',
     'type=corruption outcomes=missing-record,missing-node',
     'type=corruption outcomes=malformed-sequence,wrong-namespace,wrong-predecessor',
@@ -159,6 +160,7 @@ if ($Profile -eq 'qualification') {
 $requiredCases = @(
   'immutableIdempotentSnapshotAndCorruptionFailClosed',
   'concurrentProcessesExerciseCasLoserRetryWithoutLostRecord',
+  'sameJvmThreadsAcrossInstancesCoordinateAppendAndInventory',
   'processCrashBoundariesRemainUnacknowledgedThenConverge',
   'missingRecordAndNodeFailClosedAsTypedCorruption',
   'malformedSequenceNamespaceAndPredecessorFailClosed',
