@@ -1,5 +1,9 @@
 # INT-01/02 receiver contract — R04b/R04c
 
+[BL-R08 Learning allocation extension](learning-allocation.md) đăng ký create/read attempt và
+read/mutation classification theo action. Đây là contract cần implement/qualify trong R08;
+qualification cũ không chứng minh các actions mới đã hỗ trợ.
+
 [Canonical protocol](../../../docs/features/f10-identity-access/sessions/protocol.md). JSON strict UTF-8, duplicate/unknown fields rejected, schemaVersion integer1, UUID lowercase canonical, epoch bigint decimal string, UTC timestamps exactly millisecond `...SSSZ`. Body limit8192bytes. These are receiver contracts; R04d owns canonical INT-01 provider/coordinator. R04b qualification uses a real mTLS provider-contract fixture, not a canonical Identity substitute.
 
 ## INT-01 online read admission

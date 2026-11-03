@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://backend-lab.invalid/contracts/catalog/private-case-v3.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "unitId",
+    "expected",
+    "rubricTargets",
+    "allocation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 3
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^CASE-[A-Z0-9-]+$",
+      "maxLength": 128
+    },
+    "unitId": {
+      "type": "string",
+      "pattern": "^UNIT-[A-Z0-9-]+$",
+      "maxLength": 128
+    },
+    "expected": {
+      "type": "object"
+    },
+    "rubricTargets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^CAP-[A-Z]+-[0-9]{3}-[A-Z]$"
+      }
+    },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exerciseId",
+        "mode",
+        "caseVersion",
+        "familyId",
+        "exposureGroup",
+        "equivalenceKey",
+        "rubricVersion",
+        "graderVersion",
+        "prompt",
+        "input",
+        "inputSchema"
+      ],
+      "properties": {
+        "exerciseId": {
+          "$ref": "#/definitions/stableId"
+        },
+        "mode": {
+          "enum": [
+            "practice",
+            "assessment",
+            "project"
+          ]
+        },
+        "caseVersion": {
+          "$ref": "#/definitions/version"
+        },
+        "familyId": {
+          "$ref": "#/definitions/stableId"
+        },
+        "exposureGroup": {
+          "$ref": "#/definitions/stableId"
+        },
+        "equivalenceKey": {
+          "$ref": "#/definitions/stableId"
+        },
+        "rubricVersion": {
+          "$ref": "#/definitions/version"
+        },
+        "graderVersion": {
+          "$ref": "#/definitions/version"
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "en",
+            "vi"
+          ],
+          "properties": {
+            "en": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768
+            },
+            "vi": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768
+            }
+          }
+        },
+        "input": {
+          "type": "object"
+        },
+        "inputSchema": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "stableId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$"
+    }
+  }
+}

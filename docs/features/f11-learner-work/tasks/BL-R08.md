@@ -6,8 +6,8 @@
 
 ## Brief thực thi — 03/11/2026
 
-- Trạng thái hiện hành: `BLOCKED` theo review candidate `07372a1`; chưa READY vì thiếu admission
-  API-L01/L02 và allocation metadata contract trong verified replica. Xem checkpoint cuối để gỡ.
+- Trạng thái hiện hành: `READY`; owner/write scope và hai contract prerequisite đã được bổ sung
+  theo yêu cầu người dùng. Executor chuyển `IN_PROGRESS` để implement cả prerequisite trong R08.
 - Quyền CODE: người dùng yêu cầu task kế tiếp sau nghiệm thu R28a. Chỉ giao leaf BL-R08.
 - Dependencies: BL-R04d, BL-R06c, BL-R28a đều DONE. Không cần chờ production provider R28b để
   implement/qualify local lab; production assessment chưa được qualification từ evidence này.
@@ -63,6 +63,33 @@ abandon workflow, frontend, import/reset/delete/restore, S3/provider/cloud/deplo
 tự sinh family mới. Không viết handler submit giả để báo đã chứng minh T1: R08 chỉ cung cấp invariant/
 guard cho task R11 consume và test guard từ actual allocation state.
 
+### Scope bổ sung được cấp — admission và allocation contract
+
+Người dùng cho phép mở rộng chính leaf R08, không tạo task prerequisite mới. Đọc và implement
+[Learning admission](../../../../contracts/http/admission/learning-allocation.md) và
+[allocation v3](../../../../contracts/catalog/allocation-v3.md), cùng schema được link.
+Chúng thay giả định v2 đủ cho allocation trong brief cũ; v2 compatibility vẫn phải giữ.
+
+- Identity `session/CanonicalAdmissionWire.java` và canonical admission authority/handler/verifier
+  liên quan trong `src/main/java/lab/backend/identity/session/**`, tests tương ứng. Transport
+  allowlist/config chỉ khi cần đăng ký actions mới; POM chỉ cho required suites. Không redesign
+  credential/login/revoke protocol ngoài read/mutation classification và exact action binding.
+- Content `src/main/java/lab/backend/content/publication/**` và tests chỉ phần private bundle
+  validation, storage/transport/discriminator v2/v3, normal lab publish; không đổi coordinator
+  ordering/ACK protocol. Learning `contentreplica/**`/tests hỗ trợ discriminator và pinned metadata.
+- Additive migration mới của Content/Learning nếu storage thật sự cần; không sửa applied migrations
+  hoặc immutable bundle/receipt/history. Không tạo DB hoặc service mới.
+- `contracts/catalog/private-case-v3.schema.json`, `allocation-v3.md`, relevant fixtures;
+  `contracts/http/admission/**`, private publication docs/schema/fixtures của Content và Learning.
+- `scripts/catalog/{validate,contract,catalog.test}.mjs` chỉ private case validation/version routing;
+  không đổi catalog outline v2, v2 fixtures, framework hoặc thêm dependency.
+- Identity/Content POM test profiles và ops publication/admission lab runbooks/fixtures; helpers
+  DB/trust/fault/tests được mở rộng để qualify affected contracts trên cả ba services.
+
+Một writer, làm tuần tự: Identity action + producer/consumer schema → compatibility tests → normal
+Content publish sang Learning → allocation/journal/API → full affected AC. Không coi dependency
+foundation DONE là bằng chứng đã hỗ trợ domain contract mới.
+
 ## Invariants và quyết định thực thi
 
 1. Owner lấy từ authenticated admission. Mutation kiểm context/CSRF/Origin theo existing boundary;
@@ -104,6 +131,16 @@ guard cho task R11 consume và test guard từ actual allocation state.
 | R08-AC06 | Required suites/cases có tên, nonzero/no failure/error/skip, current inputs/JAR/raw XML/report hashes và cleanup thật. CMD-03 Learning, CMD-04 packaged API, CMD-05 DATA-22 R08 subset và CMD-06 lab đạt. Missing case/suite/stale input/unknown selector phải nonzero. |
 | R08-AC07 | Affected CMD-02/package/regressions cho admission/publication/journal còn đạt; review privacy/artifact/format/comment/transaction paths không P0/P1 mở. Registry/checkpoint chỉ ghi evidence thật; mỗi lượt bàn giao có candidate commit. |
 
+AC02 bổ sung: actual canonical Identity kiểm registered shapes trong admission extension. GET read
+không bị caller-based mutation/CSRF classification; action/method/path/audience/body/context mismatch
+deny. Optional receipt chỉ enable khi implemented. Draft-save/Content-read regression bắt buộc.
+
+AC01/03 bổ sung: Content producer/Learning replica nhận exact v2/v3; v2 historical stage/fence/release
+vẫn đạt nhưng v2 allocation deny/unavailable. V3 đầy đủ authored metadata/learner prompt/input/schema
+và refs/digests đúng. Missing/unknown/conflicting metadata/version reject trước đổi good head. Actual
+packaged publication→replica→allocation dùng v3 lab fixture có hai clean alternatives, practice tách
+assessment family; expected không lọt learner DTO.
+
 ## Validation và Definition of Done
 
 Executor mở rộng helper theo selector explicit `-EvidenceTask R08` (hiện chưa có, phải implement):
@@ -119,6 +156,11 @@ DATA-22 ở đây chỉ allocation R08; R10/R27 vẫn chưa nghiệm thu. CMD-06
 minh R08 DB→journal→disclosure; CMD-05 phải chạy actual allocation end-to-end ở packaged service.
 CMD-07 browser/edge chưa có R31a nên không claim user journey E2E; packaged HTTP/TLS evidence vẫn
 bắt buộc. Chạy affected selected CMD-02 và helper tests theo chất lượng thực tế, không dùng skip.
+
+Scope mở rộng cần thêm targeted CMD-04 Identity canonical admission, CMD-04 Content producer/catalog
+và Learning replica; actual publication regression CMD-05 R06c cho v2 và v3. Executor đăng ký selectors
+strict ở helper theo suite thật, ghi exact commands trong checkpoint; không gọi selector chưa tạo
+hoặc mock là PASS. CMD-02 affected cả ba service và catalog schema tests theo touched symbols.
 
 Reports dưới `artifacts/quality/R08/<runId>/`: snapshot full affected input inventory trước/sau,
 raw required XML/logs redact, runtime/commands/exit/cases, JAR hashes và dependency/cleanup bindings.
@@ -206,3 +248,36 @@ IN_PROGRESS. Chỉ Control Center nghiệm thu mới DONE. Không mở task khá
   mới dùng NEED_REVIEW.
 - **Validation:** scoped source/contract inspection và `git show --check 07372a1`; chỉ docs changed,
   không chạy app suites cho code chưa có. Các command R08 chưa được thực hiện/không được báo PASS.
+
+## Checkpoint gỡ blocker / scope và contract đã chốt — 03/11/2026
+
+- Người dùng yêu cầu mở rộng scope để chat implementation chạy tiếp. Control Center chọn bổ sung
+  hai prerequisite vào chính R08; không tạo sibling, không sửa acceptance bằng cách bỏ auth/pin refs.
+- Đã cấp write scope Identity canonical admission + Content private bundle producer/shared schema +
+  Learning consumer, đúng phần nối R08. Contract owner: admission/learning-allocation.md và
+  catalog/allocation-v3.md, schema private-case-v3; các owner README đã link. V2 giữ nguyên, v3 là
+  explicit discriminator, legacy allocation fail closed và staged rollout consumer-first.
+- Registry `BLOCKED → READY`; đây là gỡ blocker quyết định/scope, chưa phải runtime prerequisites
+  đã implement. Executor chuyển IN_PROGRESS để implement prerequisites rồi allocation theo AC.
+- Required evidence bổ sung canonical action/method/read/mutation, producer/replica v2/v3 + actual
+  publication path, good-head preservation và private-sentinel regression cả ba service. Existing
+  foundation DONE không cấp PASS cho các contract mới. Validation lượt này là docs/schema-only.
+- Git: giữ cùng nhánh codex/bl-r08-learning-allocation, base review ab0e8ff. Lượt scope/contract này
+  có commit riêng; mỗi lượt implement/fix tiếp theo validation/commit xong chuyển NEED_REVIEW.
+- Validation thật: Node24.22.1 hiện có + existing Ajv strict compile schema v3 đạt; một positive
+  shape được nhận, bốn negative shapes (missing allocation, version2, invalid mode, unknown metadata)
+  bị reject. Kiểm18 local links và diff whitespace đạt. Lượt đầu dùng Node cũ trên PATH thiếu
+  structuredClone nên diagnostic dừng, không báo PASS cho lượt đó. Đây chỉ schema/docs evidence;
+  semantic references và runtime compatibility vẫn là acceptance executor phải chứng minh.
+
+```text
+Tiếp tục BL-R08 theo registry và checkpoint mới nhất tại
+docs/features/f11-learner-work/tasks/BL-R08.md trên codex/bl-r08-learning-allocation.
+Blocker scope/contract đã gỡ: được sửa Identity canonical admission cho create/read attempt,
+Content private-case-v3 producer/shared contract và Learning verified replica consumer theo
+contracts/http/admission/learning-allocation.md và contracts/catalog/allocation-v3.md.
+Implement prerequisites tuần tự, giữ v2 compatibility, rồi allocation API-L01/L02 + JRN-01 trước
+disclosure theo AC01–07. Chỉ sửa scope brief đã mở rộng; không hardcode runtime metadata hoặc
+lấy expected làm prompt. Chuyển IN_PROGRESS khi code; validation, checkpoint và commit mỗi lượt.
+Candidate sẵn sàng chờ Control Center review thì NEED_REVIEW; không tự DONE hoặc mở task khác.
+```

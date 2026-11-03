@@ -4,7 +4,7 @@
 
 `candidate-v1.schema.json` là executable structural contract. Java validator còn kiểm các invariant xuyên field mà JSON Schema không biểu diễn: `target=parent+1`, reference type, DAG, private-case binding, exact impact/manifest key set, policy matrix và review-subject digest. Candidate tối đa 524288 bytes; private bundle tối đa 1048576 bytes; manifest serialize từ `oldVersions` tối đa 262144 bytes.
 
-Private bundle dùng đúng R05 `private-case-v2`: `{schemaVersion:2,id,unitId,expected,rubricTargets}`. `id` phải bind component `case` có SHA-256 bằng exact private bytes; `unitId` bind component `content`; mọi `rubricTargets` bind component `rubric`. Nó là grading input riêng, không được đưa vào public API/log/error.
+Private bundle hiện đã qualify R05 `private-case-v2`: `{schemaVersion:2,id,unitId,expected,rubricTargets}`. BL-R08 mở rộng producer/consumer theo [allocation-v3](../../../../catalog/allocation-v3.md), giữ exact v2 compatibility và yêu cầu evidence mới trước claim support v3. `id` phải bind component `case` có SHA-256 bằng exact private bytes (bao gồm allocation khi v3); `unitId` bind component `content`; mọi `rubricTargets` bind component `rubric`. Bundle vẫn private, không được đưa nguyên vào public API/log/error.
 
 Mỗi shared CAP có đúng một `impacts[]` classification và khai rõ tập `affectedVersions`. `oldVersions` có đúng một entry cho mỗi key `(capabilityId,version)` trong tập đó; nhiều old version cùng CAP được phép. Matrix v1:
 

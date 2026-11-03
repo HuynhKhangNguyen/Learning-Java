@@ -1,5 +1,10 @@
 # Catalog schema2 — R05
 
+BL-R08 bổ sung [allocation private-case v3](allocation-v3.md) và
+[schema](private-case-v3.schema.json). Đây là specification được duyệt để implement; runtime
+producer/consumer hiện vẫn chỉ qualify v2 cho tới evidence R08. V2 không bị sửa hoặc suy diễn
+metadata allocation bằng default. Catalog outline schemaVersion2 giữ nguyên.
+
 `catalog-v2.schema.json` dùng JSON Schema draft-07 cho authoring outline: topic/CAP, placements, all-of prerequisites, DP readiness, units/packages/explicit aliases. `private-case-v2.schema.json` là private expected/rubric contract; không nằm trong public outline hoặc FE import. JSON Schema kiểm shape; `scripts/catalog/validate.mjs` kiểm references, ownership, DAG và mappings.
 
 `content-v2/catalog/catalog.json` là snapshot95TOP/190CAP của bốn catalog thiết kế. Importer stdout không tự sửa file/publish; required test so snapshot với source và independent anchors. Chuyển vị trí/ngôn ngữ không tạo topic/progress mới. All-of TOP cần các CAP của topic; selector competency chỉ yêu cầu CAP nêu tên. Stage order không tạo prerequisite hoặc khóa khám phá; readiness không là milestone completion.
