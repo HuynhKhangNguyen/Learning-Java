@@ -366,3 +366,31 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   retention/disaster safety. Failed runner report do parser evidence sai trước fix vẫn giữ làm lịch
   sử, không dùng làm PASS. Bước tiếp theo duy nhất là Control Center review candidate commit mới;
   executor không đổi `DONE`, không push/merge/deploy hoặc mở task kế tiếp.
+
+## Checkpoint Control Center review candidate 0d21811 — 03/11/2026
+
+- **Kết luận:** chưa nghiệm thu, registry giữ `IN_PROGRESS`. Candidate `0d21811`, parent
+  `2e2269f`; working tree sạch lúc bắt đầu review. Không sửa source implementation hoặc mở task khác.
+- **Đã khép phần lớn finding cũ:** source có child ownership gate và typed metadata parse, explicit
+  sequence-slot CAS/retry, format dễ đọc; report bind đủ tám Java files và helper recompute current
+  hashes/cases/XML/JAR. Regression XML được retain, không còn `-DskipTests`. Helper actual rerun
+  exit0 trên run `20261103T045711513Z`; qualification/unknown profile và malformed gates đạt.
+- **P1 / AC04, DONE-01 còn mở:** `publishHeadCas` tạo canonical slot bằng CREATE_NEW rồi mới lock và
+  ghi bytes. Process chết sau create/trong write để lại empty/partial canonical slot vĩnh viễn;
+  `readPublishedHead` chỉ retry1000 lần rồi CORRUPT, mọi append sau đó tiếp tục thất bại, không có
+  recovery path. Writer khác còn có thể thấy slot trước khi winner lấy lock. Lỗi cùng tồn tại ở cả
+  hai adapter. Cần publish complete head bằng cơ chế atomic có create-if-absent/CAS semantics, hoặc
+  thiết kế recovery có fencing chứng minh không overwrite winner/ACK tốt; không xóa slot mù.
+- **Reproduction thật:** chạy pinned Java21 source diagnostic
+  `artifacts/quality/R28a/ReviewPartialHead.java` với Identity `target/classes`; tạo empty sequence1
+  slot đúng trạng thái process có thể để lại sau CREATE_NEW. Hai lần append retry đều trả
+  `CORRUPT:published head remained incomplete`, exit0 của diagnostic chỉ nghĩa tái hiện thành công.
+  Artifact diagnostic/roots nằm trong ignored evidence; không được tính là suite PASS.
+- **Crash evidence chưa khép P1:** `JournalFixtureMain` after-record/after-node tự ghi files thay vì
+  crash trong actual adapter; after-head halt sau `store.append` đã hoàn tất verify/receipt. Cần
+  process-crash test actual publication trước/trong publish và sau publish trước response, restart
+  retry hội tụ, cùng regression chứng minh preserved acknowledged prefix. Fault control phải giữ
+  test-only theo AC01/02.
+- **Bước tiếp theo:** executor sửa publication/crash fixtures trên cùng branch, rerun affected
+  CMD-06/helper/regression và tạo commit fix mới. Các report PASS hiện hành chỉ chứng minh case đã
+  chạy, chưa chứng minh cửa sổ crash vừa tái hiện. Chưa đủ DoD để DONE/integration.
