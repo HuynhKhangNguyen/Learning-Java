@@ -334,3 +334,35 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   lab vì các blocker đã xác định trực tiếp và rerun không sửa được coverage/manifest. Không thay
   source implementation. Lượt sửa tiếp theo tạo commit mới trên cùng branch, cập nhật evidence thật
   và yêu cầu nghiệm thu lại; chưa mở task khác hoặc integration.
+
+## Checkpoint fix sau review — 03/11/2026
+
+- **Trạng thái:** `IN_PROGRESS`; branch `codex/bl-r28a-journal-lab-adapter`, parent hiện hành
+  `2e2269f`. Lượt fix chỉ sửa write scope R28a; registry vẫn `IN_PROGRESS`, không mở BL-R08/R28b.
+  Candidate revision được báo trong Git handoff sau khi tạo commit riêng của lượt fix này.
+- **Đã khép finding:** hai adapter dùng immutable sequence slot `CREATE_NEW` làm local filesystem
+  CAS, loser đọc head thắng rồi retry; mọi child path đi qua ownership/reparse gate, predecessor và
+  metadata parse fail closed bằng typed outcome. Conformance mỗi service có tám named cases cho
+  idempotency/snapshot, process CAS, ba crash boundary, missing/corrupt/oversized metadata,
+  namespace/predecessor/gap/forged head, traversal/collision/reparse và orphan-before-ACK. Java/POM
+  block đã chạm được format; không thêm dependency hoặc business/provider path.
+- **CMD-06 hiện hành:**
+  `pwsh -NoProfile -File scripts/services.ps1 -Task journal -Profile lab -Offline` PASS run
+  `20261103T045711513Z`, manifest 15 current inputs (gồm đủ tám Java files) SHA-256
+  `5f5fa401e763a4ed007af5670c905cecc654b57c1f97de3b72bf7aa8673dc5bc`. Identity/Learning
+  cùng chạy 8 tests, 0 failure/error/skip; CAS retry lần lượt 66/66; 16 JUnit fixture roots đã xóa và
+  child process exit trước PASS. Artifact SHA-256: Identity
+  `4be012dfebd01f25e541789b886c827f2c485fce12ae0486075e775059c1a2d6`, Learning
+  `f47eb05b7dd2ea50f48088483e34667900a2e2d545d37e0f4159b72a82050016`; JAR có main journal
+  classes, không có `JournalFixtureMain`/IT.
+- **Regression/gates:** cùng run giữ raw Surefire XML + hash cho affected regression Identity 321 và
+  Learning 127 tests, 0 failure/error/skip; các suite cần loopback ngoài journal được report explicit
+  và không tính PASS. `scripts/tests/journal-lab.Tests.ps1` PASS recompute current hashes/digest,
+  exact cases, current XML/JAR, retained regression, stale/missing-case/cleanup/malformed gates;
+  qualification run `20261103T080647344Z` trả exit 3/`NOT_QUALIFIED`, unknown profile nonzero.
+  `git diff --check` sạch; Identity/Learning adapter/test parity đạt; privacy scan không có
+  password/cookie/key/private-payload hit. Finding executor hiện tại: P0=0, P1=0, P2=0, P3=0.
+- **Giới hạn/bước tiếp theo:** evidence chỉ local-host, không claim off-host/provider/IAM/encryption/
+  retention/disaster safety. Failed runner report do parser evidence sai trước fix vẫn giữ làm lịch
+  sử, không dùng làm PASS. Bước tiếp theo duy nhất là Control Center review candidate commit mới;
+  executor không đổi `DONE`, không push/merge/deploy hoặc mở task kế tiếp.

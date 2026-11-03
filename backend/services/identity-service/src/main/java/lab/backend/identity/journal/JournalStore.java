@@ -18,16 +18,22 @@ public interface JournalStore {
       String recordDigest,
       long sequence,
       String nodeDigest,
-      String verifiedHeadDigest) {}
+      String verifiedHeadDigest,
+      int casRetries) {}
 
-  record Entry(long sequence, String recordId, String recordDigest, String nodeDigest) {}
+  record Entry(
+      long sequence,
+      String recordId,
+      String recordDigest,
+      String nodeDigest) {}
 
   record Inventory(
       String namespace,
       String fixedHeadDigest,
       String inventoryDigest,
       List<Entry> entries,
-      List<String> orphanRecordIds) {}
+      List<String> orphanRecordIds,
+      List<String> orphanNodeDigests) {}
 
   enum ErrorCode {
     INVALID_INPUT,
