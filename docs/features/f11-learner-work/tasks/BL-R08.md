@@ -315,3 +315,14 @@ Candidate sẵn sàng chờ Control Center review thì NEED_REVIEW; không tự 
   malformed schema/keyword parity và không claim full runtime draft-07 implementation.
 - Bước tiếp theo đang giao executor: khép required matrix, validate candidate mới, commit riêng và
   handoff để main review. Khi còn implementation/validation giữ IN_PROGRESS; đủ bàn giao mới NEED_REVIEW.
+
+## Checkpoint cấu hình implementation model — 04/11/2026
+
+- Người dùng chọn `gpt-5.6-sol`, extra high (`xhigh`) cho implementation. Native executor
+  `/root/r08_implement_56sol` đã khởi tạo thành công với model/effort override và `fork_turns=none`.
+- Executor cũ `/root/r08_implementation` được yêu cầu kết thúc ở safe boundary và trả handoff;
+  executor mới standby tới khi main chuyển writer ownership. Giữ mọi uncommitted source/fixtures,
+  không reset/checkout/stash, không chạy hai writers hoặc hai qualification runs đè nhau.
+- Main chỉ sửa docs/model setup; implementation hiện tiếp nối candidate e3d7c36 và checkpoint
+  tiến độ5bb7d41. R08 giữ IN_PROGRESS, chưa đủ DoD. Model change không làm evidence cũ thành current
+  PASS cho source đang sửa. Required AC/validation/write scope không đổi.

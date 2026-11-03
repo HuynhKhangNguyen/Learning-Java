@@ -125,6 +125,14 @@ Role được chọn theo đầu ra của task, không tạo agent riêng chỉ 
 
 Role dùng tool sẵn có của runtime và skill chỉ khi task thực sự khớp trigger của skill đó. Bảng này là nhãn phân công; nó không tạo agent, sandbox hay permission riêng. Mỗi executor chỉ đọc context được brief dẫn và trả output theo định dạng task yêu cầu.
 
+### Model của implementation executor — 04/11/2026
+
+Theo chỉ dẫn người dùng, native executor làm implementation/fix dùng `gpt-5.6-sol` với
+`reasoning_effort=xhigh` (extra high). Khi tạo executor phải truyền model/effort thật, không chỉ ghi
+role trong prompt; override dùng context tối thiểu với `fork_turns=none`. Control Center/reviewer giữ
+model của session. Nếu runtime không nhận đúng cấu hình thì báo rõ, không tự thay model. Đổi executor
+đang chạy phải bàn giao trạng thái, pending validation và writer ownership trước khi executor mới sửa.
+
 ### Mode A — native subagent
 
 - Dùng khi môi trường thật sự hỗ trợ và các phần có thể làm độc lập. Integrator tạo subtask trong cùng leaf task, không biến mỗi subtask thành một backlog ID nếu nó không có đầu ra độc lập.
