@@ -6,7 +6,8 @@
 
 ## Brief thực thi — 03/11/2026
 
-- Trạng thái: registry `PLANNED`, brief `READY`; executor chuyển `IN_PROGRESS` khi bắt đầu code.
+- Trạng thái hiện hành: `BLOCKED` theo review candidate `07372a1`; chưa READY vì thiếu admission
+  API-L01/L02 và allocation metadata contract trong verified replica. Xem checkpoint cuối để gỡ.
 - Quyền CODE: người dùng yêu cầu task kế tiếp sau nghiệm thu R28a. Chỉ giao leaf BL-R08.
 - Dependencies: BL-R04d, BL-R06c, BL-R28a đều DONE. Không cần chờ production provider R28b để
   implement/qualify local lab; production assessment chưa được qualification từ evidence này.
@@ -180,3 +181,28 @@ IN_PROGRESS. Chỉ Control Center nghiệm thu mới DONE. Không mở task khá
   không tạo fixture/hardcode thay canonical replica, không claim JRN-01 allocation hay packaged
   HTTP. Registry chuyển `IN_PROGRESS`; chỉ chuyển `NEED_REVIEW` sau implementation, required
   validation và candidate commit đủ AC01–07.
+
+## Checkpoint Control Center review candidate 07372a1 — 03/11/2026
+
+- **Kết luận:** đây là handoff discovery/blocker, không phải implementation candidate để nghiệm thu.
+  Commit `07372a1`, parent `5e29ac8`, branch `codex/bl-r08-learning-allocation`; working tree sạch
+  khi review bắt đầu. AC01–07 chưa đạt; không có code/runtime report R08 và không đổi NEED_REVIEW/DONE.
+- **Blocker được xác minh:** Identity `session/CanonicalAdmissionWire.java` chỉ cho Learning action
+  LEARNING_DRAFT_SAVE, PUT và route drafts; phân loại mọi Learning request là mutation. Không thể
+  dùng contract này cho POST attempts hoặc owner GET attempt mà giữ correct action/CSRF binding.
+- **Blocker được xác minh:** Learning `contentreplica/ReplicaValidator.java` exact-allowlist private
+  bundle v2 gồm schemaVersion/id/unitId/expected/rubricTargets; không có allocation metadata và
+  learner-visible prompt/input. `contracts/catalog/private-case-v2.schema.json` cùng shape. Cần
+  producer/consumer contract transition có compatibility và trusted published fixtures; không lấy
+  expected/private grader bytes làm prompt hoặc tự hardcode runtime metadata.
+- **Đính chính readiness:** dependencies DONE chỉ chứng minh foundation đã giao, không chứng minh
+  chúng có đủ domain contract cho R08. Quyết định READY trong checkpoint mở task là quá sớm; không
+  thu hồi nghiệm thu R04d/R06c/R28a trong scope của các task đó.
+- **Điều kiện gỡ BLOCKED:** Control Center chốt owner/write scope cho hai contract changes: Identity
+  admission create/read attempt; Content producer + shared schema + Learning verified replica mang
+  allocation metadata/prompt. Có thể bổ sung scope leaf R08 hoặc tách prerequisite được duyệt, nhưng
+  lượt review này chưa tự mở task hay cấp scope cross-service mới. Sau khi có contract/fixtures đủ,
+  cập nhật brief/dependency rồi executor về IN_PROGRESS để implement/validate; handoff code candidate
+  mới dùng NEED_REVIEW.
+- **Validation:** scoped source/contract inspection và `git show --check 07372a1`; chỉ docs changed,
+  không chạy app suites cho code chưa có. Các command R08 chưa được thực hiện/không được báo PASS.
