@@ -26,7 +26,8 @@ public final class CanonicalAdmissionWire {
   private static final String EMPTY_SHA = sha(new byte[0]);
   static {
     var fields = new HashSet<>(READ_FIELDS);
-    fields.add("csrfToken"); fields.add("origin");
+    fields.add("csrfToken");
+    fields.add("origin");
     MUTATION_FIELDS = Set.copyOf(fields);
   }
 
@@ -48,38 +49,45 @@ public final class CanonicalAdmissionWire {
     if (bytes == null) throw new Denied(400, "BAD_WIRE");
     if (bytes.length > MAX_BYTES) throw new Denied(413, "PAYLOAD_TOO_LARGE");
     JsonNode node = WireCodec.strict(bytes);
-    boolean mutation = verifiedCaller.equals("learning");
+    String action = text(node, "action");
+    String audience = text(node, "audience");
+    String method = text(node, "method");
+    String path = text(node, "canonicalPath");
+
+    // Phân loại bằng shape đã đăng ký, không bằng caller. GET của Learning
+    // chỉ cấp read admission và không đòi mutation fields hoặc refresh idle.
+    boolean mutation = registeredMutation(verifiedCaller, action, method, path);
+    if (!audience.equals(verifiedCaller)) {
+      throw new Denied(403, "ADMISSION_BINDING_DENIED");
+    }
     var fields = new HashSet<String>();
     node.properties().forEach(p -> fields.add(p.getKey()));
     if (!fields.equals(mutation ? MUTATION_FIELDS : READ_FIELDS)
-        || !node.get("schemaVersion").isInt() || node.get("schemaVersion").asInt() != 1)
+        || !node.get("schemaVersion").isInt() || node.get("schemaVersion").asInt() != 1) {
       throw new Denied(400, "UNSUPPORTED_SCHEMA");
+    }
 
-    String action = text(node, "action"), audience = text(node, "audience");
-    String allowedAction = mutation ? "LEARNING_DRAFT_SAVE" : "CONTENT_BODY_READ";
-    if (!audience.equals(verifiedCaller) || !action.equals(allowedAction))
-      throw new Denied(403, "ADMISSION_BINDING_DENIED");
-    UUID nonce = id(node, "requestNonce"), context = id(node, "expectedContextId");
+    UUID nonce = id(node, "requestNonce");
+    UUID context = id(node, "expectedContextId");
     String credential = text(node, "sessionCredential");
-    if (!credential.matches("[A-Za-z0-9_-]{43}")) throw new Denied(401, "SESSION_INVALID");
-    String method = text(node, "method"), path = text(node, "canonicalPath");
-    String query = text(node, "query"), bodySha = hex(node, "bodySha256");
-    if (!query.isEmpty()) throw new Denied(403, "ADMISSION_BINDING_DENIED");
+    if (!credential.matches("[A-Za-z0-9_-]{43}")) {
+      throw new Denied(401, "SESSION_INVALID");
+    }
+    String query = text(node, "query");
+    String bodySha = hex(node, "bodySha256");
+    if (!query.isEmpty() || (!mutation && !bodySha.equals(EMPTY_SHA))) {
+      throw new Denied(403, "ADMISSION_BINDING_DENIED");
+    }
 
-    // Policy hiện chỉ có hai shape mà receiver đã triển khai. Không coi service
-    // certificate là quyền gọi mọi learner action; task endpoint sau phải đăng ký rõ.
     String csrf = null;
     if (mutation) {
-      if (!method.equals("PUT") || !path.startsWith("/api/v1/drafts/"))
-        throw new Denied(403, "ADMISSION_BINDING_DENIED");
-      WireCodec.idempotencyKey(path.substring("/api/v1/drafts/".length()));
       csrf = text(node, "csrfToken");
-      if (!csrf.matches("[A-Za-z0-9_-]{43}")) throw new Denied(403, "CSRF_DENIED");
-      if (configuredOrigin == null || !configuredOrigin.equals(text(node, "origin")))
+      if (!csrf.matches("[A-Za-z0-9_-]{43}")) {
+        throw new Denied(403, "CSRF_DENIED");
+      }
+      if (configuredOrigin == null || !configuredOrigin.equals(text(node, "origin"))) {
         throw new Denied(403, "ORIGIN_DENIED");
-    } else if (!method.equals("GET") || !bodySha.equals(EMPTY_SHA)
-        || !path.matches("/api/v1/topics/[A-Za-z0-9][A-Za-z0-9_-]{0,95}/units/[A-Za-z0-9][A-Za-z0-9_-]{0,95}")) {
-      throw new Denied(403, "ADMISSION_BINDING_DENIED");
+      }
     }
 
     // Tự tính lại binding thay vì tin digest caller gửi. Nó ràng method, route,
@@ -89,6 +97,34 @@ public final class CanonicalAdmissionWire {
       throw new Denied(403, "ADMISSION_BINDING_DENIED");
     return new Request(verifiedCaller, action, nonce, credential, context, method,
         path, bodySha, binding, csrf, mutation);
+  }
+
+  /** Exact action/method/route allowlist; optional receipt chưa có handler nên bị deny. */
+  private static boolean registeredMutation(
+      String caller, String action, String method, String path) {
+    if (caller.equals("content") && action.equals("CONTENT_BODY_READ")
+        && method.equals("GET")
+        && path.matches("/api/v1/topics/[A-Za-z0-9][A-Za-z0-9_-]{0,95}"
+            + "/units/[A-Za-z0-9][A-Za-z0-9_-]{0,95}")) {
+      return false;
+    }
+    if (caller.equals("learning")) {
+      if (action.equals("LEARNING_ATTEMPT_CREATE") && method.equals("POST")
+          && path.equals("/api/v1/attempts")) {
+        return true;
+      }
+      if (action.equals("LEARNING_DRAFT_SAVE") && method.equals("PUT")
+          && path.startsWith("/api/v1/drafts/")) {
+        WireCodec.idempotencyKey(path.substring("/api/v1/drafts/".length()));
+        return true;
+      }
+      if (action.equals("LEARNING_ATTEMPT_READ") && method.equals("GET")
+          && path.startsWith("/api/v1/attempts/")) {
+        WireCodec.idempotencyKey(path.substring("/api/v1/attempts/".length()));
+        return false;
+      }
+    }
+    throw new Denied(403, "ADMISSION_BINDING_DENIED");
   }
 
   private static String text(JsonNode node, String key) { return WireCodec.string(node, key); }

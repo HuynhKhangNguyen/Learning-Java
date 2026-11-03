@@ -46,6 +46,7 @@ public final class PublicationStore {
           throw conflict("PUBLICATION_ACTIVE_CONFLICT");
         }
 
+        verifyAllocationPool(connection, candidate.bundleBytes());
         insertOrVerifyBundle(connection, candidate);
         insertCandidate(connection, candidate, reservation.generation());
         claimReservation(connection, candidate.operationId(), reservation.generation());
@@ -89,6 +90,19 @@ public final class PublicationStore {
       statement.setObject(1, operationId);
       try (var result = statement.executeQuery()) {
         return result.next() ? storedCandidate(result) : null;
+      }
+    }
+  }
+
+  private static void verifyAllocationPool(Connection connection, byte[] bundle)
+      throws SQLException {
+    var incoming = lab.backend.content.transport.WireCodec.JSON.readTree(bundle);
+    if (incoming.path("schemaVersion").asInt() != 3) return;
+    try (var statement = connection.createStatement();
+        var rows = statement.executeQuery("SELECT bundle_bytes FROM content.publication_bundle")) {
+      while (rows.next()) {
+        AllocationMetadataValidator.consistent(
+            incoming, lab.backend.content.transport.WireCodec.JSON.readTree(rows.getBytes(1)));
       }
     }
   }

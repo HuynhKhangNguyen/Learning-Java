@@ -16,24 +16,98 @@ public final class AdmissionWire {
 
   /** Constructed by the endpoint after route/query/body validation, not from auth headers. */
   public static final class Request {
-    final UUID nonce=UUID.randomUUID(),context,draft;
-    final String credential,csrf,origin,path,bodySha,binding;
-    public Request(String credential,UUID context,UUID draftId,String csrfToken,String origin,byte[] validatedBody) {
-      if(credential==null || !credential.matches("[A-Za-z0-9_-]{43}") || csrfToken==null || !csrfToken.matches("[A-Za-z0-9_-]{43}") || context==null || draftId==null)throw deny(401,"SESSION_INVALID");
-      if(origin==null || origin.length()>256 || validatedBody==null || validatedBody.length>65536)throw deny(400,"BAD_RESOURCE");
-      try{var uri=java.net.URI.create(origin);if(!"https".equals(uri.getScheme())||uri.getHost()==null||uri.getRawUserInfo()!=null||!"".equals(uri.getRawPath())||uri.getRawQuery()!=null||uri.getRawFragment()!=null)throw new Exception();}catch(Exception e){throw deny(400,"BAD_ORIGIN");}
-      this.credential=credential;this.context=context;this.draft=draftId;this.csrf=csrfToken;this.origin=origin;
-      this.path="/api/v1/drafts/"+draftId;this.bodySha=sha(validatedBody);
-      this.binding=sha("PUT\n"+path+"\n\n"+bodySha);
+    final UUID nonce = UUID.randomUUID();
+    final UUID context;
+    final UUID draft;
+    final String credential;
+    final String csrf;
+    final String origin;
+    final String path;
+    final String bodySha;
+    final String binding;
+    final String action;
+    final String method;
+    final boolean mutation;
+
+    /** Giữ constructor draft-save cũ; allocation phải dùng exact factory riêng. */
+    public Request(String credential, UUID context, UUID draftId, String csrfToken,
+        String origin, byte[] validatedBody) {
+      this(credential, context, draftId, csrfToken, origin, validatedBody,
+          ACTION, "PUT", "/api/v1/drafts/" + draftId, true);
+      if (draftId == null) throw deny(400, "BAD_RESOURCE");
     }
+
+    public static Request createAttempt(String credential, UUID context, String csrf,
+        String origin, byte[] validatedBody) {
+      return new Request(credential, context, null, csrf, origin, validatedBody,
+          "LEARNING_ATTEMPT_CREATE", "POST", "/api/v1/attempts", true);
+    }
+
+    public static Request readAttempt(String credential, UUID context, UUID attempt) {
+      if (attempt == null) throw deny(400, "BAD_RESOURCE");
+      return new Request(credential, context, null, null, null, new byte[0],
+          "LEARNING_ATTEMPT_READ", "GET", "/api/v1/attempts/" + attempt, false);
+    }
+
+    private Request(String credential, UUID context, UUID draft, String csrf, String origin,
+        byte[] body, String action, String method, String path, boolean mutation) {
+      if (credential == null || !credential.matches("[A-Za-z0-9_-]{43}") || context == null) {
+        throw deny(401, "SESSION_INVALID");
+      }
+      if (body == null || body.length > 65536) throw deny(400, "BAD_RESOURCE");
+      if (mutation) {
+        if (csrf == null || !csrf.matches("[A-Za-z0-9_-]{43}")) {
+          throw deny(403, "CSRF_DENIED");
+        }
+        if (origin == null || origin.length() > 256) throw deny(400, "BAD_ORIGIN");
+        try {
+          var uri = java.net.URI.create(origin);
+          if (!"https".equals(uri.getScheme()) || uri.getHost() == null
+              || uri.getRawUserInfo() != null || !"".equals(uri.getRawPath())
+              || uri.getRawQuery() != null || uri.getRawFragment() != null) {
+            throw new IllegalArgumentException();
+          }
+        } catch (Exception invalid) {
+          throw deny(400, "BAD_ORIGIN");
+        }
+      }
+      this.credential = credential;
+      this.context = context;
+      this.draft = draft;
+      this.csrf = csrf;
+      this.origin = origin;
+      this.action = action;
+      this.method = method;
+      this.path = path;
+      this.mutation = mutation;
+      this.bodySha = sha(body);
+      this.binding = sha(method + "\n" + path + "\n\n" + bodySha);
+    }
+
     byte[] bytes() {
-      return WireCodec.JSON.writeValueAsBytes(Map.ofEntries(Map.entry("schemaVersion",1),Map.entry("action",ACTION),
-          Map.entry("audience","learning"),Map.entry("requestNonce",nonce.toString()),Map.entry("sessionCredential",credential),
-          Map.entry("expectedContextId",context.toString()),Map.entry("csrfToken",csrf),Map.entry("origin",origin),
-          Map.entry("method","PUT"),Map.entry("canonicalPath",path),Map.entry("query",""),
-          Map.entry("bodySha256",bodySha),Map.entry("requestBinding",binding)));
+      var value = new LinkedHashMap<String, Object>();
+      value.put("schemaVersion", 1);
+      value.put("action", action);
+      value.put("audience", "learning");
+      value.put("requestNonce", nonce.toString());
+      value.put("sessionCredential", credential);
+      value.put("expectedContextId", context.toString());
+      value.put("method", method);
+      value.put("canonicalPath", path);
+      value.put("query", "");
+      value.put("bodySha256", bodySha);
+      value.put("requestBinding", binding);
+      if (mutation) {
+        value.put("csrfToken", csrf);
+        value.put("origin", origin);
+      }
+      return WireCodec.JSON.writeValueAsBytes(value);
     }
-    @Override public String toString(){return "AdmissionRequest[credentials=REDACTED]";}
+
+    @Override
+    public String toString() {
+      return "AdmissionRequest[credentials=REDACTED]";
+    }
   }
   record Admission(UUID id,UUID nonce,UUID realm,UUID user,UUID session,UUID context,long epoch,
                    String binding,Instant issued,Instant serverTime,Instant until,Instant idle,Instant absolute) {}
@@ -46,20 +120,37 @@ public final class AdmissionWire {
       m.put("appliedFloor",Long.toString(floor));m.put("sessionRef",session==null?null:session.toString());
       m.put("sessionContextId",context==null?null:context.toString());m.put("durable",true);return m;}
   }
-  static Admission admission(byte[] bytes,Request request,UUID realm,Instant sentAt,Instant receivedAt) {
-    JsonNode n=object(bytes,ADMISSION);
-    if(!"ALLOW".equals(str(n,"decision")) || !"identity".equals(str(n,"provider")) || !"learning".equals(str(n,"caller"))
-        || !"learning".equals(str(n,"audience")) || !ACTION.equals(str(n,"action")) || !n.get("csrfVerified").isBoolean() || !n.get("csrfVerified").asBoolean())throw deny(403,"ADMISSION_BINDING_DENIED");
-    Admission a=new Admission(id(n,"admissionId"),id(n,"requestNonce"),id(n,"authRealmId"),id(n,"userId"),id(n,"sessionRef"),
-        id(n,"sessionContextId"),epoch(n,"credentialEpoch"),hex(n,"requestBinding"),time(n,"issuedAt"),time(n,"serverTime"),time(n,"validUntil"),time(n,"idleDeadline"),time(n,"absoluteDeadline"));
-    if(!a.nonce.equals(request.nonce) || !a.realm.equals(realm) || !a.context.equals(request.context) || !a.binding.equals(request.binding))throw deny(403,"ADMISSION_BINDING_DENIED");
-    // Use the measured request interval, not the maximum transport timeout as
-    // permission for a fast response from an out-of-budget provider clock.
-    if(receivedAt.isBefore(sentAt) || a.serverTime.isBefore(a.issued)
-        || a.serverTime.isAfter(receivedAt.plusMillis(500)) || a.serverTime.isBefore(sentAt.minusMillis(500))
-        || a.until.isAfter(a.issued.plusSeconds(15)) || a.until.isAfter(a.idle) || a.until.isAfter(a.absolute)
-        || !a.until.isAfter(receivedAt.plusMillis(6500)))throw deny(403,"ADMISSION_TIME_DENIED");
-    return a;
+  /** Kiểm exact action/read/mutation và thời gian của ALLOW mới, không cache principal. */
+  static Admission admission(byte[] bytes, Request request, UUID realm,
+      Instant sentAt, Instant receivedAt) {
+    JsonNode node = object(bytes, ADMISSION);
+    if (!"ALLOW".equals(str(node, "decision")) || !"identity".equals(str(node, "provider"))
+        || !"learning".equals(str(node, "caller")) || !"learning".equals(str(node, "audience"))
+        || !request.action.equals(str(node, "action"))
+        || !node.get("csrfVerified").isBoolean()
+        || node.get("csrfVerified").asBoolean() != request.mutation) {
+      throw deny(403, "ADMISSION_BINDING_DENIED");
+    }
+    Admission admission = new Admission(
+        id(node, "admissionId"), id(node, "requestNonce"), id(node, "authRealmId"),
+        id(node, "userId"), id(node, "sessionRef"), id(node, "sessionContextId"),
+        epoch(node, "credentialEpoch"), hex(node, "requestBinding"), time(node, "issuedAt"),
+        time(node, "serverTime"), time(node, "validUntil"), time(node, "idleDeadline"),
+        time(node, "absoluteDeadline"));
+    if (!admission.nonce.equals(request.nonce) || !admission.realm.equals(realm)
+        || !admission.context.equals(request.context) || !admission.binding.equals(request.binding)) {
+      throw deny(403, "ADMISSION_BINDING_DENIED");
+    }
+    // Dùng khoảng request đo thực, không lấy transport timeout làm clock tolerance.
+    if (receivedAt.isBefore(sentAt) || admission.serverTime.isBefore(admission.issued)
+        || admission.serverTime.isAfter(receivedAt.plusMillis(500))
+        || admission.serverTime.isBefore(sentAt.minusMillis(500))
+        || admission.until.isAfter(admission.issued.plusSeconds(15))
+        || admission.until.isAfter(admission.idle) || admission.until.isAfter(admission.absolute)
+        || !admission.until.isAfter(receivedAt.plusMillis(6500))) {
+      throw deny(403, "ADMISSION_TIME_DENIED");
+    }
+    return admission;
   }
   public static Fence fence(byte[] bytes,UUID operation) {
     JsonNode n=object(bytes,FENCE);String scope=str(n,"scope"),action=str(n,"action");

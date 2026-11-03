@@ -53,11 +53,17 @@ public final class ReplicaValidator {
   }
 
   private static Set<String> validatePrivateBundle(JsonNode bundle) {
-    exact(bundle, Set.of("schemaVersion", "id", "unitId", "expected", "rubricTargets"));
+    if (bundle == null || !bundle.isObject()) fail("PRIVATE_BUNDLE_INVALID");
     JsonNode version = bundle.get("schemaVersion");
     if (version == null || !version.isIntegralNumber() || !version.canConvertToInt()
-        || version.asInt() != 2
+        || !Set.of(2, 3).contains(version.asInt())
         || !bundle.path("expected").isObject()) fail("PRIVATE_BUNDLE_INVALID");
+    if (version.asInt() == 3) {
+      exact(bundle, Set.of("schemaVersion", "id", "unitId", "expected", "rubricTargets", "allocation"));
+      AllocationMetadataValidator.validate(bundle.get("allocation"));
+    } else {
+      exact(bundle, Set.of("schemaVersion", "id", "unitId", "expected", "rubricTargets"));
+    }
     boundedText(bundle, "id", "CASE-[A-Z0-9-]+", 128);
     boundedText(bundle, "unitId", "UNIT-[A-Z0-9-]+", 128);
     JsonNode targetNodes = bundle.get("rubricTargets");

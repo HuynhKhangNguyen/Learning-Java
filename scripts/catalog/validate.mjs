@@ -12,7 +12,10 @@ if (require('ajv/package.json').version !== lock.packages['node_modules/ajv'].ve
 }
 const ajv = new Ajv({ allErrors: true, jsonPointers: true, removeAdditional: false, useDefaults: false, coerceTypes: false });
 const catalogShape = ajv.compile(read('../../contracts/catalog/catalog-v2.schema.json'));
-const privateShape = ajv.compile(read('../../contracts/catalog/private-case-v2.schema.json'));
+const privateShapes = new Map([
+  [2, ajv.compile(read('../../contracts/catalog/private-case-v2.schema.json'))],
+  [3, ajv.compile(read('../../contracts/catalog/private-case-v3.schema.json'))],
+]);
 
 function requireShape(validator, value) {
   // Không sửa input khi validation lỗi; error chỉ nêu path/keyword, không
@@ -109,7 +112,28 @@ export function publicUnit(catalog, id) {
  * về sau vẫn phải bảo vệ disclosure theo auth/publication/journal contracts.
  */
 export function validatePrivateCase(catalog, value) {
-  validateCatalog(catalog); requireShape(privateShape, value);
+  validateCatalog(catalog);
+  const shape = privateShapes.get(value?.schemaVersion);
+  check(shape, 'PRIVATE_CASE_VERSION_UNSUPPORTED');
+  requireShape(shape, value);
+  if (value.schemaVersion === 3) {
+    const schema = value.allocation.inputSchema;
+    // Không compile schema learner: chỉ kiểm syntax, không resolve network/file
+    // hoặc chạy plugin. Recursive scan cấm keyword chứa đáp án hay reference.
+    let count = 0;
+    function inspect(node, depth) {
+      check(depth <= 16 && ++count <= 4096, 'PRIVATE_SCHEMA_BUDGET');
+      if (node && typeof node === 'object') {
+        for (const [key, child] of Object.entries(node)) {
+          check(!['$ref', '$id', 'default', 'examples', 'example', 'expected'].includes(key),
+            'PRIVATE_SCHEMA_KEYWORD_DENIED');
+          inspect(child, depth + 1);
+        }
+      }
+    }
+    inspect(schema, 0);
+    check(ajv.validateSchema(schema), 'PRIVATE_SCHEMA_INVALID');
+  }
   const unit = catalog.units.find(item => item.id === value.unitId);
   check(unit, 'PRIVATE_CASE_UNIT_MISSING');
   for (const id of value.rubricTargets) check(unit.competencyIds.includes(id), 'PRIVATE_RUBRIC_TARGET_MISMATCH');

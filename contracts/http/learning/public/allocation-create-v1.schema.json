@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "exerciseId",
+    "requestedMode"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "exerciseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "requestedMode": {
+      "enum": [
+        "practice",
+        "assessment",
+        "project"
+      ]
+    }
+  }
+}

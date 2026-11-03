@@ -90,11 +90,19 @@ public final class CandidateValidator {
       utf8(bundle);
 
       JsonNode privatePayload = JSON.readTree(bundle);
-      exact(privatePayload, Set.of("schemaVersion", "id", "unitId", "expected", "rubricTargets"));
-      if (!privatePayload.path("schemaVersion").isIntegralNumber()
-          || privatePayload.path("schemaVersion").asInt() != 2
+      if (privatePayload == null || !privatePayload.isObject()
+          || !privatePayload.path("schemaVersion").isIntegralNumber()
+          || !privatePayload.path("schemaVersion").canConvertToInt()
+          || !Set.of(2, 3).contains(privatePayload.path("schemaVersion").asInt())
           || !privatePayload.path("expected").isObject()) {
         fail("PRIVATE_BUNDLE_INVALID");
+      }
+      if (privatePayload.path("schemaVersion").asInt() == 3) {
+        exact(privatePayload, Set.of(
+            "schemaVersion", "id", "unitId", "expected", "rubricTargets", "allocation"));
+        AllocationMetadataValidator.validate(privatePayload.get("allocation"));
+      } else {
+        exact(privatePayload, Set.of("schemaVersion", "id", "unitId", "expected", "rubricTargets"));
       }
 
       JsonNode root = JSON.readTree(candidate);
@@ -147,12 +155,19 @@ public final class CandidateValidator {
         || unitComponent == null || !"content".equals(unitComponent.type())) {
       fail("PRIVATE_BUNDLE_BINDING_INVALID");
     }
+    JsonNode allocation = payload.get("allocation");
+    if (allocation != null && !caseComponent.version().equals(
+        allocation.path("caseVersion").asString())) {
+      fail("ALLOCATION_VERSION_BINDING_INVALID");
+    }
     Set<String> rubricTargets = new HashSet<>();
     for (JsonNode target : array(payload, "rubricTargets", MAX_COMPONENTS)) {
       if (!target.isString() || !target.asString().matches("CAP-[A-Z]+-[0-9]{3}-[A-Z]")
           || !rubricTargets.add(target.asString())
           || !components.containsKey(target.asString())
-          || !"rubric".equals(components.get(target.asString()).type())) {
+          || !"rubric".equals(components.get(target.asString()).type())
+          || (allocation != null && !components.get(target.asString()).version().equals(
+              allocation.path("rubricVersion").asString()))) {
         fail("PRIVATE_BUNDLE_BINDING_INVALID");
       }
     }

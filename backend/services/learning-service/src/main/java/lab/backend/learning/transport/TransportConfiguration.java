@@ -28,11 +28,32 @@ public class TransportConfiguration {
       ssl.addCertificate(certificate);connector.addSslHostConfig(ssl);factory.addAdditionalConnectors(connector);
     };
   }
-  @Bean FilterRegistrationBean<TransportBoundaryFilter> transportBoundary(TransportSettings settings,org.springframework.beans.factory.ObjectProvider<lab.backend.learning.identityaccess.AdmissionRuntime> admission,org.springframework.beans.factory.ObjectProvider<lab.backend.learning.delivery.DeliveryRuntime> delivery,org.springframework.beans.factory.ObjectProvider<lab.backend.learning.contentreplica.PublicationRuntime> publication){
-    var runtime=admission.getIfAvailable();
-    var relay=delivery.getIfAvailable();var gate=runtime==null?null:runtime.gate();
-    if(relay!=null){gate=new lab.backend.learning.identityaccess.AdmissionGate(relay.source(),java.util.UUID.fromString(settings.realm()),java.util.UUID.fromString(settings.generation()));gate.verifyRuntime();}
-    var pub=publication.getIfAvailable();var filter=new FilterRegistrationBean<>(new TransportBoundaryFilter(settings,gate,relay==null?null:relay.handler(),pub==null?null:new lab.backend.learning.contentreplica.PublicationHttpHandler(pub)));filter.setOrder(Ordered.HIGHEST_PRECEDENCE);filter.setDispatcherTypes(DispatcherType.REQUEST,DispatcherType.ERROR);filter.addUrlPatterns("/*");return filter;
+  @Bean
+  FilterRegistrationBean<TransportBoundaryFilter> transportBoundary(
+      TransportSettings settings,
+      org.springframework.beans.factory.ObjectProvider<lab.backend.learning.identityaccess.AdmissionRuntime> admission,
+      org.springframework.beans.factory.ObjectProvider<lab.backend.learning.delivery.DeliveryRuntime> delivery,
+      org.springframework.beans.factory.ObjectProvider<lab.backend.learning.contentreplica.PublicationRuntime> publication,
+      org.springframework.beans.factory.ObjectProvider<lab.backend.learning.work.AllocationRuntime> allocation) {
+    var runtime = admission.getIfAvailable();
+    var relay = delivery.getIfAvailable();
+    var gate = runtime == null ? null : runtime.gate();
+    if (relay != null) {
+      gate = new lab.backend.learning.identityaccess.AdmissionGate(relay.source(),
+          java.util.UUID.fromString(settings.realm()), java.util.UUID.fromString(settings.generation()));
+      gate.verifyRuntime();
+    }
+    var work = allocation.getIfAvailable();
+    var pub = publication.getIfAvailable();
+    if (work != null) pub = work.publication();
+    var filter = new FilterRegistrationBean<>(new TransportBoundaryFilter(settings, gate,
+        relay == null ? null : relay.handler(),
+        pub == null ? null : new lab.backend.learning.contentreplica.PublicationHttpHandler(pub),
+        work == null ? null : work.handler()));
+    filter.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    filter.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR);
+    filter.addUrlPatterns("/*");
+    return filter;
   }
   @Bean(destroyMethod="close") @Profile({"admission","canonical"}) lab.backend.learning.identityaccess.LearningAccess learningAccess(lab.backend.learning.identityaccess.AdmissionRuntime runtime)throws Exception{return runtime.access();}
   @Bean @Profile({"admission","canonical"}) WebServerFactoryCustomizer<TomcatServletWebServerFactory> admissionErrorEnvelope(){

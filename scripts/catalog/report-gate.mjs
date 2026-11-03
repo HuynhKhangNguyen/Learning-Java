@@ -10,6 +10,8 @@ export const requiredCases = [
   'viewedMappingIsSubsetNotEveryTopicOfSharedUnit','publicProjectionNeverContainsPrivateCaseOrExpected','unitExpectedInjection',
   'unitMissingLocale','unitCanonicalOutsideMapping','unitViewedOutsideMapping','unitCapOutsideMapping',
   'unitPublishedAgainstPlanned','privateCaseUnknownRubricRejected','publicUnitProjectionIsDetachedAndHasNoPrivateMaterial',
+  'privateV3MetadataAcceptedAndPrivateProjectionExcluded',
+  'privateV3UnknownMissingVersionAndSchemaReferencesRejected',
 ];
 export function verifyReport(text, exitCode) {
   const names = [...text.matchAll(/^# Subtest: (.+)$/gm)].map(match => match[1].trim());

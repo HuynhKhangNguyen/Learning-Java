@@ -58,3 +58,14 @@ plugin. Đây chỉ là validation shape, không chấm hay trả semantic-corre
 
 BL-R08 không biên soạn/release toàn bộ ngân hàng Collections. Fixtures lab phải là authored/versioned
 content có provenance qua pipeline thật; không hardcode case trong Learning runtime.
+
+
+## R08 runtime schema profile
+
+Java producer/consumer use a bounded structural draft-07 subset without extra dependencies:
+object/array/string/integer/number/boolean/null types, properties/required/additionalProperties/items,
+structural size/number bounds, enum, allOf/anyOf/oneOf/not and descriptive text. Unknown keywords,
+$ref/$id, default/examples/const and depth over16/schema nodes over4096 fail closed. Authoring Ajv
+still validates draft-07 syntax using the existing lockfile. No schema executes learner code or grades
+answers. This explicit subset is a runtime compatibility limit; richer authored schema must be reviewed
+and supported on both sides before publication.

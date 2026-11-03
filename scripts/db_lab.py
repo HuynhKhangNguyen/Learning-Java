@@ -98,16 +98,43 @@ def write_properties(path, values):
     path.write_text("\n".join(key + "=" + escape(value) for key, value in values.items()) + "\n", encoding="utf-8")
 
 
+def allocation_inputs():
+    """Affected source/contract/tool inventory, excluding generated targets/runtime secrets."""
+    files = [ROOT / name for name in (
+        "backend/pom.xml", "scripts/services.ps1", "scripts/db_lab.py", "ops/db-lab/layout.json",
+        "scripts/allocation-check.ps1", "scripts/r08_report.py", "scripts/tests/test_r08_report.py", "scripts/trust_lab.py",
+        "backend/mvnw.cmd", "backend/.mvn/wrapper/maven-wrapper.properties",
+        "ops/release/dependencies.json", "ops/release/postgresql.json",
+        "scripts/catalog/validate.mjs", "scripts/catalog/contract.mjs", "scripts/catalog/catalog.test.mjs",
+        "scripts/catalog/report-gate.mjs", "scripts/catalog/report-gate.test.mjs",
+        "frontend/package.json", "frontend/package-lock.json")]
+    for service in ("identity", "content", "learning"):
+        base = ROOT / "backend/services" / (service + "-service")
+        files.append(base / "pom.xml")
+        files += [p for p in (base / "src").rglob("*") if p.is_file()]
+    for folder in ("contracts/http", "contracts/catalog", "contracts/fixtures/exposure",
+                   "contracts/fixtures/publication", "ops/identity", "ops/content", "ops/learning"):
+        files += [p for p in (ROOT / folder).rglob("*") if p.is_file()]
+    return sorted(set(files))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--service", choices=["identity", "content", "learning", "all"], required=True)
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--task", choices=["db","contract","fault","relay"], default="db")
     parser.add_argument("--case")
-    parser.add_argument("--evidence-task", choices=["R02a","R02b","R02c","R03","R04a","R04b","R04c","R04d","R06a","R06b","R06c","R07"])
+    parser.add_argument("--evidence-task", choices=["R02a","R02b","R02c","R03","R04a","R04b","R04c","R04d","R06a","R06b","R06c","R07","R08"])
     parser.add_argument("--fail-before-build", action="store_true",
                         help="R02a cleanup fixture: fail after provisioning, without running Maven")
     args = parser.parse_args()
+    allocation_runtime = args.evidence_task == "R08" and args.task in {"contract", "fault"}
+    if args.evidence_task == "R08" and (
+        args.service != "learning" or args.task not in {"db", "contract", "fault"}
+        or (args.task in {"db", "contract"} and args.case)
+        or (args.task == "fault" and args.case != "DATA-22") or args.fail_before_build
+    ):
+        parser.error("R08 requires Learning db/contract or fault DATA-22")
     # Nhãn evidence không biến fixture cũ thành canonical distributed proof.
     # Chỉ named Learning driver mới chạy ba canonical apps; CMD05 selector
     # vẫn dùng cùng own-PG/PKI/input/artifact cleanup, không fixture legacy.
@@ -141,9 +168,9 @@ def main():
         parser.error("R04d requires db Identity or contract Learning canonical driver; other layers pending")
     if canonical_runtime and args.task == "contract" and args.case:
         parser.error("R04d contract requires the full baseline; use fault for implemented canonical selectors")
-    if args.case and args.case not in canonical_selectors | {"SEC-02","SEC-04","SEC-09","SEC-10","SEC-12","SEC-14","SEC-15","SEC-16","SEC-22","SEC-25","SEC-28","WIRE-01","WIRE-02","WIRE-03","WIRE-04","WIRE-05","WIRE-06","DATA-01","DATA-02","DATA-03","DATA-04","DATA-05","DATA-06","DATA-07","DATA-10","DATA-11","DATA-12","DATA-13","DATA-14","DATA-15"}:
+    if args.case and args.case not in canonical_selectors | {"SEC-02","SEC-04","SEC-09","SEC-10","SEC-12","SEC-14","SEC-15","SEC-16","SEC-22","SEC-25","SEC-28","WIRE-01","WIRE-02","WIRE-03","WIRE-04","WIRE-05","WIRE-06","DATA-01","DATA-02","DATA-03","DATA-04","DATA-05","DATA-06","DATA-07","DATA-10","DATA-11","DATA-12","DATA-13","DATA-14","DATA-15","DATA-22"}:
         parser.error("Unknown receiver/common-wire case")
-    if args.evidence_task not in {"R06b","R06c","R07"} and not canonical_runtime and not canonical_core_fault and args.task == "fault" and args.case not in {"SEC-01","SEC-02","SEC-03","SEC-04","SEC-05","SEC-09","SEC-12","SEC-14","SEC-15","SEC-20","SEC-22"}:
+    if args.evidence_task not in {"R06b","R06c","R07","R08"} and not canonical_runtime and not canonical_core_fault and args.task == "fault" and args.case not in {"SEC-01","SEC-02","SEC-03","SEC-04","SEC-05","SEC-09","SEC-12","SEC-14","SEC-15","SEC-20","SEC-22"}:
         parser.error("Fault requires an implemented SEC case")
     if not canonical_runtime and args.case in {"SEC-01","SEC-03","SEC-05"} and (args.task != "fault" or args.service != "learning"):
         parser.error("Mutation admission selectors require fault and Learning")
@@ -354,6 +381,8 @@ def main():
                     inputs += [ROOT / "scripts/trust_lab.py", ROOT / "ops/release/dependencies.json", ROOT / "ops/release/postgresql.json"]
             if args.task != "db":
                 inputs += [p for p in (ROOT / "contracts/http/common").rglob("*") if p.is_file()]
+            if args.evidence_task == "R08":
+                inputs = allocation_inputs()
             input_hashes = {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
             (evidence / (name + "-inputs.json")).write_text(json.dumps(input_hashes,indent=2),encoding="utf-8")
             command = [pwsh, "-NoProfile", "-File", str(ROOT / "scripts/services.ps1"), "-Task", args.task,
@@ -374,8 +403,12 @@ def main():
             # observation attempt253.98s), ngoài fresh three-app build/browser.
             # Full contract cho headroom bounded1200s để thu đủ XML; selected
             # layers/core giữ900s. Không nới per-test/HTTP/KDF/SQL/retry budget.
-            verification_budget = 1200 if canonical_runtime and args.task == "contract" else 900 if canonical_runtime or canonical_core_fault or (args.evidence_task == "R04d" and args.task == "db" and name == "identity") or (args.evidence_task == "R06b" and args.task in {"contract","fault"}) or (args.evidence_task == "R06c" and args.task in {"contract","fault"}) or (args.evidence_task == "R07" and args.task in {"contract","fault"}) else 600
+            verification_budget = 1200 if allocation_runtime else 1200 if canonical_runtime and args.task == "contract" else 900 if canonical_runtime or canonical_core_fault or (args.evidence_task == "R04d" and args.task == "db" and name == "identity") or (args.evidence_task == "R06b" and args.task in {"contract","fault"}) or (args.evidence_task == "R06c" and args.task in {"contract","fault"}) or (args.evidence_task == "R07" and args.task in {"contract","fault"}) else 600
             run(command, env=environment, log=evidence / (name + "-verify.log"), timeout=verification_budget)
+            if args.evidence_task == "R08" and set(input_hashes) != {
+                str(p.relative_to(ROOT)) for p in allocation_inputs()
+            }:
+                raise RuntimeError("R08 input inventory added/removed during run; no PASS")
             if any(hashlib.sha256((ROOT / p).read_bytes()).hexdigest()!=digest for p,digest in input_hashes.items()):
                 raise RuntimeError("Build inputs changed during verification; repeat the affected service, no PASS")
             artifact = ROOT / "backend/services" / (name + "-service") / "target" / (name + "-service-0.1.0-SNAPSHOT.jar")
@@ -412,7 +445,7 @@ def main():
                     "artifactSha256": hashlib.sha256(peer_artifact.read_bytes()).hexdigest(),
                     "reports": retain_reports("identity", evidence, None),
                 }]
-            if canonical_runtime:
+            if canonical_runtime or allocation_runtime:
                 # Driver chạy ba JAR fresh; giữ cả hai peers và unit reports,
                 # không lấy qualifiedDeliveryCandidate cũ làm current artifact.
                 peers = []
@@ -445,7 +478,7 @@ def main():
             print(f"PASS: {command_id} {name}; actual reports checked by helper; scope={args.task}", flush=True)
         status = "PASS"
     except Exception:
-        if canonical_runtime:
+        if canonical_runtime or args.evidence_task == "R08":
             # Giữ XML/log thất bại trước clean ở lượt sau. Không copy config
             # chứa password/key/proof; evidence FAIL không thành qualification.
             for peer in ["identity", "content", "learning"]:
@@ -487,6 +520,12 @@ def main():
         if evidence_task == "R04d":
             report["scope"] = ("R04d three packaged apps/three own DB/canonical mTLS baseline or exact selected fault layer: admission/dual-ACK barrier/proof/sensitive/browser, strict-poison independence and legacy credential reconciliation; no T1/T2/publication/lifecycle journal or full final DoD qualification"
                                if canonical_runtime else "R04d Identity canonical admission/auth barrier/reauth core own-PG layer and current foundation regressions only; no canonical mTLS/reauth HTTP/INT06 wire/three-app/browser/full leaf qualification")
+        if evidence_task == "R08":
+            report["scope"] = ("R08 actual Learning own-PG allocation core and filesystem journal; "
+                               "packaged canonical admission/disclosure is a separate required layer"
+                               if args.task == "db" else
+                               "R08 packaged canonical three-service allocation and current published v3 "
+                               "replica with filesystem journal; local lab only, no production provider/T1/T2")
         (evidence / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(f"{args.task} evidence: {evidence.relative_to(ROOT)}; owned listener closed={stopped}", flush=True)
 

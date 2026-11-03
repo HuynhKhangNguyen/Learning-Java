@@ -1,0 +1,21 @@
+{
+  "AllocationStoreIT": [
+    "actualPreparingJournalVerifiedReadyPinsDraftZeroAndNeverLeaksExpected",
+    "sameKeyChangedPayloadAndForeignOwnerCannotReadOrConsumeAssignment",
+    "twoConnectionsAndStoreReplicasSerializeUnderActualLearnerGuard",
+    "finitePoolKeepsExposureAcrossEpochAndNeverCreatesFakeClean",
+    "lostAckAndPumpRestartReuseSameExternalRecordOutsideDatabaseLocks",
+    "beforeAppendWrongReceiptAndLocalRollbackCannotDiscloseOrConsume",
+    "epochLifecycleFenceAndRuntimeRoleConstraintsFailClosed"
+  ],
+  "AllocationWireTests": [
+    "canonicalFingerprintIgnoresFormattingButRejectsPrivilegedAndAmbiguousFields"
+  ],
+  "AllocationAdmissionConsumerTests": [
+    "readUsesExactReadFieldsAndRejectsMutationAllowOrCrossAction"
+  ],
+  "AllocationV3CompatibilityTests": [
+    "acceptsAuthoredV3AndHistoricalV2WithoutChangingBytes",
+    "missingUnknownConflictingMetadataAndSchemaEscapeFailClosed"
+  ]
+}

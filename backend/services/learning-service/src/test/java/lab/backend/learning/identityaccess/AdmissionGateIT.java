@@ -35,11 +35,18 @@ public class AdmissionGateIT {
     m.put("schemaVersion",1);m.put("operationId",op.toString());m.put("scope",session==null?"ACCOUNT":"SESSION");m.put("action",action);m.put("audience","learning");m.put("userId",user.toString());m.put("sessionRef",session==null?null:session.toString());m.put("sessionContextId",context==null?null:context.toString());m.put("epochFloor",Long.toString(floor));m.put("authRealmId",realm.toString());m.put("topologyVersion",TOPOLOGY);m.put("participantGeneration",generation.toString());
     m.put("commandDigest",sha(action+"\n"+user+"\n"+(session==null?"ACCOUNT":session)+"\n"+floor+"\n"+realm+"\n"+TOPOLOGY+"\ncontent,learning"));return lab.backend.learning.transport.WireCodec.JSON.writeValueAsBytes(m);
   }
-  @Test @Tag("SEC-02") void absentSessionFenceDeniesLateAdmissionWithoutProvisioningLearner()throws Exception{
-    var r=request();var a=admission(r,UUID.randomUUID(),1);var f=command(a.user(),a.session(),a.context(),1);
-    gate.fence(f);denied(()->gate.use(a,r,(c,u)->"forbidden"),"SESSION_FENCED");
-    assertThat(count("learning.auth_admission_use","user_id='"+a.user()+"'")).isZero();
-    assertThat(count("information_schema.tables","table_schema='learning' AND table_name IN ('learner_guard','attempt','draft','submission')")).isZero();
+  @Test
+  @Tag("SEC-02")
+  void absentSessionFenceDeniesLateAdmissionWithoutProvisioningLearner() throws Exception {
+    var request = request();
+    var admission = admission(request, UUID.randomUUID(), 1);
+    var fence = command(admission.user(), admission.session(), admission.context(), 1);
+    gate.fence(fence);
+    denied(() -> gate.use(admission, request, (connection, user) -> "forbidden"), "SESSION_FENCED");
+    assertThat(count("learning.auth_admission_use", "user_id='" + admission.user() + "'")).isZero();
+    // R08 đã có schema domain; denied admission vẫn không provision row cho owner.
+    assertThat(count("learning.learner_guard", "user_id='" + admission.user() + "'")).isZero();
+    assertThat(count("learning.allocation_attempt", "user_id='" + admission.user() + "'")).isZero();
   }
   @Test @Tag("SEC-09") void olderCommandCannotLowerFloorAndNewEpochMayProceed()throws Exception{
     UUID user=UUID.randomUUID();gate.fence(command(user,null,null,9));var ack=gate.fence(command(user,null,null,2));assertThat(ack.floor()).isEqualTo(9);

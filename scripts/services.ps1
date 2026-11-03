@@ -9,9 +9,9 @@ param(
   [string]$JavaHome,
   [string]$LabConfig,
   [string]$TrustConfig,
-  [ValidateSet('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-06','SEC-07','SEC-08','SEC-09','SEC-10','SEC-11','SEC-12','SEC-14','SEC-15','SEC-16','SEC-19','SEC-20','SEC-22','SEC-23','SEC-25','SEC-28','WIRE-01','WIRE-02','WIRE-03','WIRE-04','WIRE-05','WIRE-06','DATA-01','DATA-02','DATA-03','DATA-04','DATA-05','DATA-06','DATA-07','DATA-10','DATA-11','DATA-12','DATA-13','DATA-14','DATA-15')]
+  [ValidateSet('SEC-01','SEC-02','SEC-03','SEC-04','SEC-05','SEC-06','SEC-07','SEC-08','SEC-09','SEC-10','SEC-11','SEC-12','SEC-14','SEC-15','SEC-16','SEC-19','SEC-20','SEC-22','SEC-23','SEC-25','SEC-28','WIRE-01','WIRE-02','WIRE-03','WIRE-04','WIRE-05','WIRE-06','DATA-01','DATA-02','DATA-03','DATA-04','DATA-05','DATA-06','DATA-07','DATA-10','DATA-11','DATA-12','DATA-13','DATA-14','DATA-15','DATA-22')]
   [string]$Case,
-  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c','R07','R28a')]
+  [ValidateSet('R02a','R02b','R02c','R03','R04a','R04b','R04c','R04d','R05','R06a','R06b','R06c','R07','R08','R28a')]
   [string]$EvidenceTask,
   [ValidateSet('lab', 'qualification')]
   [string]$Profile,
@@ -47,6 +47,25 @@ if ($EvidenceTask -eq 'R05') {
   } | Select-Object -First 1
   if (-not $catalogNode) { throw 'Catalog requires existing Node24+; no runtime is downloaded.' }
   & $catalogNode (Join-Path $PSScriptRoot 'catalog/contract.mjs')
+  exit $LASTEXITCODE
+}
+# R08 có runner/domain suites riêng; không map nhãn allocation vào foundation PASS.
+if ($EvidenceTask -eq 'R08') {
+  if ($Service -ne 'learning' -or $Task -notin @('db','contract','fault') -or
+      ($Task -in @('db','contract') -and $Case) -or
+      ($Task -eq 'fault' -and $Case -ne 'DATA-22') -or $Profile -or $JavaHome) {
+    throw 'R08 requires Learning db/contract or fault DATA-22 with pinned runtime.'
+  }
+  if (-not $LabConfig) {
+    $arguments = @('-X','utf8',(Join-Path $PSScriptRoot 'db_lab.py'),
+      '--service','learning','--task',$Task,'--evidence-task','R08')
+    if ($Case) { $arguments += @('--case',$Case) }
+    if ($Offline) { $arguments += '--offline' }
+    & (Get-Command python -ErrorAction Stop).Source @arguments
+  } else {
+    & (Join-Path $PSScriptRoot 'allocation-check.ps1') -Task $Task -LabConfig $LabConfig `
+      -TrustConfig $TrustConfig -Offline:$Offline
+  }
   exit $LASTEXITCODE
 }
 $backendDirectory = Join-Path $repoDirectory 'backend'

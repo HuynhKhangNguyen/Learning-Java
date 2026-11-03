@@ -98,3 +98,35 @@ test('publicUnitProjectionIsDetachedAndHasNoPrivateMaterial',()=>{
   const result=publicUnit(c,fixture.unit.id);result.title.en='changed';assert.notEqual(c.units[0].title.en,'changed');
   assert.ok(!JSON.stringify(result).includes('PRIVATE_EXPECTED'));
 });
+
+
+// Metadata chỉ được đưa vào pipeline private; public projection không đổi contract.
+test('privateV3MetadataAcceptedAndPrivateProjectionExcluded', () => {
+  const value = read('../../contracts/fixtures/exposure/r08-private-a-v3.json');
+  const catalog = mapped();
+  validatePrivateCase(catalog, value);
+  const publicValue = JSON.stringify(publicOutline(catalog));
+  assert.ok(!publicValue.includes(value.expected.sentinel));
+  assert.ok(!publicValue.includes(value.allocation.prompt.en));
+});
+
+test('privateV3UnknownMissingVersionAndSchemaReferencesRejected', () => {
+  const original = read('../../contracts/fixtures/exposure/r08-private-a-v3.json');
+  const mutations = [
+    value => { delete value.allocation; },
+    value => { value.schemaVersion = 4; },
+    value => { value.schemaVersion = 2; },
+    value => { value.allocation.owner = 'forged'; },
+    value => { value.allocation.mode = 'clean'; },
+    value => { value.allocation.inputSchema = { $ref: 'https://untrusted.invalid/schema' }; },
+    value => { value.allocation.inputSchema = { properties: { x: { default: 42 } } }; },
+    value => { value.allocation.inputSchema = { type: 'not-a-type' }; },
+  ];
+  for (const mutate of mutations) {
+    const value = structuredClone(original);
+    mutate(value);
+    const before = structuredClone(value);
+    assert.throws(() => validatePrivateCase(mapped(), value));
+    assert.deepEqual(value, before);
+  }
+});

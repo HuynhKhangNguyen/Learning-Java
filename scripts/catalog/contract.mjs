@@ -37,7 +37,9 @@ try {
   const inputs={};
   for(const name of ['scripts/services.ps1','scripts/catalog/contract.mjs','scripts/catalog/validate.mjs','scripts/catalog/catalog.test.mjs',
     'scripts/catalog/report-gate.mjs','scripts/catalog/report-gate.test.mjs','scripts/catalog/cli.test.mjs','scripts/catalog/import_outline.py',
-    'contracts/catalog/catalog-v2.schema.json','contracts/catalog/private-case-v2.schema.json','contracts/catalog/fixtures/mapping.json',
+    'contracts/catalog/catalog-v2.schema.json','contracts/catalog/private-case-v2.schema.json',
+    'contracts/catalog/private-case-v3.schema.json','contracts/catalog/fixtures/mapping.json',
+    'contracts/fixtures/exposure/r08-private-a-v3.json',
     'content-v2/catalog/catalog.json','frontend/package.json','frontend/package-lock.json',
     'docs/curriculum/core-foundations.md','docs/curriculum/core-api-data.md','docs/curriculum/core-security-operations.md','docs/curriculum/devops-catalog.md']) {
     inputs[name]=hash(resolve(root,name));

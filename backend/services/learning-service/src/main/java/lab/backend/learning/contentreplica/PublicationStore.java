@@ -19,7 +19,59 @@ public final class PublicationStore {
    * trả publication_pending sau restart thay vì dựa vào state trong memory.
    */
   public <T>T contentSensitive(Supplier<T> callback,Supplier<T> pending){return gate.contentSensitive(()->isFenced()?pending.get():callback.get());}
-  public byte[] stage(PublicationWire.Command c,ReplicaValidator.Verified replica){return gate.exclusive(()->tx(db->{environment(db,c);publicationLock(db);byte[] prior=receipt(db,c);if(prior!=null)return prior;expectNextSequence(db,c);head(db,c.parentRevision(),false,null);try(var s=db.prepareStatement("INSERT INTO learning.content_replica(bundle_id,target_revision,bundle_sha256,manifest_sha256,bundle_bytes,manifest_bytes) VALUES (?,?,?,?,?,?) ON CONFLICT DO NOTHING")){s.setString(1,c.bundleId());s.setLong(2,c.targetRevision());s.setString(3,c.bundleSha256());s.setString(4,c.manifestSha256());s.setBytes(5,replica.bundle());s.setBytes(6,replica.manifest());s.executeUpdate();}verifyReplica(db,c);try(var s=db.prepareStatement("INSERT INTO learning.publication_operation VALUES (?,?,?,?,?,?,?,?,?,'STAGED')")){s.setObject(1,c.operationId());s.setLong(2,c.parentRevision());s.setLong(3,c.targetRevision());s.setString(4,c.bundleId());s.setString(5,c.bundleSha256());s.setString(6,c.manifestSha256());s.setObject(7,c.realmId());s.setObject(8,c.producerGeneration());s.setObject(9,c.participantGeneration());s.executeUpdate();}return save(db,c,"STAGED");}));}
+  /** Stage dưới DB publication lock, kiểm immutable pool trước khi ghi candidate mới. */
+  public byte[] stage(PublicationWire.Command command, ReplicaValidator.Verified replica) {
+    return gate.exclusive(() -> tx(db -> {
+      environment(db, command);
+      publicationLock(db);
+      byte[] prior = receipt(db, command);
+      if (prior != null) return prior;
+      expectNextSequence(db, command);
+      head(db, command.parentRevision(), false, null);
+      verifyAllocationPool(db, replica.bundle());
+      try (var statement = db.prepareStatement(
+          "INSERT INTO learning.content_replica(bundle_id,target_revision,bundle_sha256,"
+              + "manifest_sha256,bundle_bytes,manifest_bytes) VALUES (?,?,?,?,?,?) "
+              + "ON CONFLICT DO NOTHING")) {
+        statement.setString(1, command.bundleId());
+        statement.setLong(2, command.targetRevision());
+        statement.setString(3, command.bundleSha256());
+        statement.setString(4, command.manifestSha256());
+        statement.setBytes(5, replica.bundle());
+        statement.setBytes(6, replica.manifest());
+        statement.executeUpdate();
+      }
+      verifyReplica(db, command);
+      try (var statement = db.prepareStatement(
+          "INSERT INTO learning.publication_operation VALUES (?,?,?,?,?,?,?,?,?,'STAGED')")) {
+        statement.setObject(1, command.operationId());
+        statement.setLong(2, command.parentRevision());
+        statement.setLong(3, command.targetRevision());
+        statement.setString(4, command.bundleId());
+        statement.setString(5, command.bundleSha256());
+        statement.setString(6, command.manifestSha256());
+        statement.setObject(7, command.realmId());
+        statement.setObject(8, command.producerGeneration());
+        statement.setObject(9, command.participantGeneration());
+        statement.executeUpdate();
+      }
+      return save(db, command, "STAGED");
+    }));
+  }
+
+  private static void verifyAllocationPool(Connection connection, byte[] bundle)
+      throws SQLException {
+    var incoming = PublicationWire.JSON.readTree(bundle);
+    if (incoming.path("schemaVersion").asInt() != 3) return;
+    try (var statement = connection.createStatement();
+        var rows = statement.executeQuery("SELECT bundle_bytes FROM learning.content_replica")) {
+      while (rows.next()) {
+        AllocationMetadataValidator.consistent(
+            incoming, PublicationWire.JSON.readTree(rows.getBytes(1)));
+      }
+    }
+  }
+
   public byte[] phase(PublicationWire.Command c){return gate.exclusive(()->tx(db->{environment(db,c);publicationLock(db);byte[] prior=receipt(db,c);if(prior!=null)return prior;expectNextSequence(db,c);String current=operation(db,c);return switch(c.phase()){case "FENCE"->{if(!"STAGED".equals(current))conflict();head(db,c.parentRevision(),false,null);try(var s=db.prepareStatement("UPDATE learning.publication_head SET fence_operation=? WHERE singleton AND fence_operation IS NULL")){s.setObject(1,c.operationId());if(s.executeUpdate()!=1)conflict();}state(db,c,"FENCED");yield save(db,c,"FENCED");}case "RELEASE"->{if(!"FENCED".equals(current))conflict();head(db,c.parentRevision(),true,c.operationId());try(var s=db.prepareStatement("UPDATE learning.publication_head SET applied_revision=?,active_bundle_id=?,active_manifest_sha256=?,fence_operation=NULL WHERE singleton")){s.setLong(1,c.targetRevision());s.setString(2,c.bundleId());s.setString(3,c.manifestSha256());s.executeUpdate();}state(db,c,"RELEASED");yield save(db,c,"RELEASED");}case "ABORT"->{if(!SetLike.of("STAGED","FENCED").contains(current))conflict();try(var s=db.prepareStatement("UPDATE learning.publication_head SET fence_operation=NULL WHERE singleton AND (fence_operation IS NULL OR fence_operation=?)")){s.setObject(1,c.operationId());if(s.executeUpdate()!=1)conflict();}state(db,c,"ABORTED");yield save(db,c,"ABORTED");}default->throw new IllegalArgumentException("STAGE_REQUIRES_REPLICA");};}));}
   public Map<String,Object> status(UUID operation){return tx(db->{try(var s=db.prepareStatement("SELECT o.state,o.parent_revision,o.target_revision,o.bundle_id,o.bundle_sha256,o.manifest_sha256,o.realm_id,o.producer_generation,o.participant_generation,r.phase,r.delivery_sequence,r.command_sha256 FROM learning.publication_operation o JOIN learning.publication_receipt r ON r.operation_id=o.operation_id AND r.phase=CASE o.state WHEN 'STAGED' THEN 'STAGE' WHEN 'FENCED' THEN 'FENCE' WHEN 'RELEASED' THEN 'RELEASE' ELSE 'ABORT' END WHERE o.operation_id=?")){s.setObject(1,operation);try(var r=s.executeQuery()){if(!r.next())throw new IllegalArgumentException("OPERATION_NOT_FOUND");return Map.ofEntries(Map.entry("contractVersion",1),Map.entry("operationId",operation.toString()),Map.entry("phase",r.getString(10)),Map.entry("state",r.getString(1)),Map.entry("parentRevision",r.getLong(2)),Map.entry("targetRevision",r.getLong(3)),Map.entry("bundleId",r.getString(4)),Map.entry("bundleSha256",r.getString(5)),Map.entry("manifestSha256",r.getString(6)),Map.entry("realmId",r.getObject(7,UUID.class).toString()),Map.entry("producerGeneration",r.getObject(8,UUID.class).toString()),Map.entry("participantGeneration",r.getObject(9,UUID.class).toString()),Map.entry("deliverySequence",r.getLong(11)),Map.entry("commandSha256",r.getString(12)));}}});}
   private void environment(Connection db,PublicationWire.Command c)throws SQLException{if(!realm.equals(c.realmId())||!generation.equals(c.participantGeneration()))conflict();/* Bảng môi trường chỉ do provisioner quản lý và bất biến với app; advisory transaction lock bên dưới mới tuần tự hóa phase. FOR SHARE ở đây vừa thừa vừa đòi quyền UPDATE. */try(var s=db.createStatement();var r=s.executeQuery("SELECT realm_id,db_generation,content_generation,ready FROM learning.publication_environment WHERE singleton")){if(!r.next()||!realm.equals(r.getObject(1,UUID.class))||!generation.equals(r.getObject(2,UUID.class))||!c.producerGeneration().equals(r.getObject(3,UUID.class))||!r.getBoolean(4))throw new IllegalStateException("PUBLICATION_NOT_READY");}}

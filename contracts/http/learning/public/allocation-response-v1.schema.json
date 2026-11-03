@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "attemptId",
+        "draftId",
+        "learningEpoch",
+        "state"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "learningEpoch": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,18})$"
+        },
+        "state": {
+          "const": "preparing"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "attemptId",
+        "draftId",
+        "learningEpoch",
+        "state",
+        "exerciseId",
+        "mode",
+        "caseVersion",
+        "independentAtAssignment",
+        "prompt",
+        "input",
+        "inputSchema",
+        "draft"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "attemptId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "draftId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "learningEpoch": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]{0,18})$"
+        },
+        "state": {
+          "const": "ready"
+        },
+        "exerciseId": {
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "practice",
+            "assessment",
+            "project"
+          ]
+        },
+        "caseVersion": {
+          "type": "string"
+        },
+        "independentAtAssignment": {
+          "type": "boolean"
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "en",
+            "vi"
+          ],
+          "properties": {
+            "en": {
+              "type": "string"
+            },
+            "vi": {
+              "type": "string"
+            }
+          }
+        },
+        "input": {
+          "type": "object"
+        },
+        "inputSchema": {
+          "type": "object"
+        },
+        "draft": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "revision",
+            "answer",
+            "position"
+          ],
+          "properties": {
+            "revision": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,18})$"
+            },
+            "answer": {
+              "type": "object"
+            },
+            "position": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
