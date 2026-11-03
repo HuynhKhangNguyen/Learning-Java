@@ -246,6 +246,9 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
 
 ### Xác nhận Control Center — 03/11/2026
 
+> Đính chính tại lượt review commit `31e5c45`: nội dung xác nhận dưới đây không được evidence
+> nghiệm thu hiện hành hỗ trợ và không còn hiệu lực. Xem checkpoint review lại cuối file.
+
 - Người dùng xác nhận Control Center đã nghiệm thu candidate implementation/evidence và không còn
   finding acceptance mở. AC01–07 cùng DONE-01–04 được chấp nhận trong giới hạn local-host lab.
 - Registry vẫn `IN_PROGRESS` vì DONE-05 còn yêu cầu staged diff/commit theo Git workflow, trong khi
@@ -253,6 +256,9 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   không push/merge/deploy và không mở task kế tiếp.
 
 ### Đóng task — 03/11/2026
+
+> Đính chính tại lượt review commit `31e5c45`: quyết định DONE dưới đây bị thu hồi vì các finding
+> acceptance vẫn tồn tại. Registry hiện hành là `IN_PROGRESS`.
 
 - Người dùng sau đó cấp quyền stage/commit cho candidate đã được Control Center nghiệm thu. Registry
   chuyển `DONE`; DONE-01–05 được chấp nhận, không còn P0–P3 mở trong supported R28a scope.
@@ -304,3 +310,27 @@ giữ IN_PROGRESS nếu chưa đủ DoD. Mỗi lượt implement/fix xong tự c
   tất phải validation rồi tạo commit riêng trước handoff; Control Center review theo candidate commit.
 - Task vẫn `IN_PROGRESS`, các finding review còn hiệu lực. Commit candidate không cần đợi đủ DoD;
   chỉ nghiệm thu/integration cần đủ DoD. Quyền mới không tự mở task kế tiếp.
+
+## Checkpoint nghiệm thu lại candidate 31e5c45 — 03/11/2026
+
+- **Kết luận:** REJECT candidate `31e5c45`, parent `7ec4ecd`, branch
+  `codex/bl-r28a-journal-lab-adapter`. Working tree sạch khi bắt đầu review. Registry sửa từ DONE
+  về `IN_PROGRESS`; các đoạn xác nhận/đóng task không có evidence nghiệm thu được đính chính phía trên.
+- **P1 / AC06:** run `20261103T034022558Z` vẫn chỉ hash bảy POM/doc/script files; không có tám Java
+  main/test files. Runner vẫn dùng glob `src/*/java/...`, ghi cleanup cứng true và chỉ gate count >=2;
+  helper không recompute current hashes hay kiểm required case names. Rerun cùng helper lỗi không
+  khép finding hoặc bind candidate source.
+- **P1 / AC02, AC05:** cả hai adapter vẫn tạo/ghi trực tiếp child records/nodes/heads; `owned` chỉ
+  kiểm namespace trước các write này. Child reparse có thể dẫn write ra ngoài root. `findHead` vẫn
+  đọc path từ predecessor chưa validate; malformed node sequence vẫn có thể ném unchecked
+  NumberFormatException thay typed CORRUPT.
+- **P1 / AC03–05:** test inventory vẫn chỉ ba methods/service, một corruption case đổi record bytes;
+  chưa có required missing-node/record, malformed sequence, namespace/predecessor/gap/forged-head,
+  path/reparse và orphan-before-retry evidence. Chưa có CAS loser/retry case đúng AC03; file lock
+  serialization hiện có cần được đối chiếu/thiết kế rõ trước khi tuyên bố AC03 đạt.
+- **P2 / AC07:** runner vẫn dùng `-DskipTests`; new POM profiles/Java symbols vẫn dồn statement.
+  Regression321/127 vẫn thiếu retained command/run/report bindings trong checkpoint.
+- **Validation review:** đọc committed diff, source/test/helper và report mới; không chạy lại full
+  lab vì các blocker đã xác định trực tiếp và rerun không sửa được coverage/manifest. Không thay
+  source implementation. Lượt sửa tiếp theo tạo commit mới trên cùng branch, cập nhật evidence thật
+  và yêu cầu nghiệm thu lại; chưa mở task khác hoặc integration.
