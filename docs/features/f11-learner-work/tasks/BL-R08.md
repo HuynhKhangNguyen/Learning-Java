@@ -149,3 +149,34 @@ codex/bl-r08-learning-allocation. Triển khai, validation và checkpoint; tự 
 fix sau validation theo Git workflow. Bàn giao candidate chờ review thì NEED_REVIEW; còn việc thì
 IN_PROGRESS. Chỉ Control Center nghiệm thu mới DONE. Không mở task khác.
 ```
+
+## Checkpoint executor — 03/11/2026 — `IN_PROGRESS`, dependency contract blocker
+
+- Git audit: branch `codex/bl-r08-learning-allocation`, reviewed stacked base `41aff92`, task-doc
+  parent `5e29ac8`; working tree sạch trước lượt. Executor đã đọc registry, checkpoint,
+  Git/quality mapping và chỉ source do brief dẫn. Chưa có implementation runtime R08.
+- Blocker admission: canonical Identity provider hiện exact-allowlist caller Learning thành
+  action `LEARNING_DRAFT_SAVE`, method `PUT`, route `/api/v1/drafts/{uuid}` trong
+  `CanonicalAdmissionWire.parse`. API-L01 cần `POST /api/v1/attempts`, API-L02 cần authenticated
+  `GET /api/v1/attempts/{attemptId}`; cả hai shape/action chưa được provider đăng ký. Write
+  scope R08 chỉ cho minimal integration phía Learning, không cho sửa Identity owner. Dùng
+  draft-save admission cho allocation sẽ sai action/route binding và không đạt AC02/AC05.
+- Blocker content: verified Learning replica V4/private-case-v2 chỉ chấp nhận exact fields
+  `schemaVersion,id,unitId,expected,rubricTargets`; publication manifest chỉ có policy theo
+  capability/version. Replica không có exercise, mode policy, family/exposureGroup/equivalence,
+  caseVersion, learner-visible prompt/input/schema hoặc rubric/grader version để chọn và ghim.
+  Brief cấm hardcode runtime case và cấm gọi Content trong transaction, nên Learning không thể
+  tự bổ sung dữ liệu thiếu mà vẫn đạt AC01–03.
+- AC còn thiếu: AC01–AC07 đều chưa đạt. Chưa tạo migration/API/store/helper,
+  chưa có selector `-EvidenceTask R08`, và không chạy bốn required command để tránh
+  ghi PASS cho layer chưa tồn tại. Validation lượt audit chỉ gồm scoped source search,
+  task/link review, `git diff --check` và staged diff review; không có runtime evidence/hash.
+- Control Center cần chốt dependency trước khi executor code: (1) giao owner task/cho phép
+  mở rộng Identity canonical admission contract cho API-L01/L02; (2) giao owner task/contract
+  publication bundle mới mang allocation metadata + learner-visible prompt trong verified replica,
+  kèm migration/compatibility cho replica V4 hiện hành. Không được coi hai thay đổi này là
+  local implementation detail của Learning.
+- Giới hạn: không mở R09/R10/sibling, không sửa Identity/Content source ngoài scope,
+  không tạo fixture/hardcode thay canonical replica, không claim JRN-01 allocation hay packaged
+  HTTP. Registry chuyển `IN_PROGRESS`; chỉ chuyển `NEED_REVIEW` sau implementation, required
+  validation và candidate commit đủ AC01–07.
