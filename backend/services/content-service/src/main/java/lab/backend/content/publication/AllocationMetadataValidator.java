@@ -1,5 +1,6 @@
 package lab.backend.content.publication;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import tools.jackson.databind.JsonNode;
@@ -43,14 +44,17 @@ final class AllocationMetadataValidator {
   }
 
   /** Ngăn rename/version/mode conflict làm known case trở lại clean. */
-  static void consistent(JsonNode incoming, JsonNode prior) {
+  static void consistent(
+      JsonNode incoming, byte[] incomingBytes, JsonNode prior, byte[] priorBytes) {
     if (incoming.path("schemaVersion").asInt() != 3
         || prior.path("schemaVersion").asInt() != 3) return;
     JsonNode next = incoming.path("allocation");
     JsonNode old = prior.path("allocation");
     if (incoming.path("id").equals(prior.path("id"))
         && next.path("caseVersion").equals(old.path("caseVersion"))
-        && !incoming.equals(prior)) fail();
+        // ID/version là immutable identity của authored case. So raw bytes để
+        // key-order/whitespace khác không lách exact component digest contract.
+        && !Arrays.equals(incomingBytes, priorBytes)) fail();
     if (next.path("familyId").equals(old.path("familyId"))) {
       for (String field : Set.of("equivalenceKey", "exposureGroup", "mode", "exerciseId")) {
         if (!next.path(field).equals(old.path(field))) fail();
@@ -75,7 +79,15 @@ final class AllocationMetadataValidator {
           if (!value.isString()
               || !value.asString().equals("http://json-schema.org/draft-07/schema#")) fail();
         }
-        case "title", "description", "pattern" -> text(value, null, 32768);
+        case "title", "description" -> text(value, null, 32768);
+        case "pattern" -> {
+          String pattern = text(value, null, 32768);
+          try {
+            java.util.regex.Pattern.compile(pattern);
+          } catch (java.util.regex.PatternSyntaxException invalid) {
+            fail();
+          }
+        }
         case "type" -> {
           if (value.isString()) {
             if (!TYPES.contains(value.asString())) fail();
@@ -117,10 +129,10 @@ final class AllocationMetadataValidator {
           if (!value.isBoolean()) fail();
         }
         case "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum" -> {
-          if (!value.isNumber()) fail();
+          if (!value.isNumber() || !Double.isFinite(value.asDouble())) fail();
         }
         case "multipleOf" -> {
-          if (!value.isNumber() || value.asDouble() <= 0) fail();
+          if (!value.isNumber() || !Double.isFinite(value.asDouble()) || value.asDouble() <= 0) fail();
         }
         case "enum" -> {
           if (!value.isArray() || value.isEmpty()) fail();
@@ -131,6 +143,14 @@ final class AllocationMetadataValidator {
           if (!value.isIntegralNumber() || !value.canConvertToInt() || value.asInt() < 0) fail();
         }
       }
+    }
+    // Profile không nhận schema tự mâu thuẫn: tránh producer/consumer/catalog
+    // có kết luận khác nhau dù không execute schema hay chấm bài ở đây.
+    for (String[] pair : new String[][]{{"minItems", "maxItems"},
+        {"minLength", "maxLength"}, {"minProperties", "maxProperties"},
+        {"minimum", "maximum"}, {"exclusiveMinimum", "exclusiveMaximum"}}) {
+      if (node.has(pair[0]) && node.has(pair[1])
+          && node.get(pair[0]).decimalValue().compareTo(node.get(pair[1]).decimalValue()) > 0) fail();
     }
   }
 

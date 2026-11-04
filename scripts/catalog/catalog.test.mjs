@@ -130,3 +130,14 @@ test('privateV3UnknownMissingVersionAndSchemaReferencesRejected', () => {
     assert.deepEqual(value, before);
   }
 });
+
+
+test('privateV3SharedMalformedSchemaCorpusRejectsRegexContradictionAndUnsupportedKeyword', () => {
+  const original = read('../../contracts/fixtures/exposure/r08-private-a-v3.json');
+  const corpus = read('../../contracts/fixtures/exposure/r08-invalid-schemas.json');
+  for (const schema of corpus) {
+    const value = structuredClone(original);
+    value.allocation.inputSchema = schema;
+    assert.throws(() => validatePrivateCase(mapped(), value));
+  }
+});

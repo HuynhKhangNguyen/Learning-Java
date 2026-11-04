@@ -27,8 +27,59 @@ class AllocationReportGateTests(unittest.TestCase):
                 ET.SubElement(suite, "testcase", name=method)
             ET.ElementTree(suite).write(self.folder / ("TEST-" + name + ".xml"))
 
+    def write_runtime_report(self, service="learning"):
+        selection = GATE.selection("contract", service)
+        methods = selection["methods"]
+        invocations = selection["invocations"]
+        suite = ET.Element(
+            "testsuite",
+            name="lab.backend.learning.AllocationRuntimeIT",
+            tests=str(sum(invocations.values())),
+            failures="0",
+            errors="0",
+            skipped="0",
+        )
+        for method in methods:
+            for index in range(invocations[method]):
+                # Surefire adds the parameter signature/index; the gate binds the base method.
+                suffix = "" if invocations[method] == 1 else f"(String)[{index + 1}]"
+                ET.SubElement(suite, "testcase", name=method + suffix)
+        ET.ElementTree(suite).write(self.folder / "TEST-AllocationRuntimeIT.xml")
+
     def test_exact_named_report_is_gate_fixture_only(self):
         self.assertEqual(GATE.verify(self.target, "db")["status"], "PASS")
+
+    def test_runtime_manifest_parameter_counts_and_service_subset_are_exact(self):
+        for service in ("learning", "identity", "content"):
+            with self.subTest(service=service):
+                self.write_runtime_report(service)
+                result = GATE.verify(self.target, "contract", service)
+                selected = GATE.selection("contract", service)
+                self.assertEqual(result["requestedService"], service)
+                self.assertEqual(
+                    result["runtimeInvocations"],
+                    sum(selected["invocations"].values()),
+                )
+
+    def test_runtime_parameter_count_cannot_be_replaced_by_one_named_case(self):
+        self.write_runtime_report()
+        report = self.folder / "TEST-AllocationRuntimeIT.xml"
+        suite = ET.parse(report).getroot()
+        method = next(
+            name
+            for name, count in GATE.selection("contract")["invocations"].items()
+            if count > 1
+        )
+        duplicate = next(
+            case
+            for case in suite.findall("testcase")
+            if case.get("name", "").startswith(method + "(")
+        )
+        suite.remove(duplicate)
+        suite.set("tests", str(int(suite.get("tests")) - 1))
+        ET.ElementTree(suite).write(report)
+        with self.assertRaisesRegex(ValueError, "MISSING_OR_DUPLICATED"):
+            GATE.verify(self.target, "contract")
 
     def test_missing_suite_cannot_use_other_nonzero_suites(self):
         (self.folder / "TEST-AllocationStoreIT.xml").unlink()
@@ -52,8 +103,15 @@ class AllocationReportGateTests(unittest.TestCase):
             report.write_bytes(original)
 
     def test_database_cases_cannot_be_claimed_as_packaged_runtime(self):
+        (self.folder / "TEST-AllocationRuntimeIT.xml").unlink()
         with self.assertRaisesRegex(ValueError, "SUITE_MISSING:AllocationRuntimeIT"):
             GATE.verify(self.target, "contract")
+
+    def test_unknown_or_unsupported_selector_fails_closed(self):
+        with self.assertRaisesRegex(ValueError, "SELECTOR_UNSUPPORTED"):
+            GATE.selection("fault", "identity")
+        with self.assertRaisesRegex(ValueError, "SELECTOR_UNKNOWN"):
+            GATE.selection("contract", "unknown")
 
 
 if __name__ == "__main__":

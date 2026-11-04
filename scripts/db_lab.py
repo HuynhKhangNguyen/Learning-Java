@@ -130,11 +130,13 @@ def main():
     args = parser.parse_args()
     allocation_runtime = args.evidence_task == "R08" and args.task in {"contract", "fault"}
     if args.evidence_task == "R08" and (
-        args.service != "learning" or args.task not in {"db", "contract", "fault"}
+        args.service not in {"learning", "identity", "content"}
+        or (args.task != "contract" and args.service != "learning")
+        or args.task not in {"db", "contract", "fault"}
         or (args.task in {"db", "contract"} and args.case)
         or (args.task == "fault" and args.case != "DATA-22") or args.fail_before_build
     ):
-        parser.error("R08 requires Learning db/contract or fault DATA-22")
+        parser.error("R08 requires Learning db/fault DATA-22 or registered service contract")
     # Nhãn evidence không biến fixture cũ thành canonical distributed proof.
     # Chỉ named Learning driver mới chạy ba canonical apps; CMD05 selector
     # vẫn dùng cùng own-PG/PKI/input/artifact cleanup, không fixture legacy.
@@ -204,7 +206,8 @@ def main():
     if not pwsh:
         raise RuntimeError("PowerShell7.4+ required for the service build helper")
     layout = json.loads((ROOT / "ops/db-lab/layout.json").read_text(encoding="utf-8"))["services"]
-    services = list(layout) if args.service == "all" else [args.service]
+    services = (["learning"] if args.evidence_task == "R08"
+                else list(layout) if args.service == "all" else [args.service])
     if LAB_ROOT.resolve() != LAB_ROOT:
         raise RuntimeError("Lab root resolves through a link; refusing provisioning")
     LAB_ROOT.mkdir(parents=True, exist_ok=True)
@@ -225,6 +228,9 @@ def main():
     status = "FAIL"
     outcomes = []
     port = None
+    # Exception cleanup có thể chạy trước khi PKI bundle được tạo (init/provision fault).
+    # Khởi tạo bên ngoài try để không che nguyên nhân gốc bằng UnboundLocalError.
+    trust_configs = None
     try:
         run([str(bin_dir / "initdb.exe"), "-D", str(data), "-U", "lab_admin", "--encoding=UTF8", "--locale=C",
              "--auth-local=scram-sha-256", "--auth-host=scram-sha-256", "--pwfile=" + str(password_file)],
@@ -283,11 +289,13 @@ def main():
         environment.pop("PGPASSWORD")
         properties = directory / "test-credentials.properties"
         write_properties(properties, credentials)
-        trust_configs = None
         if args.task != "db" and not canonical_core_fault and not credential_fault and not receiver_db_fault:
             import trust_lab
             trust_configs = trust_lab.create_bundle(evidence, credentials)
-        ipc = ROOT / ".tools/jvm-ipc-sockets"
+        # Mỗi managed run có namespace AF_UNIX riêng. Dùng thư mục chung khiến
+        # selector PipeImpl của JVM mới có thể đụng address còn sống từ JVM peer.
+        # Tên ngắn giữ path dưới giới hạn Windows đã qualify cho workaround này.
+        ipc = ROOT / ".tools" / ("ipc-" + run_id[:8])
         ipc.mkdir(parents=True, exist_ok=True)
         environment["JDK_JAVA_OPTIONS"] = '"-Djdk.net.unixdomain.tmpdir=' + str(ipc) + '"'
         # Explicit lab-only cap for memory-constrained hosts, inherited by packaged JVMs too.
@@ -386,7 +394,8 @@ def main():
             input_hashes = {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
             (evidence / (name + "-inputs.json")).write_text(json.dumps(input_hashes,indent=2),encoding="utf-8")
             command = [pwsh, "-NoProfile", "-File", str(ROOT / "scripts/services.ps1"), "-Task", args.task,
-                       "-Service", name, "-LabConfig", str(properties)]
+                       "-Service", args.service if args.evidence_task == "R08" else name,
+                       "-LabConfig", str(properties)]
             if trust_configs:
                 command.extend(["-TrustConfig",str(trust_configs[name])])
             if args.case:
@@ -411,6 +420,11 @@ def main():
                 raise RuntimeError("R08 input inventory added/removed during run; no PASS")
             if any(hashlib.sha256((ROOT / p).read_bytes()).hexdigest()!=digest for p,digest in input_hashes.items()):
                 raise RuntimeError("Build inputs changed during verification; repeat the affected service, no PASS")
+            if args.evidence_task == "R08":
+                after = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                         for path in allocation_inputs()}
+                (evidence / (name + "-inputs-after.json")).write_text(
+                    json.dumps(after, indent=2), encoding="utf-8")
             artifact = ROOT / "backend/services" / (name + "-service") / "target" / (name + "-service-0.1.0-SNAPSHOT.jar")
             artifact_hash = hashlib.sha256(artifact.read_bytes()).hexdigest()
             qualified_artifact = evidence / name / "qualified-artifact.jar"
@@ -418,7 +432,7 @@ def main():
             shutil.copyfile(artifact,qualified_artifact)
             outcomes.append({"service": name, "status": "PASS", "log": name + "-verify.log",
                              "artifactSha256": artifact_hash,
-                             "reports": retain_reports(name, evidence, "canonical-runtime" if canonical_runtime else "delivery" if args.task == "relay" else "database" if args.task == "db" or receiver_db_fault or canonical_core_fault else "credential" if credential_fault else "transport")})
+                             "reports": retain_reports(name, evidence, "allocation-runtime" if allocation_runtime else "canonical-runtime" if canonical_runtime else "delivery" if args.task == "relay" else "database" if args.task == "db" or receiver_db_fault or canonical_core_fault else "credential" if credential_fault else "transport")})
             if args.evidence_task == "R06b" and args.task in {"contract","fault"}:
                 peer_artifact = ROOT / "backend/services/content-service/target/content-service-0.1.0-SNAPSHOT.jar"
                 peer_destination = evidence / "content/qualified-artifact.jar"
@@ -521,6 +535,17 @@ def main():
             report["scope"] = ("R04d three packaged apps/three own DB/canonical mTLS baseline or exact selected fault layer: admission/dual-ACK barrier/proof/sensitive/browser, strict-poison independence and legacy credential reconciliation; no T1/T2/publication/lifecycle journal or full final DoD qualification"
                                if canonical_runtime else "R04d Identity canonical admission/auth barrier/reauth core own-PG layer and current foundation regressions only; no canonical mTLS/reauth HTTP/INT06 wire/three-app/browser/full leaf qualification")
         if evidence_task == "R08":
+            report["requestedService"] = args.service
+            report["driverService"] = "learning"
+            report["qualificationLayer"] = ("allocation" if args.service == "learning"
+                                            else "canonical-admission" if args.service == "identity"
+                                            else "private-publication")
+            report["artifactHashes"] = {
+                str(path.relative_to(evidence)): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in evidence.rglob("*") if path.is_file()
+                and (path.suffix == ".xml" or path.name.endswith("inputs.json")
+                     or path.name.endswith("inputs-after.json") or path.name == "qualified-artifact.jar")
+            }
             report["scope"] = ("R08 actual Learning own-PG allocation core and filesystem journal; "
                                "packaged canonical admission/disclosure is a separate required layer"
                                if args.task == "db" else

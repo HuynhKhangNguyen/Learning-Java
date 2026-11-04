@@ -23,8 +23,108 @@ public class PublicationStoreIT {
   @Test @Order(2) void changedRetryOutOfOrderAndFailureLeaveLastGoodReplicaUntouched()throws Exception{var changed=new PublicationWire.Command(1,OP,"RELEASE",1,2,"fx05-p2",BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,3,"0".repeat(64));assertThatThrownBy(()->store.phase(changed)).isInstanceOf(IllegalArgumentException.class);UUID next=UUID.randomUUID();assertThatThrownBy(()->store.phase(command(next,"FENCE",4))).isInstanceOf(IllegalArgumentException.class);var replica=new ReplicaValidator().verify(RACE_BUNDLE,MANIFEST,RACE_BD,MD);var gap=new PublicationWire.Command(1,UUID.randomUUID(),"STAGE",2,3,"fx05-p3",RACE_BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,5,"5".repeat(64));var stale=new PublicationWire.Command(1,UUID.randomUUID(),"STAGE",2,3,"fx05-p3",RACE_BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,2,"2".repeat(64));assertThatThrownBy(()->store.stage(gap,replica)).isInstanceOf(IllegalArgumentException.class);assertThatThrownBy(()->store.stage(stale,replica)).isInstanceOf(IllegalArgumentException.class);assertThat(number("SELECT last_sequence FROM learning.publication_delivery_cursor WHERE stream_key='content-global'")).isEqualTo(3);assertThat(count("content_replica")).isOne();assertThat(number("SELECT applied_revision FROM learning.publication_head WHERE singleton")).isEqualTo(2);}
   @Test @Order(3) void twoConnectionStageRaceCommitsOneReplicaAndOneReceipt()throws Exception{var replica=new ReplicaValidator().verify(RACE_BUNDLE,MANIFEST,RACE_BD,MD);var c=new PublicationWire.Command(1,RACE_OP,"STAGE",2,3,"fx05-p3",RACE_BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,4,"4".repeat(64));var other=new PublicationStore(app,REALM,LEARNING_GEN,new PublicationGate());try(var pool=Executors.newFixedThreadPool(2)){var start=new CountDownLatch(1);var a=pool.submit(()->{start.await();return store.stage(c,replica);});var b=pool.submit(()->{start.await();return other.stage(c,replica);});start.countDown();assertThat(a.get()).isEqualTo(b.get());}assertThat(number("SELECT count(*) FROM learning.content_replica WHERE bundle_id='fx05-p3'")).isOne();assertThat(number("SELECT count(*) FROM learning.publication_receipt WHERE operation_id='"+RACE_OP+"' AND phase='STAGE'")).isOne();}
   @Test @Order(4) void durableFenceReturnsPublicationPendingAfterStoreRestartAndAbortKeepsHead()throws Exception{var entered=new CountDownLatch(1);var release=new CountDownLatch(1);try(var pool=Executors.newFixedThreadPool(2)){var callback=pool.submit(()->store.contentSensitive(()->{try(var db=app.getConnection();var s=db.createStatement()){db.setAutoCommit(false);s.execute("SELECT applied_revision FROM learning.publication_head WHERE singleton");entered.countDown();release.await();db.commit();return "effect";}catch(Exception e){throw new IllegalStateException(e);}},()->"publication_pending"));assertThat(entered.await(2,TimeUnit.SECONDS)).isTrue();var fence=pool.submit(()->store.phase(new PublicationWire.Command(1,RACE_OP,"FENCE",2,3,"fx05-p3",RACE_BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,5,"5".repeat(64))));Thread.sleep(100);assertThat(fence.isDone()).isFalse();release.countDown();assertThat(callback.get(2,TimeUnit.SECONDS)).isEqualTo("effect");fence.get(2,TimeUnit.SECONDS);}var restarted=new PublicationStore(app,REALM,LEARNING_GEN,new PublicationGate());assertThat(restarted.contentSensitive(()->"effect",()->"publication_pending")).isEqualTo("publication_pending");var abort=new PublicationWire.Command(1,RACE_OP,"ABORT",2,3,"fx05-p3",RACE_BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,6,"6".repeat(64));byte[] receipt=restarted.phase(abort);assertThat(restarted.phase(abort)).isEqualTo(receipt);assertThat(number("SELECT applied_revision FROM learning.publication_head WHERE singleton")).isEqualTo(2);assertThat(text("SELECT fence_operation::text FROM learning.publication_head WHERE singleton")).isNull();assertThat(text("SELECT state FROM learning.publication_operation WHERE operation_id='"+RACE_OP+"'")).isEqualTo("ABORTED");assertThat(restarted.contentSensitive(()->"effect",()->"publication_pending")).isEqualTo("effect");assertThatThrownBy(()->restarted.phase(new PublicationWire.Command(1,OP,"ABORT",1,2,"fx05-p2",BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,7,"7".repeat(64)))).isInstanceOf(IllegalArgumentException.class);}
-  @Test @Order(5) void appRoleCannotMutateImmutableRowsOrSecurityGeneration()throws Exception{for(String statement:List.of("UPDATE learning.content_replica SET bundle_bytes='x' WHERE bundle_id='fx05-p2'","DELETE FROM learning.publication_receipt WHERE operation_id='"+OP+"'","UPDATE learning.publication_operation SET bundle_sha256='"+"0".repeat(64)+"' WHERE operation_id='"+OP+"'","UPDATE learning.publication_delivery_cursor SET last_sequence=last_sequence+2 WHERE stream_key='content-global'","UPDATE learning.publication_environment SET db_generation='"+UUID.randomUUID()+"'"))assertThatThrownBy(()->execute(app,statement)).isInstanceOf(SQLException.class);}
+  @Test
+  @Order(5)
+  void sameCaseVersionRequiresExactReplicaBytesWithoutAdvancingRejectedPrefix() throws Exception {
+    byte[] authored = Files.readAllBytes(Path.of(
+        "../../../contracts/fixtures/exposure/r08-private-a-v3.json"));
+    byte[] compact = PublicationWire.JSON.writeValueAsBytes(PublicationWire.JSON.readTree(authored));
+    assertThat(compact).isNotEqualTo(authored);
+    long prefix = number(
+        "SELECT last_sequence FROM learning.publication_delivery_cursor "
+            + "WHERE stream_key='content-global'");
+    String authoredDigest = PublicationWire.sha256(authored);
+    var verified = new ReplicaValidator().verify(authored, MANIFEST, authoredDigest, MD);
+    long fixtureParent = 99;
+    sql("UPDATE learning.publication_head SET applied_revision=" + fixtureParent
+        + ",fence_operation=NULL WHERE singleton");
+
+    UUID operation = UUID.randomUUID();
+    var stage = allocationCommand(
+        operation,
+        "STAGE",
+        "r08-replica-raw-a",
+        authoredDigest,
+        fixtureParent,
+        prefix + 1);
+    byte[] receipt = store.stage(stage, verified);
+    // Exact lost-ACK replay hội tụ trước khi pool validation chạy lại.
+    assertThat(store.stage(stage, verified)).isEqualTo(receipt);
+    store.phase(allocationCommand(
+        operation,
+        "FENCE",
+        "r08-replica-raw-a",
+        authoredDigest,
+        fixtureParent,
+        prefix + 2));
+    store.phase(allocationCommand(
+        operation,
+        "RELEASE",
+        "r08-replica-raw-a",
+        authoredDigest,
+        fixtureParent,
+        prefix + 3));
+
+    String compactDigest = PublicationWire.sha256(compact);
+    var semanticOnly = new ReplicaValidator().verify(compact, MANIFEST, compactDigest, MD);
+    assertThatThrownBy(() -> store.stage(allocationCommand(
+        UUID.randomUUID(),
+        "STAGE",
+        "r08-replica-semantic-only",
+        compactDigest,
+        fixtureParent + 1,
+        prefix + 4),
+        semanticOnly)).isInstanceOf(IllegalArgumentException.class);
+    assertThat(number(
+        "SELECT last_sequence FROM learning.publication_delivery_cursor "
+            + "WHERE stream_key='content-global'"))
+        .isEqualTo(prefix + 3);
+    assertThat(number(
+        "SELECT count(*) FROM learning.content_replica "
+            + "WHERE bundle_id='r08-replica-semantic-only'"))
+        .isZero();
+    assertThat(number("SELECT applied_revision FROM learning.publication_head WHERE singleton"))
+        .isEqualTo(fixtureParent + 1);
+  }
+
+  @Test
+  @Order(6)
+  void appRoleCannotMutateImmutableRowsOrSecurityGeneration() throws Exception {
+    for (String statement : List.of(
+        "UPDATE learning.content_replica SET bundle_bytes='x' WHERE bundle_id='fx05-p2'",
+        "DELETE FROM learning.publication_receipt WHERE operation_id='" + OP + "'",
+        "UPDATE learning.publication_operation SET bundle_sha256='" + "0".repeat(64)
+            + "' WHERE operation_id='" + OP + "'",
+        "UPDATE learning.publication_delivery_cursor SET last_sequence=last_sequence+2 "
+            + "WHERE stream_key='content-global'",
+        "UPDATE learning.publication_environment SET db_generation='" + UUID.randomUUID() + "'")) {
+      assertThatThrownBy(() -> execute(app, statement)).isInstanceOf(SQLException.class);
+    }
+  }
   static PublicationWire.Command command(UUID op,String phase,long seq){return new PublicationWire.Command(1,op,phase,1,2,"fx05-p2",BD,MD,REALM,CONTENT_GEN,LEARNING_GEN,seq,PublicationWire.sha256((op+phase+seq).getBytes()));}
+  static PublicationWire.Command allocationCommand(
+      UUID operation,
+      String phase,
+      String bundleId,
+      String bundleDigest,
+      long parent,
+      long sequence) {
+    return new PublicationWire.Command(
+        1,
+        operation,
+        phase,
+        parent,
+        parent + 1,
+        bundleId,
+        bundleDigest,
+        MD,
+        REALM,
+        CONTENT_GEN,
+        LEARNING_GEN,
+        sequence,
+        PublicationWire.sha256(
+            (operation + phase + bundleId + sequence).getBytes(StandardCharsets.UTF_8)));
+  }
   static PGSimpleDataSource source(String kind){var s=new PGSimpleDataSource();s.setServerNames(new String[]{"127.0.0.1"});s.setPortNumbers(new int[]{Integer.parseInt(CONFIG.getProperty("lab.port"))});s.setDatabaseName("learning_db");s.setUser(CONFIG.getProperty("learning."+kind+".user"));s.setPassword(CONFIG.getProperty("learning."+kind+".password"));s.setSslMode("disable");return s;}
   static void sql(String statement)throws Exception{execute(migrator,statement);}static void execute(PGSimpleDataSource ds,String statement)throws SQLException{try(var c=ds.getConnection();var s=c.createStatement()){s.execute(statement);}}
   static long count(String table)throws Exception{return number("SELECT count(*) FROM learning."+table);}static long number(String query)throws Exception{try(var c=app.getConnection();var s=c.createStatement();var r=s.executeQuery(query)){r.next();return r.getLong(1);}}static String text(String query)throws Exception{try(var c=app.getConnection();var s=c.createStatement();var r=s.executeQuery(query)){r.next();return r.getString(1);}}

@@ -1,0 +1,46 @@
+{
+  "invocations": {
+    "aaPackagedCreateReadRetryOwnerAndCanonicalAdmissionShapesAreBound": 1,
+    "abAnonymousPrivilegedPayloadContextCsrfOriginAndReadBodyCannotDisclose": 1,
+    "abBigintEpochBoundaryAndResponseAllowlistRemainExact": 1,
+    "abConcurrentPackagedRequestsWaitOnActualAccountGateAndConverge": 2,
+    "abValidWrongCsrfOriginCookieContextAndPrivilegedHeadersFailBeforeEffect": 1,
+    "acActualJournalFailureCrashAfterAckAndRestartRetryKeepSingleAssignment": 1,
+    "adCanonicalGateChangesAfterJournalAckBeforeFinalDenyDisclosure": 3,
+    "aeLocalLifecycleChangesAfterJournalAckBeforeFinalDenyDisclosure": 3,
+    "afReadyReadRechecksGatesAfterPhysicalJournalBarrier": 6,
+    "agCommittedReadySnapshotPrecedesLaterGateAndSubsequentReadIsDenied": 1,
+    "ahPublicationFenceReleaseWithdrawWinsBetweenJournalAckAndFinal": 1,
+    "aiMissingCurrentTargetAndActiveLegacyDenyAbsenceFallback": 1,
+    "ajMalformedMetadataAndImmutableFamilyConflictsKeepBothGoodHeads": 1
+  },
+  "services": {
+    "learning": [
+      "aaPackagedCreateReadRetryOwnerAndCanonicalAdmissionShapesAreBound",
+      "abAnonymousPrivilegedPayloadContextCsrfOriginAndReadBodyCannotDisclose",
+      "abBigintEpochBoundaryAndResponseAllowlistRemainExact",
+      "abConcurrentPackagedRequestsWaitOnActualAccountGateAndConverge",
+      "abValidWrongCsrfOriginCookieContextAndPrivilegedHeadersFailBeforeEffect",
+      "acActualJournalFailureCrashAfterAckAndRestartRetryKeepSingleAssignment",
+      "adCanonicalGateChangesAfterJournalAckBeforeFinalDenyDisclosure",
+      "aeLocalLifecycleChangesAfterJournalAckBeforeFinalDenyDisclosure",
+      "afReadyReadRechecksGatesAfterPhysicalJournalBarrier",
+      "agCommittedReadySnapshotPrecedesLaterGateAndSubsequentReadIsDenied",
+      "ahPublicationFenceReleaseWithdrawWinsBetweenJournalAckAndFinal",
+      "aiMissingCurrentTargetAndActiveLegacyDenyAbsenceFallback",
+      "ajMalformedMetadataAndImmutableFamilyConflictsKeepBothGoodHeads"
+    ],
+    "identity": [
+      "aaPackagedCreateReadRetryOwnerAndCanonicalAdmissionShapesAreBound",
+      "abValidWrongCsrfOriginCookieContextAndPrivilegedHeadersFailBeforeEffect",
+      "adCanonicalGateChangesAfterJournalAckBeforeFinalDenyDisclosure",
+      "afReadyReadRechecksGatesAfterPhysicalJournalBarrier"
+    ],
+    "content": [
+      "aaPackagedCreateReadRetryOwnerAndCanonicalAdmissionShapesAreBound",
+      "ahPublicationFenceReleaseWithdrawWinsBetweenJournalAckAndFinal",
+      "aiMissingCurrentTargetAndActiveLegacyDenyAbsenceFallback",
+      "ajMalformedMetadataAndImmutableFamilyConflictsKeepBothGoodHeads"
+    ]
+  }
+}

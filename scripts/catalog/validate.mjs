@@ -118,21 +118,59 @@ export function validatePrivateCase(catalog, value) {
   requireShape(shape, value);
   if (value.schemaVersion === 3) {
     const schema = value.allocation.inputSchema;
-    // Không compile schema learner: chỉ kiểm syntax, không resolve network/file
-    // hoặc chạy plugin. Recursive scan cấm keyword chứa đáp án hay reference.
+    // Chỉ kiểm syntax/profile; không resolve reference, execute code hoặc chấm answer.
+    check(ajv.validateSchema(schema), 'PRIVATE_SCHEMA_INVALID');
+    const supported = new Set(['$schema', 'type', 'title', 'description', 'properties', 'required',
+      'additionalProperties', 'items', 'minItems', 'maxItems', 'uniqueItems', 'minLength',
+      'maxLength', 'pattern', 'minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum',
+      'multipleOf', 'minProperties', 'maxProperties', 'allOf', 'anyOf', 'oneOf', 'not', 'enum']);
+    const integerBounds = new Set(['minItems', 'maxItems', 'minLength', 'maxLength',
+      'minProperties', 'maxProperties']);
     let count = 0;
+    function text(value, maximum) {
+      check(typeof value === 'string' && value.trim().length > 0 && value.length <= maximum,
+        'PRIVATE_SCHEMA_INVALID');
+    }
     function inspect(node, depth) {
       check(depth <= 16 && ++count <= 4096, 'PRIVATE_SCHEMA_BUDGET');
-      if (node && typeof node === 'object') {
-        for (const [key, child] of Object.entries(node)) {
-          check(!['$ref', '$id', 'default', 'examples', 'example', 'expected'].includes(key),
-            'PRIVATE_SCHEMA_KEYWORD_DENIED');
-          inspect(child, depth + 1);
+      if (typeof node === 'boolean') return;
+      check(node && typeof node === 'object' && !Array.isArray(node), 'PRIVATE_SCHEMA_INVALID');
+      for (const [key, value] of Object.entries(node)) {
+        check(supported.has(key), 'PRIVATE_SCHEMA_KEYWORD_DENIED');
+        if (key === '$schema') {
+          check(value === 'http://json-schema.org/draft-07/schema#', 'PRIVATE_SCHEMA_INVALID');
+        } else if (['title', 'description', 'pattern'].includes(key)) {
+          text(value, 32768);
+          if (key === 'pattern') {
+            try { new RegExp(value); } catch { throw new Error('PRIVATE_SCHEMA_INVALID'); }
+          }
+        } else if (key === 'properties') {
+          for (const [name, child] of Object.entries(value)) {
+            text(name, 128);
+            inspect(child, depth + 1);
+          }
+        } else if (key === 'required') {
+          for (const name of value) text(name, 128);
+        } else if (['additionalProperties', 'not'].includes(key)) {
+          inspect(value, depth + 1);
+        } else if (key === 'items') {
+          if (Array.isArray(value)) for (const child of value) inspect(child, depth + 1);
+          else inspect(value, depth + 1);
+        } else if (['allOf', 'anyOf', 'oneOf'].includes(key)) {
+          for (const child of value) inspect(child, depth + 1);
+        } else if (integerBounds.has(key)) {
+          check(Number.isInteger(value) && value >= 0 && value <= 2147483647, 'PRIVATE_SCHEMA_INVALID');
+        } else if (['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'multipleOf'].includes(key)) {
+          check(Number.isFinite(value), 'PRIVATE_SCHEMA_INVALID');
         }
+      }
+      for (const [minimum, maximum] of [['minItems', 'maxItems'], ['minLength', 'maxLength'],
+        ['minProperties', 'maxProperties'], ['minimum', 'maximum'], ['exclusiveMinimum', 'exclusiveMaximum']]) {
+        check(node[minimum] === undefined || node[maximum] === undefined
+          || node[minimum] <= node[maximum], 'PRIVATE_SCHEMA_CONTRADICTION');
       }
     }
     inspect(schema, 0);
-    check(ajv.validateSchema(schema), 'PRIVATE_SCHEMA_INVALID');
   }
   const unit = catalog.units.find(item => item.id === value.unitId);
   check(unit, 'PRIVATE_CASE_UNIT_MISSING');

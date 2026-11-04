@@ -51,19 +51,20 @@ if ($EvidenceTask -eq 'R05') {
 }
 # R08 có runner/domain suites riêng; không map nhãn allocation vào foundation PASS.
 if ($EvidenceTask -eq 'R08') {
-  if ($Service -ne 'learning' -or $Task -notin @('db','contract','fault') -or
+  if ($Service -notin @('learning','identity','content') -or
+      ($Task -ne 'contract' -and $Service -ne 'learning') -or $Task -notin @('db','contract','fault') -or
       ($Task -in @('db','contract') -and $Case) -or
       ($Task -eq 'fault' -and $Case -ne 'DATA-22') -or $Profile -or $JavaHome) {
-    throw 'R08 requires Learning db/contract or fault DATA-22 with pinned runtime.'
+    throw 'R08 requires Learning db/fault DATA-22 or registered Identity/Content/Learning contract with pinned runtime.'
   }
   if (-not $LabConfig) {
     $arguments = @('-X','utf8',(Join-Path $PSScriptRoot 'db_lab.py'),
-      '--service','learning','--task',$Task,'--evidence-task','R08')
+      '--service',$Service,'--task',$Task,'--evidence-task','R08')
     if ($Case) { $arguments += @('--case',$Case) }
     if ($Offline) { $arguments += '--offline' }
     & (Get-Command python -ErrorAction Stop).Source @arguments
   } else {
-    & (Join-Path $PSScriptRoot 'allocation-check.ps1') -Task $Task -LabConfig $LabConfig `
+    & (Join-Path $PSScriptRoot 'allocation-check.ps1') -Task $Task -RequestedService $Service -LabConfig $LabConfig `
       -TrustConfig $TrustConfig -Offline:$Offline
   }
   exit $LASTEXITCODE

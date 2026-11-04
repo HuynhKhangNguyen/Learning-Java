@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 3,
+  "id": "CASE-R08-A",
+  "unitId": "UNIT-CATALOG-FIXTURE",
+  "expected": {
+    "sentinel": "R08_PRIVATE_EXPECTED_A",
+    "groups": {
+      "x": [
+        1,
+        2
+      ]
+    }
+  },
+  "rubricTargets": [
+    "CAP-COL-002-A"
+  ]
+}

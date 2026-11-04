@@ -41,6 +41,7 @@ import lab.backend.content.publication.PublicationFixtureSupport;
 import lab.backend.content.publication.PublicationCoordinatorWire;
 import lab.backend.content.publication.PublicationStore;
 import lab.backend.content.transport.WireCodec;
+import tools.jackson.databind.node.ObjectNode;
 
 /** Real DB fixtures only; no learner/auth/work algorithm or simulated PostgreSQL. */
 @TestMethodOrder(MethodOrderer.MethodName.class)
@@ -185,6 +186,45 @@ class DatabaseIsolationIT {
   }
 
   @Test
+  void publicationAllocationCaseIdentityUsesExactBytesAcrossBundleIds() throws Exception {
+    seedPublicationHead();
+    releasePublicationReservation();
+    byte[] authored = Files.readAllBytes(Path.of(
+        "../../../contracts/fixtures/exposure/r08-private-a-v3.json"));
+    byte[] compact = WireCodec.JSON.writeValueAsBytes(WireCodec.JSON.readTree(authored));
+    assertThat(compact).isNotEqualTo(authored);
+
+    PublicationStore store = new PublicationStore(appDataSource());
+    CandidateValidator.Valid first = allocationCandidate(
+        authored, UUID.randomUUID(), "r08-raw-identity-a");
+    store.prepare(first);
+    releasePublicationReservation();
+
+    // Publication kế tiếp có bundle ID mới vẫn hợp lệ khi case bytes giống hệt.
+    CandidateValidator.Valid exact = allocationCandidate(
+        authored, UUID.randomUUID(), "r08-raw-identity-exact");
+    store.prepare(exact);
+    releasePublicationReservation();
+
+    CandidateValidator.Valid semanticOnly = allocationCandidate(
+        compact, UUID.randomUUID(), "r08-raw-identity-semantic-only");
+    assertThatThrownBy(() -> store.prepare(semanticOnly))
+        .isInstanceOf(SQLException.class)
+        .hasMessageContaining("PREPARE_FAILED");
+    try (Connection app = connect("app", SERVICE + "_db")) {
+      assertThat(number(app,
+          "SELECT count(*) FROM content.publication_bundle "
+              + "WHERE bundle_id IN ('r08-raw-identity-a','r08-raw-identity-exact')"))
+          .isEqualTo(2);
+      assertThat(number(app,
+          "SELECT count(*) FROM content.publication_bundle "
+              + "WHERE bundle_id='r08-raw-identity-semantic-only'"))
+          .isZero();
+      assertGoodPublicationHead(app);
+    }
+  }
+
+  @Test
   void publicationDbFaultRollsBackEveryWriteAndKeepsGoodHead() throws Exception {
     seedPublicationHead();
     releasePublicationReservation();
@@ -245,9 +285,13 @@ class DatabaseIsolationIT {
       String active = text(app,
           "SELECT operation_id::text FROM content.publication_candidate_reservation WHERE singleton");
       winner = active.equals(first.operationId().toString()) ? first : second;
-      assertThat(number(app, "SELECT count(*) FROM content.publication_candidate WHERE target_revision=2"))
+      assertThat(number(app,
+          "SELECT count(*) FROM content.publication_candidate WHERE operation_id IN ('"
+              + first.operationId() + "','" + second.operationId() + "')"))
           .isEqualTo(1);
-      assertThat(number(app, "SELECT count(*) FROM content.publication_bundle WHERE target_revision=2"))
+      assertThat(number(app,
+          "SELECT count(*) FROM content.publication_bundle WHERE bundle_id IN ('"
+              + first.bundleId() + "','" + second.bundleId() + "')"))
           .isEqualTo(1);
     }
 
@@ -263,7 +307,10 @@ class DatabaseIsolationIT {
         UUID.randomUUID(), winner.bundleId(), expected, reason);
     store.prepare(replacement);
     try (Connection app = connect("app", SERVICE + "_db")) {
-      assertThat(number(app, "SELECT count(*) FROM content.publication_candidate WHERE target_revision=2"))
+      assertThat(number(app,
+          "SELECT count(*) FROM content.publication_candidate WHERE operation_id IN ('"
+              + first.operationId() + "','" + second.operationId() + "','"
+              + replacement.operationId() + "')"))
           .isEqualTo(2);
       assertThat(number(app, "SELECT count(*) FROM content.publication_bundle WHERE bundle_id='" + winner.bundleId() + "'"))
           .isEqualTo(1);
@@ -849,6 +896,21 @@ class DatabaseIsolationIT {
           "INSERT INTO content.publication_canonical_head(revision,bundle_id,bundle_digest) "
               + "VALUES(1,'fx05-p1',repeat('0',64)) ON CONFLICT DO NOTHING");
     }
+  }
+
+  private static CandidateValidator.Valid allocationCandidate(
+      byte[] bundle, UUID operationId, String bundleId) throws Exception {
+    String caseId = WireCodec.JSON.readTree(bundle).path("id").asString();
+    byte[] candidate = PublicationFixtureSupport.candidateForBundle(bundle, root -> {
+      root.put("operationId", operationId.toString());
+      ((ObjectNode) root.path("bundle")).put("id", bundleId);
+      for (var component : root.path("components")) {
+        if (component.path("type").asString().equals("case")) {
+          ((ObjectNode) component).put("id", caseId);
+        }
+      }
+    });
+    return new CandidateValidator().validate(candidate, bundle);
   }
 
   private static void releasePublicationReservation() throws SQLException {

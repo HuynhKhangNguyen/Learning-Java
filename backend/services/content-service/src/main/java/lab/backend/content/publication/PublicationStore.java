@@ -101,8 +101,12 @@ public final class PublicationStore {
     try (var statement = connection.createStatement();
         var rows = statement.executeQuery("SELECT bundle_bytes FROM content.publication_bundle")) {
       while (rows.next()) {
+        byte[] priorBytes = rows.getBytes(1);
         AllocationMetadataValidator.consistent(
-            incoming, lab.backend.content.transport.WireCodec.JSON.readTree(rows.getBytes(1)));
+            incoming,
+            bundle,
+            lab.backend.content.transport.WireCodec.JSON.readTree(priorBytes),
+            priorBytes);
       }
     }
   }

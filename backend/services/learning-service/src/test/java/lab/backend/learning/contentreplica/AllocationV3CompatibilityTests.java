@@ -41,6 +41,18 @@ class AllocationV3CompatibilityTests {
     }
   }
 
+  @Test
+  void sharedMalformedSchemaCorpusRejectsRegexContradictionAndUnsupportedKeyword() throws Exception {
+    var corpus = WireCodec.JSON.readTree(Files.readAllBytes(Path.of(
+        "../../../contracts/fixtures/exposure/r08-invalid-schemas.json")));
+    for (var schema : corpus) {
+      var bundle = (ObjectNode) WireCodec.JSON.readTree(fixture());
+      ((ObjectNode) bundle.path("allocation")).set("inputSchema", schema);
+      byte[] bytes = WireCodec.JSON.writeValueAsBytes(bundle);
+      assertThrows(IllegalArgumentException.class, () -> verify(bytes));
+    }
+  }
+
   private static byte[] fixture() throws Exception {
     return Files.readAllBytes(Path.of("../../../contracts/fixtures/exposure/r08-private-a-v3.json"));
   }

@@ -24,11 +24,13 @@ tại assignment; encounter của assignment đó chỉ làm known cho assignmen
 
 ## Validation và privacy
 
-Content validator và Learning validator cùng kiểm schema và semantic references: unit/rubric targets
-phải thuộc candidate components, policy manifest phải cover các targets/version được pin, mode và
-family/equivalence phải nhất quán trong finite authored pool. Duplicate case ID/version khác bytes,
-conflicting mode/family mapping hoặc thiếu refs phải reject candidate, giữ published head tốt.
-Practice fixtures không dùng assessment families/equivalence để lộ case rồi giữ nhãn clean.
+Content validator kiểm candidate component/reference/DAG và bind unit, case version, rubric targets
+trước immutable publish. INT-03 không mang candidate graph, nên Learning không được claim tự chứng
+minh graph đó; consumer kiểm lại exact v2/v3 bundle shape, allocation/schema profile, bundle/manifest
+digests, policy tuples và coverage của mọi rubric target từ authenticated bundle + manifest thực nhận.
+Không cần mở rộng wire chỉ để lặp lại graph validation thuộc Content. Duplicate case ID/version khác
+bytes, conflicting mode/family mapping hoặc thiếu refs phải reject trước đổi good head. Practice
+fixtures không dùng assessment families/equivalence để lộ case rồi giữ nhãn clean.
 
 Toàn bộ private-case v3 bytes vẫn là private INT-03 bundle; checksum component case bind exact
 bytes, gồm cả allocation. Không thêm sidecar không được digest/signature chain hiện hành cover.

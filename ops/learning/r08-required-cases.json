@@ -6,7 +6,9 @@
     "finitePoolKeepsExposureAcrossEpochAndNeverCreatesFakeClean",
     "lostAckAndPumpRestartReuseSameExternalRecordOutsideDatabaseLocks",
     "beforeAppendWrongReceiptAndLocalRollbackCannotDiscloseOrConsume",
-    "epochLifecycleFenceAndRuntimeRoleConstraintsFailClosed"
+    "epochLifecycleFenceAndRuntimeRoleConstraintsFailClosed",
+    "malformedReceiptNullAndCrossOwnerEpochForeignKeysFailAtActualDatabaseBoundary",
+    "malformedAndConflictingV3StageKeepsReleasedReplicaAndReceiptPrefix"
   ],
   "AllocationWireTests": [
     "canonicalFingerprintIgnoresFormattingButRejectsPrivilegedAndAmbiguousFields"
@@ -16,6 +18,22 @@
   ],
   "AllocationV3CompatibilityTests": [
     "acceptsAuthoredV3AndHistoricalV2WithoutChangingBytes",
-    "missingUnknownConflictingMetadataAndSchemaEscapeFailClosed"
+    "missingUnknownConflictingMetadataAndSchemaEscapeFailClosed",
+    "sharedMalformedSchemaCorpusRejectsRegexContradictionAndUnsupportedKeyword"
+  ],
+  "AllocationRuntimeIT": [
+    "aaPackagedCreateReadRetryOwnerAndCanonicalAdmissionShapesAreBound",
+    "abAnonymousPrivilegedPayloadContextCsrfOriginAndReadBodyCannotDisclose",
+    "abBigintEpochBoundaryAndResponseAllowlistRemainExact",
+    "abConcurrentPackagedRequestsWaitOnActualAccountGateAndConverge",
+    "abValidWrongCsrfOriginCookieContextAndPrivilegedHeadersFailBeforeEffect",
+    "acActualJournalFailureCrashAfterAckAndRestartRetryKeepSingleAssignment",
+    "adCanonicalGateChangesAfterJournalAckBeforeFinalDenyDisclosure",
+    "aeLocalLifecycleChangesAfterJournalAckBeforeFinalDenyDisclosure",
+    "afReadyReadRechecksGatesAfterPhysicalJournalBarrier",
+    "agCommittedReadySnapshotPrecedesLaterGateAndSubsequentReadIsDenied",
+    "ahPublicationFenceReleaseWithdrawWinsBetweenJournalAckAndFinal",
+    "aiMissingCurrentTargetAndActiveLegacyDenyAbsenceFallback",
+    "ajMalformedMetadataAndImmutableFamilyConflictsKeepBothGoodHeads"
   ]
 }

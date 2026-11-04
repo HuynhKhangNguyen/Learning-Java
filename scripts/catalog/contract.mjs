@@ -40,6 +40,7 @@ try {
     'contracts/catalog/catalog-v2.schema.json','contracts/catalog/private-case-v2.schema.json',
     'contracts/catalog/private-case-v3.schema.json','contracts/catalog/fixtures/mapping.json',
     'contracts/fixtures/exposure/r08-private-a-v3.json',
+    'contracts/fixtures/exposure/r08-invalid-schemas.json',
     'content-v2/catalog/catalog.json','frontend/package.json','frontend/package-lock.json',
     'docs/curriculum/core-foundations.md','docs/curriculum/core-api-data.md','docs/curriculum/core-security-operations.md','docs/curriculum/devops-catalog.md']) {
     inputs[name]=hash(resolve(root,name));

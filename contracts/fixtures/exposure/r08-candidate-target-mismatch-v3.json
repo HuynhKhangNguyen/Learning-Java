@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "operationId": "40000000-0000-4000-8000-000000000007",
+  "parentRevision": 6,
+  "targetRevision": 7,
+  "bundle": {
+    "id": "r08-target-mismatch-v3",
+    "sha256": "e7bfea651dca356d0ef612c921a779aea63c88a9d08ec29004134b173964de0c"
+  },
+  "components": [
+    {
+      "id": "UNIT-CATALOG-FIXTURE",
+      "type": "content",
+      "version": "2",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "id": "CAP-COL-002-B",
+      "type": "rubric",
+      "version": "2",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    {
+      "id": "CASE-R08-PRACTICE",
+      "type": "case",
+      "version": "3",
+      "sha256": "e7bfea651dca356d0ef612c921a779aea63c88a9d08ec29004134b173964de0c"
+    }
+  ],
+  "references": [
+    {
+      "from": "UNIT-CATALOG-FIXTURE",
+      "to": "CAP-COL-002-B",
+      "expectedType": "rubric"
+    }
+  ],
+  "prerequisiteEdges": [
+    {
+      "from": "UNIT-CATALOG-FIXTURE",
+      "to": "CAP-COL-002-B"
+    }
+  ],
+  "coverage": {
+    "reportId": "coverage-r08-target-mismatch-v3",
+    "subjectVersion": 1,
+    "subjectSha256": "80fdeced70d26a647dcad1a5c7eb6dd12ff3301037e450cc79baafdc8976042c",
+    "status": "PASSED"
+  },
+  "review": {
+    "reportId": "review-r08-target-mismatch-v3",
+    "subjectVersion": 1,
+    "subjectSha256": "80fdeced70d26a647dcad1a5c7eb6dd12ff3301037e450cc79baafdc8976042c",
+    "status": "APPROVED"
+  },
+  "impacts": [
+    {
+      "capabilityId": "CAP-COL-002-B",
+      "classification": "COSMETIC",
+      "affectedVersions": [
+        "1"
+      ]
+    }
+  ],
+  "oldVersions": [
+    {
+      "capabilityId": "CAP-COL-002-B",
+      "version": "1",
+      "newAttemptAllowed": true,
+      "submitAllowed": true,
+      "finalizeAllowed": true,
+      "currentEvidencePolicy": "RETAIN",
+      "bodyAvailable": true,
+      "reason": "R08 controlled publication fixture"
+    }
+  ]
+}

@@ -239,6 +239,95 @@ class AllocationStoreIT {
     }
   }
 
+  @Test
+  void malformedReceiptNullAndCrossOwnerEpochForeignKeysFailAtActualDatabaseBoundary() throws Exception {
+    UUID owner = UUID.randomUUID();
+    UUID key = UUID.randomUUID();
+    UUID attempt = tx(connection -> store.create(connection, owner, key, request("assessment")));
+    String operation;
+    String digest;
+    try (var connection = app.getConnection(); var statement = connection.prepareStatement(
+        "SELECT operation_id,record_sha256 FROM learning.allocation_journal WHERE attempt_id=?")) {
+      statement.setObject(1, attempt);
+      try (var row = statement.executeQuery()) {
+        row.next();
+        operation = row.getObject(1, UUID.class).toString();
+        digest = row.getString(2);
+      }
+    }
+    var valid = new java.util.LinkedHashMap<String, Object>();
+    valid.put("namespace", "learning-exposure-" + REALM);
+    valid.put("recordId", operation);
+    valid.put("recordDigest", digest);
+    valid.put("sequence", "1");
+    valid.put("nodeDigest", "a".repeat(64));
+    valid.put("verifiedHeadDigest", "b".repeat(64));
+    valid.put("casRetries", 0);
+    for (String kind : new String[]{"recordIdNull", "sequenceNull", "nodeNull", "missingHead",
+        "overflowSequence", "negativeRetries", "extra"}) {
+      var invalid = new java.util.LinkedHashMap<>(valid);
+      switch (kind) {
+        case "recordIdNull" -> invalid.put("recordId", null);
+        case "sequenceNull" -> invalid.put("sequence", null);
+        case "nodeNull" -> invalid.put("nodeDigest", null);
+        case "missingHead" -> invalid.remove("verifiedHeadDigest");
+        case "overflowSequence" -> invalid.put("sequence", "9223372036854775808");
+        case "negativeRetries" -> invalid.put("casRetries", -1);
+        case "extra" -> invalid.put("unbound", true);
+        default -> fail("Unknown receipt mutation");
+      }
+      try (var connection = app.getConnection(); var statement = connection.prepareStatement(
+          "UPDATE learning.allocation_journal SET state='VERIFIED',receipt=?::jsonb WHERE attempt_id=?")) {
+        statement.setString(1, WireCodec.JSON.writeValueAsString(invalid));
+        statement.setObject(2, attempt);
+        SQLException denied = assertThrows(SQLException.class, statement::executeUpdate, kind);
+        assertEquals("23514", denied.getSQLState());
+      }
+    }
+    for (String column : new String[]{"user_id", "learning_epoch"}) {
+      String value = column.equals("user_id") ? "'" + UUID.randomUUID() + "'" : "2";
+      SQLException denied = assertThrows(SQLException.class, () -> execute(migrator,
+          "UPDATE learning.allocation_draft SET " + column + "=" + value + " WHERE attempt_id='" + attempt + "'"));
+      assertEquals("23503", denied.getSQLState());
+    }
+    SQLException immutable = assertThrows(SQLException.class, () -> execute(migrator,
+        "UPDATE learning.allocation_attempt SET case_version='forged' WHERE attempt_id='" + attempt + "'"));
+    assertEquals("23514", immutable.getSQLState());
+    SQLException unique = assertThrows(SQLException.class, () -> execute(app,
+        "INSERT INTO learning.allocation_receipt SELECT * FROM learning.allocation_receipt WHERE user_id='"
+            + owner + "' AND idempotency_key='" + key + "'"));
+    assertEquals("23505", unique.getSQLState());
+  }
+
+  @Test
+  void malformedAndConflictingV3StageKeepsReleasedReplicaAndReceiptPrefix() throws Exception {
+    long head = queryNumber("SELECT applied_revision FROM learning.publication_head WHERE singleton");
+    long prefix = queryNumber("SELECT last_sequence FROM learning.publication_delivery_cursor WHERE stream_key='content-global'");
+    long replicas = queryNumber("SELECT count(*) FROM learning.content_replica");
+    for (String kind : new String[]{"family-conflict", "immutable-conflict", "bad-schema", "missing-allocation"}) {
+      byte[] bytes = Files.readAllBytes(Path.of(
+          "../../../contracts/fixtures/exposure/r08-private-" + kind + "-v3.json"));
+      String digest = PublicationWire.sha256(bytes);
+      var command = new PublicationWire.Command(1, UUID.randomUUID(), "STAGE", head, head + 1,
+          "r08-rejected-" + kind, digest, PublicationWire.sha256(manifest), REALM, CONTENT, GENERATION,
+          prefix + 1, "c".repeat(64));
+      var publication = new PublicationStore(app, REALM, GENERATION, new PublicationGate());
+      assertThrows(IllegalArgumentException.class, () -> publication.stage(command,
+          new ReplicaValidator().verify(bytes, manifest, digest, PublicationWire.sha256(manifest))));
+      assertEquals(head, queryNumber("SELECT applied_revision FROM learning.publication_head WHERE singleton"));
+      assertEquals(prefix, queryNumber("SELECT last_sequence FROM learning.publication_delivery_cursor WHERE stream_key='content-global'"));
+      assertEquals(replicas, queryNumber("SELECT count(*) FROM learning.content_replica"));
+    }
+  }
+
+  private static long queryNumber(String query) throws Exception {
+    try (var connection = app.getConnection(); var statement = connection.createStatement();
+        var rows = statement.executeQuery(query)) {
+      rows.next();
+      return rows.getLong(1);
+    }
+  }
+
   private static void publish(String name) throws Exception {
     byte[] bundle = Files.readAllBytes(Path.of(
         "../../../contracts/fixtures/exposure/r08-private-" + name + "-v3.json"));

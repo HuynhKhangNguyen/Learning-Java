@@ -66,8 +66,9 @@ public final class PublicationStore {
     try (var statement = connection.createStatement();
         var rows = statement.executeQuery("SELECT bundle_bytes FROM learning.content_replica")) {
       while (rows.next()) {
+        byte[] priorBytes = rows.getBytes(1);
         AllocationMetadataValidator.consistent(
-            incoming, PublicationWire.JSON.readTree(rows.getBytes(1)));
+            incoming, bundle, PublicationWire.JSON.readTree(priorBytes), priorBytes);
       }
     }
   }

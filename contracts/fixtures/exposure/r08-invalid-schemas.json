@@ -1,0 +1,28 @@
+[
+  {
+    "pattern": "["
+  },
+  {
+    "type": "array",
+    "minItems": 3,
+    "maxItems": 1
+  },
+  {
+    "type": "number",
+    "minimum": 9,
+    "maximum": 2
+  },
+  {
+    "type": "string",
+    "format": "email"
+  },
+  {
+    "properties": {
+      "answer": {
+        "examples": [
+          42
+        ]
+      }
+    }
+  }
+]

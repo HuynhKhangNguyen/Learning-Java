@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 3,
+  "id": "CASE-R08-A",
+  "unitId": "UNIT-CATALOG-FIXTURE",
+  "expected": {
+    "sentinel": "R08_PRIVATE_EXPECTED_FORGED",
+    "groups": {
+      "x": [
+        1,
+        2
+      ]
+    }
+  },
+  "rubricTargets": [
+    "CAP-COL-002-A"
+  ],
+  "allocation": {
+    "exerciseId": "EXERCISE-R08-GROUPING",
+    "mode": "assessment",
+    "caseVersion": "2",
+    "familyId": "FAMILY-R08-A",
+    "exposureGroup": "GROUP-R08-ASSESSMENT",
+    "equivalenceKey": "EQUIV-R08-A",
+    "rubricVersion": "2",
+    "graderVersion": "r08-lab-1",
+    "prompt": {
+      "en": "Lab fixture A: group the assigned records by category; preserve value order.",
+      "vi": "Fixture lab A: nhóm các record được giao theo category; giữ thứ tự value."
+    },
+    "input": {
+      "records": [
+        {
+          "category": "x",
+          "value": 1
+        },
+        {
+          "category": "x",
+          "value": 2
+        }
+      ]
+    },
+    "inputSchema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

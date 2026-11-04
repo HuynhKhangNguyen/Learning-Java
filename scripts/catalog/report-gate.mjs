@@ -12,6 +12,7 @@ export const requiredCases = [
   'unitPublishedAgainstPlanned','privateCaseUnknownRubricRejected','publicUnitProjectionIsDetachedAndHasNoPrivateMaterial',
   'privateV3MetadataAcceptedAndPrivateProjectionExcluded',
   'privateV3UnknownMissingVersionAndSchemaReferencesRejected',
+  'privateV3SharedMalformedSchemaCorpusRejectsRegexContradictionAndUnsupportedKeyword',
 ];
 export function verifyReport(text, exitCode) {
   const names = [...text.matchAll(/^# Subtest: (.+)$/gm)].map(match => match[1].trim());

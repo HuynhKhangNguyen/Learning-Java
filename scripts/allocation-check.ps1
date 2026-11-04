@@ -3,6 +3,7 @@
 param(
   [Parameter(Mandatory)][ValidateSet('db','contract','fault')][string]$Task,
   [Parameter(Mandatory)][string]$LabConfig,
+  [ValidateSet('learning','identity','content')][string]$RequestedService = 'learning',
   [string]$TrustConfig,
   [switch]$Offline
 )
@@ -38,7 +39,14 @@ try {
     $(if ($Task -eq 'db') { '-Pallocation-db-it' } else { '-Pallocation-runtime-it' }),
     '-Dtest=AllocationWireTests,AllocationAdmissionConsumerTests,AllocationV3CompatibilityTests',
     ('-Dlab.config=' + (Resolve-Path -LiteralPath $LabConfig).Path))
-  if ($Task -ne 'db') { $arguments += ('-Dtrust.config=' + (Resolve-Path -LiteralPath $TrustConfig).Path) }
+  if ($Task -ne 'db') {
+    $selected = & (Get-Command python -ErrorAction Stop).Source -X utf8 (Join-Path $PSScriptRoot 'r08_report.py') `
+      --task $Task --service $RequestedService --select
+    if ($LASTEXITCODE -ne 0) { throw 'R08 registered case selector missing; not PASS.' }
+    $selection = $selected | ConvertFrom-Json
+    $arguments += ('-Dtrust.config=' + (Resolve-Path -LiteralPath $TrustConfig).Path)
+    $arguments += ('-Dit.test=AllocationRuntimeIT#' + ($selection.methods -join '+'))
+  }
   if ($Offline) { $arguments += '--offline' }
   Push-Location (Join-Path $allocationRepo 'backend')
   try {
@@ -46,7 +54,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'R08 allocation own-DB suite failed; not PASS.' }
   } finally { Pop-Location }
   & (Get-Command python -ErrorAction Stop).Source -X utf8 (Join-Path $PSScriptRoot 'r08_report.py') `
-    --task $Task --target (Join-Path $allocationRepo 'backend/services/learning-service/target')
+    --task $Task --service $RequestedService --target (Join-Path $allocationRepo 'backend/services/learning-service/target')
   exit $LASTEXITCODE
 } finally {
   foreach ($key in $allocationSaved.Keys) {
