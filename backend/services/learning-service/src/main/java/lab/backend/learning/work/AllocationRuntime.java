@@ -40,9 +40,14 @@ public final class AllocationRuntime implements AutoCloseable {
     LearningAccess access = null;
     PublicationRuntime publication = null;
     try {
-      if (!settings.canonicalLab()) throw new IllegalArgumentException();
-      Path config = Path.of(environment.getRequiredProperty("backendlab.allocation.config")).toRealPath();
-      if (!config.getParent().equals(settings.directory())) throw new IllegalArgumentException();
+      if (!settings.canonicalLab()) {
+        throw new IllegalArgumentException();
+      }
+      Path config = Path.of(environment.getRequiredProperty("backendlab.allocation.config"))
+          .toRealPath();
+      if (!config.getParent().equals(settings.directory())) {
+        throw new IllegalArgumentException();
+      }
       var properties = new Properties();
       try (var reader = Files.newBufferedReader(config, java.nio.charset.StandardCharsets.UTF_8)) {
         properties.load(reader);
@@ -56,7 +61,9 @@ public final class AllocationRuntime implements AutoCloseable {
           || !properties.getProperty("dbRunId").equals(settings.dbRunId())) {
         throw new IllegalArgumentException();
       }
-      Path journalRoot = Path.of(properties.getProperty("journalDirectory")).toAbsolutePath().normalize();
+      Path journalRoot = Path.of(properties.getProperty("journalDirectory"))
+          .toAbsolutePath()
+          .normalize();
       if (!journalRoot.equals(settings.directory().resolve("allocation-journal"))) {
         throw new IllegalArgumentException();
       }
@@ -80,8 +87,12 @@ public final class AllocationRuntime implements AutoCloseable {
           new ExposureJournalPump(source, new FilesystemJournalStore(journalRoot)));
       return new AllocationRuntime(access, publication, new AllocationHttpHandler(coordinator));
     } catch (Exception unavailable) {
-      if (access != null) access.close();
-      if (publication != null) publication.close();
+      if (access != null) {
+        access.close();
+      }
+      if (publication != null) {
+        publication.close();
+      }
       throw new IllegalStateException("Allocation own-lab config/readiness unavailable");
     }
   }

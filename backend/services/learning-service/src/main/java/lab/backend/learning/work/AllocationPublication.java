@@ -21,7 +21,10 @@ final class AllocationPublication {
     currentManifest = manifest;
   }
 
-  static AllocationPublication lock(Connection connection, UUID realm, UUID generation) throws SQLException {
+  static AllocationPublication lock(
+      Connection connection,
+      UUID realm,
+      UUID generation) throws SQLException {
     try (var statement = connection.createStatement()) {
       // Cùng advisory key với PublicationStore.phase; lock sống đến commit/rollback,
       // không chỉ là process-local gate nên hai replica vẫn có một linearization.
@@ -39,7 +42,9 @@ final class AllocationPublication {
           || !generation.equals(rows.getObject(6, UUID.class))) {
         throw AllocationWire.deny(503, "PUBLICATION_PENDING");
       }
-      if (rows.getBytes(3) == null) throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+      if (rows.getBytes(3) == null) {
+        throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+      }
       return new AllocationPublication(WireCodec.JSON.readTree(rows.getBytes(3)),
           WireCodec.JSON.readTree(rows.getBytes(4)));
     }
@@ -54,13 +59,19 @@ final class AllocationPublication {
                 + "ON o.bundle_id=r.bundle_id WHERE o.state='RELEASED' ORDER BY r.bundle_id")) {
       while (rows.next()) {
         JsonNode bundle = WireCodec.JSON.readTree(rows.getBytes(4));
-        if (bundle.path("schemaVersion").asInt() != 3) continue;
+        if (bundle.path("schemaVersion").asInt() != 3) {
+          continue;
+        }
         JsonNode metadata = bundle.path("allocation");
         if (!metadata.path("exerciseId").asString().equals(request.exerciseId())
-            || !metadata.path("mode").asString().equals(request.requestedMode())) continue;
+            || !metadata.path("mode").asString().equals(request.requestedMode())) {
+          continue;
+        }
         Candidate candidate = new Candidate(rows.getString(1), rows.getString(2),
             rows.getString(3), bundle, metadata);
-        if (allowed(candidate)) candidates.add(candidate);
+        if (allowed(candidate)) {
+          candidates.add(candidate);
+        }
       }
     }
     return candidates;
@@ -74,21 +85,27 @@ final class AllocationPublication {
             + "WHERE o.bundle_id=r.bundle_id AND o.state='RELEASED')")) {
       statement.setString(1, bundleId);
       try (var rows = statement.executeQuery()) {
-        if (!rows.next()) throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+        if (!rows.next()) {
+          throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+        }
         JsonNode bundle = WireCodec.JSON.readTree(rows.getBytes(3));
         if (bundle.path("schemaVersion").asInt() != 3) {
           throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
         }
         Candidate candidate = new Candidate(bundleId, rows.getString(1), rows.getString(2),
             bundle, bundle.path("allocation"));
-        if (!allowed(candidate)) throw AllocationWire.deny(409, "ALLOCATION_WITHDRAWN");
+        if (!allowed(candidate)) {
+          throw AllocationWire.deny(409, "ALLOCATION_WITHDRAWN");
+        }
         return candidate;
       }
     }
   }
 
   private boolean allowed(Candidate candidate) {
-    if (currentBundle.path("schemaVersion").asInt() != 3) return false;
+    if (currentBundle.path("schemaVersion").asInt() != 3) {
+      return false;
+    }
     String version = candidate.allocation.path("rubricVersion").asString();
     for (JsonNode target : candidate.bundle.path("rubricTargets")) {
       boolean found = false;
@@ -96,21 +113,27 @@ final class AllocationPublication {
         if (policy.path("capabilityId").equals(target)
             && policy.path("version").asString().equals(version)) {
           if (!policy.path("newAttemptAllowed").asBoolean()
-              || !policy.path("bodyAvailable").asBoolean()) return false;
+              || !policy.path("bodyAvailable").asBoolean()) {
+            return false;
+          }
           found = true;
         }
       }
       // Manifest chỉ liệt kê old versions. Absence chỉ được coi là current
       // khi active v3 cùng target và cùng rubricVersion, không đoán từ số version.
       if (!found && (!version.equals(currentBundle.path("allocation")
-          .path("rubricVersion").asString()) || !containsTarget(currentBundle, target))) return false;
+          .path("rubricVersion").asString()) || !containsTarget(currentBundle, target))) {
+        return false;
+      }
     }
     return true;
   }
 
   private static boolean containsTarget(JsonNode bundle, JsonNode target) {
     for (JsonNode existing : bundle.path("rubricTargets")) {
-      if (existing.equals(target)) return true;
+      if (existing.equals(target)) {
+        return true;
+      }
     }
     return false;
   }

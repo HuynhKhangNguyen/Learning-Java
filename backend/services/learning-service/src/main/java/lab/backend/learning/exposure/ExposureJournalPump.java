@@ -25,21 +25,32 @@ public final class ExposureJournalPump {
   public boolean verify(UUID attempt) {
     try {
       Pending pending = load(attempt);
-      if (pending == null || !AllocationWire.sha(pending.bytes).equals(pending.digest)) return false;
+      if (pending == null || !AllocationWire.sha(pending.bytes).equals(pending.digest)) {
+        return false;
+      }
       JournalStore.Receipt receipt = pending.receipt == null
           ? journal.append(pending.namespace, pending.operation.toString(), pending.bytes)
           : decode(pending.receipt);
       if (!receipt.namespace().equals(pending.namespace)
           || !receipt.recordId().equals(pending.operation.toString())
-          || !receipt.recordDigest().equals(pending.digest) || receipt.sequence() < 1) return false;
+          || !receipt.recordDigest().equals(pending.digest)
+          || receipt.sequence() < 1) {
+        return false;
+      }
       var inventory = journal.inventory(pending.namespace, receipt.verifiedHeadDigest());
-      if (!inventory.fixedHeadDigest().equals(receipt.verifiedHeadDigest())) return false;
+      if (!inventory.fixedHeadDigest().equals(receipt.verifiedHeadDigest())) {
+        return false;
+      }
       boolean covered = inventory.entries().stream().anyMatch(entry ->
           entry.sequence() == receipt.sequence() && entry.recordId().equals(receipt.recordId())
               && entry.recordDigest().equals(receipt.recordDigest())
               && entry.nodeDigest().equals(receipt.nodeDigest()));
-      if (!covered) return false;
-      if (pending.receipt == null) acknowledge(pending, receipt);
+      if (!covered) {
+        return false;
+      }
+      if (pending.receipt == null) {
+        acknowledge(pending, receipt);
+      }
       return true;
     } catch (Exception unavailable) {
       // Timeout/conflict/corrupt/missing prefix đều giữ preparing. Không log bytes/record.
@@ -59,7 +70,9 @@ public final class ExposureJournalPump {
                 + "AND a.learning_epoch=j.learning_epoch WHERE j.attempt_id=?")) {
       statement.setObject(1, attempt);
       try (var rows = statement.executeQuery()) {
-        if (!rows.next()) return null;
+        if (!rows.next()) {
+          return null;
+        }
         JsonNode record = WireCodec.strict(rows.getBytes(3));
         if (!record.path("operationId").asString().equals(rows.getObject(1, UUID.class).toString())
             || !record.path("attemptId").asString().equals(attempt.toString())
@@ -70,7 +83,9 @@ public final class ExposureJournalPump {
         String[] fields = {"familyId", "exposureGroup", "equivalenceKey", "caseVersion",
             "rubricVersion", "graderVersion", "bundleId", "bundleSha256", "manifestSha256"};
         for (int index = 0; index < fields.length; index++) {
-          if (!record.path(fields[index]).asString().equals(rows.getString(index + 8))) return null;
+          if (!record.path(fields[index]).asString().equals(rows.getString(index + 8))) {
+            return null;
+          }
         }
         return new Pending(rows.getObject(1, UUID.class), rows.getString(2), rows.getBytes(3),
             rows.getString(4), rows.getString(5));
@@ -101,7 +116,9 @@ public final class ExposureJournalPump {
     JsonNode node = WireCodec.JSON.readTree(stored);
     if (!node.isObject() || !node.propertyNames().equals(java.util.Set.of(
         "namespace", "recordId", "recordDigest", "sequence", "nodeDigest",
-        "verifiedHeadDigest", "casRetries"))) throw new IllegalArgumentException();
+        "verifiedHeadDigest", "casRetries"))) {
+      throw new IllegalArgumentException();
+    }
     return new JournalStore.Receipt(
         WireCodec.string(node, "namespace"), WireCodec.string(node, "recordId"),
         WireCodec.string(node, "recordDigest"), Long.parseLong(WireCodec.decimal(node.get("sequence"))),

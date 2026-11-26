@@ -95,8 +95,10 @@ class AllocationRuntimeIT {
         Files.deleteIfExists(directory.resolve("publication-coordinator.cap"));
         for (String service : SERVICES) {
           Path log = directory.resolve(service + "-canonical.log");
-          if (Files.exists(log)) assertThat(Files.readString(log))
-              .doesNotContain("R08_PRIVATE_EXPECTED", new String(CAPABILITY, StandardCharsets.UTF_8));
+          if (Files.exists(log)) {
+            assertThat(Files.readString(log))
+                .doesNotContain("PRIVATE_EXPECTED", new String(CAPABILITY, StandardCharsets.UTF_8));
+          }
         }
       }
     }
@@ -117,8 +119,12 @@ class AllocationRuntimeIT {
     assertThat(json(read(owner, attempt), 200).path("prompt")).isEqualTo(ready.path("prompt"));
     assertThat(create(owner, key, "practice").statusCode()).isEqualTo(409);
     assertThat(read(login(), attempt).statusCode()).isEqualTo(404);
-    assertThat(count("learning", "allocation_attempt", "user_id", owner.view().path("userId").asString())).isEqualTo(1);
-    assertThat(count("learning", "allocation_journal", "user_id", owner.view().path("userId").asString())).isEqualTo(1);
+    assertThat(count(
+        "learning", "allocation_attempt", "user_id", owner.view().path("userId").asString()))
+        .isEqualTo(1);
+    assertThat(count(
+        "learning", "allocation_journal", "user_id", owner.view().path("userId").asString()))
+        .isEqualTo(1);
     assertPrivateAbsent(ready);
 
     String path = "/internal/v1/auth-context/admissions";
@@ -321,7 +327,9 @@ class AllocationRuntimeIT {
       assertDeniedPrivate(barrier.response.get(8, TimeUnit.SECONDS), 401);
     }
     assertThat(attemptState(pending.attempt)).isEqualTo("PREPARING");
-    if (operation != null) awaitCompleted(operation);
+    if (operation != null) {
+      awaitCompleted(operation);
+    }
   }
 
   @ParameterizedTest
@@ -352,7 +360,9 @@ class AllocationRuntimeIT {
     }
     // READY đã commit ở allocation cũ; deny read không được xóa good work/exposure.
     assertThat(attemptState(attempt)).isEqualTo("READY");
-    if (operation != null) awaitCompleted(operation);
+    if (operation != null) {
+      awaitCompleted(operation);
+    }
   }
 
   @Test
@@ -378,11 +388,15 @@ class AllocationRuntimeIT {
     publicationCli("start", operation);
     publicationCli("dispatch", operation); // STAGE không làm mất quyền đọc current head.
     try (var dispatcher = PublicationDispatchBarrier.start(operation);
-        var receipt = JournalAckBarrier.start(pending.owner, pending.attempt)) {
+        var receipt = JournalAckBarrier.start(
+            pending.owner,
+            pending.attempt,
+            Duration.ofSeconds(20))) {
       assertJournalCovered(pending.attempt);
       dispatcher.dispatch(); // Actual packaged product CLI FENCE + canonical commit.
       assertThat(sqlLong("learning", "SELECT count(*) FROM learning.publication_head "
           + "WHERE fence_operation IS NOT NULL")).isEqualTo(1);
+      receipt.assertStillWaiting();
       receipt.release();
       assertDeniedPrivate(receipt.response.get(8, TimeUnit.SECONDS), 503);
     }
@@ -396,7 +410,11 @@ class AllocationRuntimeIT {
   @Test
   void aiMissingCurrentTargetAndActiveLegacyDenyAbsenceFallback() throws Exception {
     Login owner = login();
-    UUID oldAttempt = UUID.fromString(json(create(owner, UUID.randomUUID(), "assessment"), 200)
+    HttpResponse<byte[]> initial = create(owner, UUID.randomUUID(), "assessment");
+    assertThat(initial.statusCode())
+        .as("ai positive precondition %s", allocationFailureDiagnostic(initial, owner))
+        .isEqualTo(200);
+    UUID oldAttempt = UUID.fromString(json(initial, 200)
         .path("attemptId").asString());
     publish(root.resolve("contracts/fixtures/exposure/r08-candidate-target-mismatch-v3.json"),
         root.resolve("contracts/fixtures/exposure/r08-private-target-mismatch-v3.json"));
@@ -415,7 +433,8 @@ class AllocationRuntimeIT {
     long bundles = sqlLong("content", "SELECT count(*) FROM content.publication_bundle");
     long candidates = sqlLong("content", "SELECT count(*) FROM content.publication_candidate");
     long replicas = sqlLong("learning", "SELECT count(*) FROM learning.content_replica");
-    for (String name : new String[]{"family-conflict", "immutable-conflict", "bad-schema", "missing-allocation", "bad-ref"}) {
+    for (String name : new String[]{
+        "family-conflict", "immutable-conflict", "bad-schema", "missing-allocation", "bad-ref"}) {
       publicationCliRejected("prepare",
           root.resolve("contracts/fixtures/exposure/r08-candidate-" + name + "-v3.json").toString(),
           root.resolve("contracts/fixtures/exposure/r08-private-" + name + "-v3.json").toString());
@@ -436,6 +455,7 @@ class AllocationRuntimeIT {
 
     private PublicationDispatchBarrier(String operation) throws Exception {
       var command = new ArrayList<>(List.of(Path.of(System.getProperty("java.home"), "bin/java.exe").toString(),
+          javaIpcOption("b"),
           "-Dspring.profiles.active=canonical",
           "-Dloader.main=lab.backend.content.publication.PublicationDispatchFixtureMain",
           "-Dloader.path=" + root.resolve("backend/services/content-service/target/test-classes"),
@@ -443,7 +463,8 @@ class AllocationRuntimeIT {
           "org.springframework.boot.loader.launch.PropertiesLauncher", "dispatch", operation));
       var builder = new ProcessBuilder(command).directory(directory.toFile());
       sanitize(builder);
-      builder.redirectError(ProcessBuilder.Redirect.appendTo(directory.resolve("publication-dispatch-barrier.log").toFile()));
+      builder.redirectError(ProcessBuilder.Redirect.appendTo(
+          directory.resolve("publication-dispatch-barrier.log").toFile()));
       process = builder.start();
       output = process.inputReader(StandardCharsets.UTF_8);
       try (var reader = Executors.newSingleThreadExecutor()) {
@@ -511,12 +532,16 @@ class AllocationRuntimeIT {
     private final Connection held;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Future<HttpResponse<byte[]>> response;
+    private final int blocker;
     private boolean released;
 
     private JournalAckBarrier(Login owner, UUID attempt) throws Exception {
+      this(owner, attempt, null);
+    }
+
+    private JournalAckBarrier(Login owner, UUID attempt, Duration clientTimeout) throws Exception {
       held = source("learning", "app").getConnection();
       held.setAutoCommit(false);
-      int blocker;
       try (var statement = held.createStatement(); var rows = statement.executeQuery("SELECT pg_backend_pid()")) {
         rows.next();
         blocker = rows.getInt(1);
@@ -526,7 +551,12 @@ class AllocationRuntimeIT {
         statement.setObject(1, attempt);
         statement.executeQuery().close();
       }
-      response = executor.submit(() -> read(owner, attempt));
+      // Request này cố ý chờ held row lock rồi mới recheck publication.
+      // Client budget riêng chỉ cho barrier tránh host checkpoint làm hết
+      // timeout8s của smoke call; production admission/SQL deadline không đổi.
+      response = executor.submit(() -> clientTimeout == null
+          ? read(owner, attempt)
+          : readWithTimeout(owner, attempt, clientTimeout));
       try {
         awaitSqlWait(blocker, "UPDATE learning.allocation_journal SET state");
         assertThat(response.isDone()).isFalse();
@@ -538,6 +568,20 @@ class AllocationRuntimeIT {
 
     static JournalAckBarrier start(Login owner, UUID attempt) throws Exception {
       return new JournalAckBarrier(owner, attempt);
+    }
+
+    static JournalAckBarrier start(
+        Login owner,
+        UUID attempt,
+        Duration clientTimeout) throws Exception {
+      return new JournalAckBarrier(owner, attempt, clientTimeout);
+    }
+
+    void assertStillWaiting() throws Exception {
+      assertThat(sqlWaitCount(
+          blocker, "UPDATE learning.allocation_journal SET state%"))
+          .isEqualTo(1);
+      assertThat(response.isDone()).isFalse();
     }
 
     void release() throws Exception {
@@ -576,7 +620,9 @@ class AllocationRuntimeIT {
       try {
         long deadline = System.nanoTime() + Duration.ofSeconds(3).toNanos();
         while (count("learning", "auth_admission_use", "user_id", owner.view().path("userId").asString()) <= uses) {
-          if (System.nanoTime() >= deadline) throw new IllegalStateException("Read locate admission did not commit");
+          if (System.nanoTime() >= deadline) {
+            throw new IllegalStateException("Read locate admission did not commit");
+          }
           Thread.sleep(20);
         }
         assertThat(response.isDone()).isFalse();
@@ -617,20 +663,26 @@ class AllocationRuntimeIT {
     // trước khi request tới ACK UPDATE, nên timeout ngắn không được biến thành race theo máy.
     long deadline = System.nanoTime() + Duration.ofSeconds(10).toNanos();
     while (System.nanoTime() < deadline) {
-      try (var connection = source("learning", "app").getConnection();
-          var statement = connection.prepareStatement(
-              "SELECT count(*) FROM pg_stat_activity WHERE datname='learning_db' "
-                  + "AND ?=ANY(pg_blocking_pids(pid)) AND query LIKE ?")) {
-        statement.setInt(1, blocker);
-        statement.setString(2, queryLike);
-        try (var rows = statement.executeQuery()) {
-          rows.next();
-          if (rows.getInt(1) == expected) return;
-        }
+      if (sqlWaitCount(blocker, queryLike) == expected) {
+        return;
       }
       Thread.sleep(20);
     }
     throw new IllegalStateException("Packaged journal ACK UPDATE did not reach exact DB barrier");
+  }
+
+  private static int sqlWaitCount(int blocker, String queryLike) throws Exception {
+    try (var connection = source("learning", "app").getConnection();
+        var statement = connection.prepareStatement(
+            "SELECT count(*) FROM pg_stat_activity WHERE datname='learning_db' "
+                + "AND ?=ANY(pg_blocking_pids(pid)) AND query LIKE ?")) {
+      statement.setInt(1, blocker);
+      statement.setString(2, queryLike);
+      try (var rows = statement.executeQuery()) {
+        rows.next();
+        return rows.getInt(1);
+      }
+    }
   }
 
   private static void awaitSqlLockWaitCount(String queryLike, int expected) throws Exception {
@@ -643,7 +695,9 @@ class AllocationRuntimeIT {
         statement.setString(1, queryLike);
         try (var rows = statement.executeQuery()) {
           rows.next();
-          if (rows.getInt(1) == expected) return;
+          if (rows.getInt(1) == expected) {
+            return;
+          }
         }
       }
       Thread.sleep(20);
@@ -708,7 +762,9 @@ class AllocationRuntimeIT {
   private static String allocationText(String query) throws Exception {
     try (var connection = source("learning", "app").getConnection(); var statement = connection.createStatement();
         var rows = statement.executeQuery(query)) {
-      if (!rows.next()) throw new IllegalStateException("Allocation fixture row missing");
+      if (!rows.next()) {
+        throw new IllegalStateException("Allocation fixture row missing");
+      }
       return rows.getString(1);
     }
   }
@@ -751,6 +807,7 @@ class AllocationRuntimeIT {
 
   private static void startAllocation() throws Exception {
     var builder = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin/java.exe").toString(),
+        javaIpcOption("l"),
         "-jar", jar("learning").toString(), "--spring.profiles.active=canonical", "--server.port=18083",
         "--backendlab.trust.config=" + directory.resolve("learning.properties"),
         "--backendlab.admission.config=" + directory.resolve("learning-canonical.properties"),
@@ -762,9 +819,15 @@ class AllocationRuntimeIT {
     apps.put("learning", process);
     long deadline = System.nanoTime() + Duration.ofSeconds(35).toNanos();
     while (System.nanoTime() < deadline) {
-      if (!process.isAlive()) throw new IllegalStateException("Allocation process exited; retained own log");
+      if (!process.isAlive()) {
+        throw new IllegalStateException("Allocation process exited; retained own log");
+      }
       try {
-        if (call("learning", "edge", 18083, "GET", "/api/v1/transport/status", null, Map.of()).statusCode() == 200) return;
+        if (call(
+            "learning", "edge", 18083, "GET", "/api/v1/transport/status", null, Map.of())
+            .statusCode() == 200) {
+          return;
+        }
       } catch (java.io.IOException notReady) { }
       Thread.sleep(100);
     }
@@ -775,33 +838,93 @@ class AllocationRuntimeIT {
     String operation = WireCodec.JSON.readTree(Files.readAllBytes(candidate)).path("operationId").asString();
     publicationCli("prepare", candidate.toString(), bundle.toString());
     publicationCli("start", operation);
-    for (int phase = 0; phase < 3; phase++) publicationCli("dispatch", operation);
+    for (int phase = 0; phase < 3; phase++) {
+      publicationCli("dispatch", operation);
+    }
     assertThat(publicationCli("status", operation)).contains("state=COMPLETE");
   }
 
   private static String publicationCli(String... arguments) throws Exception {
+    List<CliResult> attempts = new ArrayList<>();
     CliResult result = runPublicationCli(arguments);
+    assertPublicCliOutput(result);
+    attempts.add(result);
     if (result.exit != 0 && "prepare".equals(arguments[0])) {
       // TransportSettings giữ clock/connect budget chặt và CLI cố ý chỉ trả
       // một lỗi an toàn. Retry đúng một exact candidate vẫn đi lại toàn bộ
       // validation/DB guard; prepare idempotent nên cũng cover lost response.
       result = runPublicationCli(arguments);
+      assertPublicCliOutput(result);
+      attempts.add(result);
+      System.out.println("PUBLICATION_CLI_RETRY action=prepare attempts="
+          + cliAttemptSummary(attempts));
     }
-    assertThat(result.output).doesNotContain("R08_PRIVATE_EXPECTED");
-    assertThat(result.exit).as("publication CLI " + arguments[0] + " " + result.output).isZero();
+    String diagnosis = result.exit == 0 || !"prepare".equals(arguments[0])
+        ? "not-required"
+        : publicationPrepareDiagnosis(arguments);
+    assertThat(result.exit)
+        .as("publication CLI %s attempts=%s diagnosis=%s",
+            arguments[0], cliAttemptSummary(attempts), diagnosis)
+        .isZero();
     return result.output;
   }
 
   private static void publicationCliRejected(String... arguments) throws Exception {
     CliResult result = runPublicationCli(arguments);
+    assertPublicCliOutput(result);
     assertThat(result.exit).isEqualTo(1);
-    assertThat(result.output).doesNotContain("R08_PRIVATE_EXPECTED");
     assertThat(result.output.lines().filter(line -> !line.startsWith("NOTE: Picked up JDK_JAVA_OPTIONS:"))
         .filter(line -> !line.isBlank()).toList()).containsExactly("PUBLICATION_CANDIDATE_REJECTED");
   }
 
+  /**
+   * Chỉ chạy sau hai prepare failure: validate tách candidate bytes khỏi
+   * config/DB path, status kiểm exact canonical config và own Content DB.
+   * Report chỉ giữ exit/classification cố định, không raw private output.
+   */
+  private static String publicationPrepareDiagnosis(String... arguments) throws Exception {
+    CliResult validation = runPublicationCli("validate", arguments[1], arguments[2]);
+    assertPublicCliOutput(validation);
+    CliResult status = runPublicationCli(
+        "status", "00000000-0000-4000-8000-000000000000");
+    assertPublicCliOutput(status);
+    return "validate=" + validation.exit + ":" + cliOutputClass(validation)
+        + ",status=" + status.exit + ":" + cliOutputClass(status);
+  }
+
+  private static void assertPublicCliOutput(CliResult result) {
+    assertThat(result.output).doesNotContain(
+        "PRIVATE_EXPECTED", new String(CAPABILITY, StandardCharsets.UTF_8));
+  }
+
+  private static String cliAttemptSummary(List<CliResult> attempts) {
+    List<String> summary = new ArrayList<>();
+    for (int index = 0; index < attempts.size(); index++) {
+      CliResult attempt = attempts.get(index);
+      summary.add((index + 1) + ":" + attempt.exit + ":" + cliOutputClass(attempt));
+    }
+    return String.join(",", summary);
+  }
+
+  private static String cliOutputClass(CliResult result) {
+    List<String> lines = result.output.lines()
+        .filter(line -> !line.startsWith("NOTE: Picked up JDK_JAVA_OPTIONS:"))
+        .filter(line -> !line.isBlank())
+        .toList();
+    if (lines.equals(List.of("PUBLICATION_CANDIDATE_REJECTED"))) {
+      return "REJECTED";
+    }
+    if (result.exit == 0 && lines.size() == 1
+        && (lines.getFirst().startsWith("VALID ")
+            || lines.getFirst().startsWith("PUBLICATION_"))) {
+      return "SUCCESS";
+    }
+    return lines.isEmpty() ? "EMPTY" : "UNEXPECTED";
+  }
+
   private static CliResult runPublicationCli(String... arguments) throws Exception {
     var command = new ArrayList<>(List.of(Path.of(System.getProperty("java.home"), "bin/java.exe").toString(),
+        javaIpcOption("p"),
         "-Dspring.profiles.active=canonical", "-Dloader.main=lab.backend.content.publication.PublicationLabCli",
         "-Dbackendlab.trust.config=" + directory.resolve("content.properties"), "-cp", jar("content").toString(),
         "org.springframework.boot.loader.launch.PropertiesLauncher"));
@@ -845,6 +968,79 @@ class AllocationRuntimeIT {
 
   private static HttpResponse<byte[]> read(Login login, UUID attempt) throws Exception {
     return call("learning", "edge", 18083, "GET", "/api/v1/attempts/" + attempt, null, allocationHeaders(login));
+  }
+
+  private static HttpResponse<byte[]> readWithTimeout(
+      Login login,
+      UUID attempt,
+      Duration timeout) throws Exception {
+    try (var http = client("learning", "edge")) {
+      var request = HttpRequest.newBuilder(
+          URI.create("https://127.0.0.1:18083/api/v1/attempts/" + attempt))
+          .timeout(timeout);
+      allocationHeaders(login).forEach(request::header);
+      return http.send(request.GET().build(), HttpResponse.BodyHandlers.ofByteArray());
+    }
+  }
+
+  /**
+   * Failure-only diagnostic giữ đúng allowlist: không ghi response body, owner,
+   * operation UUID, private bundle bytes hoặc credential vào report.
+   */
+  private static String allocationFailureDiagnostic(
+      HttpResponse<byte[]> response,
+      Login owner) {
+    if (response.statusCode() == 200) {
+      return "not-required";
+    }
+    try {
+      JsonNode body = WireCodec.strict(response.body());
+      String code = body.path("code").asString();
+      if (!java.util.Set.of(
+          "ALLOCATION_CONTENT_UNAVAILABLE",
+          "ALLOCATION_PIN_CONFLICT",
+          "ALLOCATION_POOL_CONFLICT",
+          "CLOCK_UNAVAILABLE",
+          "PUBLICATION_PENDING",
+          "RECEIVER_UNAVAILABLE",
+          "REQUEST_TIMEOUT").contains(code)) {
+        code = "UNEXPECTED_CODE";
+      }
+      String ownerId = owner.view().path("userId").asString();
+      return "status=" + response.statusCode()
+          + ",code=" + code
+          + "," + publicationHeadDiagnostic()
+          + ",attempts=" + count(
+              "learning", "allocation_attempt", "user_id", ownerId)
+          + ",journals=" + count(
+              "learning", "allocation_journal", "user_id", ownerId);
+    } catch (Exception unavailable) {
+      return "status=" + response.statusCode()
+          + ",diagnostic=" + unavailable.getClass().getSimpleName();
+    }
+  }
+
+  private static String publicationHeadDiagnostic() throws Exception {
+    try (var connection = source("learning", "app").getConnection();
+        var statement = connection.createStatement();
+        var rows = statement.executeQuery(
+            "SELECT applied_revision,fence_operation IS NOT NULL,active_bundle_id "
+                + "FROM learning.publication_head WHERE singleton")) {
+      if (!rows.next()) {
+        return "head=MISSING";
+      }
+      String bundle = rows.getString(3);
+      String safeBundle = java.util.Set.of(
+          "r08-a-v3",
+          "r08-b-v3",
+          "r08-practice-v3",
+          "r08-withdraw-v3").contains(bundle)
+              ? bundle
+              : "OTHER";
+      return "headRevision=" + rows.getLong(1)
+          + ",fenced=" + rows.getBoolean(2)
+          + ",activeBundle=" + safeBundle;
+    }
   }
 
   private static void rebind(Map<String, Object> request) {

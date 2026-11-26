@@ -12,7 +12,9 @@ public final class AllocationWire {
   public record Create(String exerciseId, String requestedMode, String fingerprint) {}
 
   public static Create create(byte[] bytes) {
-    if (bytes == null || bytes.length > 8192) throw deny(413, "PAYLOAD_TOO_LARGE");
+    if (bytes == null || bytes.length > 8192) {
+      throw deny(413, "PAYLOAD_TOO_LARGE");
+    }
     JsonNode node = WireCodec.strict(bytes);
     if (!node.isObject() || !node.propertyNames().equals(
         Set.of("schemaVersion", "exerciseId", "requestedMode"))

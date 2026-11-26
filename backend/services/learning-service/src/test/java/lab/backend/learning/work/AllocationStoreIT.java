@@ -44,7 +44,9 @@ class AllocationStoreIT {
   @BeforeAll
   static void seedVerifiedReleasedReplicaViaParticipant() throws Exception {
     String file = System.getProperty("lab.config");
-    if (file == null || file.startsWith("${")) throw new IllegalStateException("Owned PG required");
+    if (file == null || file.startsWith("${")) {
+      throw new IllegalStateException("Owned PG required");
+    }
     try (var reader = Files.newBufferedReader(Path.of(file).toRealPath())) {
       CONFIG.load(reader);
     }
@@ -57,7 +59,9 @@ class AllocationStoreIT {
     sql("INSERT INTO learning.publication_delivery_cursor VALUES('content-global',0)");
     manifest = WireCodec.JSON.writeValueAsBytes(WireCodec.JSON.readTree(Files.readAllBytes(Path.of(
         "../../../contracts/fixtures/publication/fx05-candidate-cosmetic.json"))).path("oldVersions"));
-    for (String name : new String[]{"a", "b", "practice"}) publish(name);
+    for (String name : new String[]{"a", "b", "practice"}) {
+      publish(name);
+    }
   }
 
   @Test
@@ -341,7 +345,9 @@ class AllocationStoreIT {
           AllocationWire.sha((operation + phase).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
       if (phase.equals("STAGE")) {
         publication.stage(command, new ReplicaValidator().verify(bundle, manifest, digest, manifestDigest));
-      } else publication.phase(command);
+      } else {
+        publication.phase(command);
+      }
     }
     revision++;
   }
@@ -352,7 +358,9 @@ class AllocationStoreIT {
       try (var connection = migrator.getConnection(); var statement = connection.createStatement();
           var rows = statement.executeQuery("SELECT count(*) FROM pg_locks WHERE NOT granted")) {
         rows.next();
-        if (rows.getInt(1) > 0) return;
+        if (rows.getInt(1) > 0) {
+          return;
+        }
       }
       Thread.sleep(20);
     }

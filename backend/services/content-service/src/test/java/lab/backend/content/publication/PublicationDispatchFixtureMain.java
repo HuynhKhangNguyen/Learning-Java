@@ -16,7 +16,9 @@ public final class PublicationDispatchFixtureMain {
     System.out.println("READY");
     System.out.flush();
     try (var reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
-      if (!"GO".equals(reader.readLine())) throw new IllegalArgumentException("Barrier command required");
+      if (!"GO".equals(reader.readLine())) {
+        throw new IllegalArgumentException("Barrier command required");
+      }
     }
     PublicationLabCli.main(arguments);
   }

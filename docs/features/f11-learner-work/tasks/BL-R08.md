@@ -6,8 +6,8 @@
 
 ## Brief thực thi — 03/11/2026
 
-- Trạng thái hiện hành: `READY`; owner/write scope và hai contract prerequisite đã được bổ sung
-  theo yêu cầu người dùng. Executor chuyển `IN_PROGRESS` để implement cả prerequisite trong R08.
+- Trạng thái hiện hành: `IN_PROGRESS`; prerequisites và allocation đã có implementation candidate,
+  còn validation tích hợp và review trước nghiệm thu. Owner/write scope đã được cấp trong R08.
 - Quyền CODE: người dùng yêu cầu task kế tiếp sau nghiệm thu R28a. Chỉ giao leaf BL-R08.
 - Dependencies: BL-R04d, BL-R06c, BL-R28a đều DONE. Không cần chờ production provider R28b để
   implement/qualify local lab; production assessment chưa được qualification từ evidence này.
@@ -176,6 +176,25 @@ Center nghiệm thu DONE. Executor đã validation/commit và bàn giao chờ re
 checkpoint sang NEED_REVIEW; còn implementation/validation/fix thì IN_PROGRESS, ghi AC thiếu và bước
 tiếp theo chính xác. Review yêu cầu sửa thì về IN_PROGRESS, fix xong lại commit và NEED_REVIEW.
 
+## DoD/evidence hiện hành — 06/11/2026
+
+HEAD implementation `de35532`, parent `1bd1716`, branch `codex/bl-r08-learning-allocation`.
+Working tree có fix harness và format chưa commit. Các run dưới là evidence từng lớp.
+Report ở `artifacts/quality/<selector>/<runId>/report.json`; giữ nguyên các failed diagnostics.
+
+| AC/cổng | Evidence hiện có | Hiệu lực và việc còn thiếu |
+|---|---|---|
+| AC01/03, producer v2/v3 và immutable bytes | R06a CMD03 `3fd30b5c-563e-4234-a36f-79919ceac730`: PASS, Content unit140/DB83, cleanup true | Main đã đọc report; chưa thay publication end-to-end hoặc full R08 constraints/races |
+| AC01/03, replica v2/v3 và immutable bytes | R06b CMD03 `3d773cbd-7a79-4b2e-94d3-82ca5f499ad2`: PASS, Learning unit158/DB83, cleanup true | Main đã đọc report; store fixture head99 chỉ chứng minh store boundary, không canonical publication |
+| AC07, Content transport subset | R06a CMD04 `df7feb4e-3e95-4d5b-b31a-1f7a85dbc8e2`: PASS, bootstrap6/transport7, cleanup true | Main đã đọc report; single-service subset không tái hiện topology canonical ba service |
+| AC02/04/05, packaged allocation | R08 CMD04 Learning `b2a7f549-90a3-4efb-b12e-55427a630c67`: 22/23 PASS, overall FAIL, cleanup true | `aiMissingCurrentTarget...` nhận 503 tại create dương tính. Chưa có mã lỗi để phân biệt gate. Cần chẩn đoán trước lượt chạy lại |
+| AC02/05/07, canonical Identity | R08 CMD04 Identity `8cc5a9af-ea0e-42c0-8e0b-029d170cf4b9`: PASS 11 runtime, cleanup true | Main đã khớp 357 input hashes và 45 artifact hashes trên snapshot của run. Có regression draft-save/Content-read. Sửa harness `AllocationRuntimeIT` làm binding cần kiểm lại |
+| AC01/03/04/06, Learning DB | R08 CMD03 `c3b0afb0-752c-4dd3-b359-02e544b253e4`: PASS 86 DB và 158 unit, cleanup true | Gồm 9 AllocationStoreIT. Sửa harness `AllocationRuntimeIT` làm binding cần kiểm lại |
+| AC05/06/07, Content publication | R08 CMD04 Content `4407c492-6621-4545-8f0c-02a22cf3af12`: PASS 4 runtime, cleanup true | Main khớp 357 input hashes và 45 artifact hashes. Ca FENCE xác nhận exact ACK waiter trước khi release |
+| AC07, catalog và report gates | R05 CMD04 `82f0699e-d8c4-4430-89ed-0e06700a2b87`: PASS 39. Node24.22.1 CLI/report tests PASS 19. R08 Python report-gate doubles PASS 7 | Catalog kiểm schema, refs và mapping. Gate tests kiểm cách thu evidence |
+| AC06/07, closing matrix | Required commands và affected selectors trong phần validation | Learning CMD04 đầy đủ, DATA-22, CMD06 lab, R06c regressions và các evidence cần kiểm lại binding |
+| DONE04/05, review và integration | Candidate `de35532`; registry IN_PROGRESS | Còn format/privacy review, candidate fix commit và Control Center acceptance; không mở task kế tiếp |
+
 ## Checkpoint mở task — 03/11/2026
 
 - Control Center xác nhận dependencies DONE, BL-R08 READY. Registry vẫn PLANNED, chưa code/validation
@@ -316,13 +335,40 @@ Candidate sẵn sàng chờ Control Center review thì NEED_REVIEW; không tự 
 - Bước tiếp theo đang giao executor: khép required matrix, validate candidate mới, commit riêng và
   handoff để main review. Khi còn implementation/validation giữ IN_PROGRESS; đủ bàn giao mới NEED_REVIEW.
 
-## Checkpoint cấu hình implementation model — 04/11/2026
+## Checkpoint Control Center tiếp tục — 05/11/2026
 
-- Người dùng chọn `gpt-5.6-sol`, extra high (`xhigh`) cho implementation. Native executor
-  `/root/r08_implement_56sol` đã khởi tạo thành công với model/effort override và `fork_turns=none`.
-- Executor cũ `/root/r08_implementation` được yêu cầu kết thúc ở safe boundary và trả handoff;
-  executor mới standby tới khi main chuyển writer ownership. Giữ mọi uncommitted source/fixtures,
-  không reset/checkout/stash, không chạy hai writers hoặc hai qualification runs đè nhau.
-- Main chỉ sửa docs/model setup; implementation hiện tiếp nối candidate e3d7c36 và checkpoint
-  tiến độ5bb7d41. R08 giữ IN_PROGRESS, chưa đủ DoD. Model change không làm evidence cũ thành current
-  PASS cho source đang sửa. Required AC/validation/write scope không đổi.
+- Người dùng yêu cầu theo dõi đến khi xong, tự nghiệm thu và giao fix khi có lỗi. Executor cũ không
+  còn live trong runtime khi tiếp tục; đã chuyển sole-writer ownership cho native `/root/r08_finish`,
+  khởi tạo thực với `gpt-5.6-sol`, `xhigh`, context tối thiểu. Main sở hữu registry/task/execution docs.
+- Review candidate `de35532`: raw-byte immutability đã được bổ sung; evidence từng lớp nằm trong bảng
+  hiện hành. Hai docs có thay đổi chưa commit từ trước lượt này; giữ nội dung, không destructive restore.
+- Lỗi chặn hiện tại là packaged CLI prepare trong canonical setup. SQL transaction rollback và schema
+  probe từng đạt không chứng minh nguyên nhân timeout/config; chỉ là diagnostic. Không lặp full suite
+  khi chưa có quan sát mới. Giữ production fail-closed gates và immutable constraints.
+- Giao fix helper: scan privacy từng CLI attempt trước khi overwrite kết quả; giữ diagnostic exit/retry
+  an toàn, negative helper không retry. Giao format control-flow trong allocation symbols theo AGENTS.
+- Bước tiếp theo: bounded diagnostic/fix → targeted regression → đóng băng candidate và required matrix
+  → implementation commit → main review/acceptance. R08 vẫn IN_PROGRESS tới khi đủ handoff.
+
+## Checkpoint Control Center tiếp tục validation — 06/11/2026
+
+- Canonical Learning từng thoát ở DB clock readiness. Log cho thấy kết nối bị ngắt trong cùng khoảng
+  checkpoint PostgreSQL kéo dài. Chưa phân biệt được latency, skew hoặc binding là nguyên nhân trực tiếp.
+- Harness giữ diagnostic an toàn và cho phép một lần khởi động lại khi child thoát trước readiness
+  với lỗi clock đã nhận diện. Production gate giữ nguyên. Đã sửa race ở cuối vòng chờ để retry chỉ
+  xảy ra sau phân loại. `db8a2d32-dcff-42a7-82df-3b4c39a21332` đạt 11 ca trước sửa race, nên evidence
+  hiện hành dùng `8cc5a9af-ea0e-42c0-8e0b-029d170cf4b9` đã kiểm source binding sau sửa.
+- Control Center kích hoạt lại sole writer `/root/r08_finish` để hoàn tất matrix trong bảng DoD.
+  Chỉ bàn giao NEED_REVIEW sau khi có candidate commit và evidence phù hợp. Registry vẫn IN_PROGRESS.
+
+### Delta sau kiểm tra Content
+
+- Run `3b3db54a-220a-464b-a2b7-d7ccedf141da` lỗi client timeout ở ca FENCE vs journal ACK.
+  Ca kế tiếp nhận 503 khi FENCE còn hiệu lực. Run `4c02298b-3328-49b4-8ad3-da78336bb96f` lỗi trước
+  cases ở `UnixDomainSockets.connect0` khi JVM Learning khởi tạo selector. Cả hai lab đã cleanup.
+- Harness giới hạn HTTP budget 20s cho ca FENCE và truy vấn PostgreSQL chứng minh exact waiter còn
+  chờ ngay trước release. Các JVM con có IPC namespace riêng trong run. Content CMD04 hiện PASS
+  theo bảng evidence. Executor đang chạy full Learning CMD04 trên cùng input snapshot.
+- Full Learning CMD04 chạy đủ 23 ca trên cùng snapshot. Ca FENCE đạt, một ca nhận 503 tại create
+  dương tính trước khi kiểm thử thay đổi current target. Giữ report FAIL. Bước kế tiếp là ghi mã
+  lỗi an toàn và snapshot gate để phân loại trước khi chọn cách sửa.

@@ -36,10 +36,16 @@ public final class AllocationStore {
       return retry;
     }
     var pool = publication.pool(connection, request);
-    if (pool.isEmpty()) throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+    if (pool.isEmpty()) {
+      throw AllocationWire.deny(503, "ALLOCATION_CONTENT_UNAVAILABLE");
+    }
     Set<String> groups = new java.util.HashSet<>();
-    for (var candidate : pool) groups.add(candidate.allocation().path("exposureGroup").asString());
-    if (groups.size() != 1) throw AllocationWire.deny(503, "ALLOCATION_POOL_CONFLICT");
+    for (var candidate : pool) {
+      groups.add(candidate.allocation().path("exposureGroup").asString());
+    }
+    if (groups.size() != 1) {
+      throw AllocationWire.deny(503, "ALLOCATION_POOL_CONFLICT");
+    }
     String group = groups.iterator().next();
     UUID active = active(connection, owner, epoch, group, request);
     if (active != null) {
@@ -55,7 +61,9 @@ public final class AllocationStore {
         break;
       }
     }
-    if (selected == null) throw AllocationWire.deny(409, "CASE_EXHAUSTED");
+    if (selected == null) {
+      throw AllocationWire.deny(409, "CASE_EXHAUSTED");
+    }
     UUID attempt = UUID.randomUUID();
     UUID draft = UUID.randomUUID();
     UUID operation = UUID.randomUUID();
@@ -114,7 +122,9 @@ public final class AllocationStore {
       result.put("state", "preparing");
       return result;
     }
-    if (row.state.equals("CLOSED")) throw AllocationWire.deny(409, "ATTEMPT_CLOSED");
+    if (row.state.equals("CLOSED")) {
+      throw AllocationWire.deny(409, "ATTEMPT_CLOSED");
+    }
     try (var statement = connection.prepareStatement(
         "UPDATE learning.allocation_attempt SET state='READY' "
             + "WHERE attempt_id=? AND state='PREPARING'")) {
@@ -139,7 +149,9 @@ public final class AllocationStore {
       statement.setObject(3, owner);
       statement.setLong(4, epoch);
       try (var draft = statement.executeQuery()) {
-        if (!draft.next()) throw AllocationWire.deny(503, "DRAFT_UNAVAILABLE");
+        if (!draft.next()) {
+          throw AllocationWire.deny(503, "DRAFT_UNAVAILABLE");
+        }
         result.put("draft", Map.of("revision", Long.toString(draft.getLong(1)),
             "answer", WireCodec.JSON.readTree(draft.getString(2)),
             "position", WireCodec.JSON.readTree(draft.getString(3))));
@@ -188,8 +200,12 @@ public final class AllocationStore {
       statement.setObject(1, owner);
       statement.setObject(2, key);
       try (var rows = statement.executeQuery()) {
-        if (!rows.next()) return null;
-        if (!rows.getString(1).equals(fingerprint)) throw AllocationWire.deny(409, "KEY_REUSED");
+        if (!rows.next()) {
+          return null;
+        }
+        if (!rows.getString(1).equals(fingerprint)) {
+          throw AllocationWire.deny(409, "KEY_REUSED");
+        }
         return rows.getObject(2, UUID.class);
       }
     }
@@ -204,7 +220,9 @@ public final class AllocationStore {
       statement.setLong(2, epoch);
       statement.setString(3, group);
       try (var rows = statement.executeQuery()) {
-        if (!rows.next()) return null;
+        if (!rows.next()) {
+          return null;
+        }
         if (!rows.getString(2).equals(request.exerciseId())
             || !rows.getString(3).equals(request.requestedMode())) {
           throw AllocationWire.deny(409, "ASSIGNMENT_ALREADY_OPEN");
@@ -314,9 +332,13 @@ public final class AllocationStore {
       statement.setObject(1, attempt);
       statement.setObject(2, owner);
       try (var rows = statement.executeQuery()) {
-        if (!rows.next()) throw AllocationWire.deny(404, "RESOURCE_NOT_FOUND");
+        if (!rows.next()) {
+          throw AllocationWire.deny(404, "RESOURCE_NOT_FOUND");
+        }
         AdmissionGate.requireOwner(owner, rows.getObject(1, UUID.class));
-        if (rows.getLong(2) != epoch) throw AllocationWire.deny(409, "LEARNING_EPOCH_CHANGED");
+        if (rows.getLong(2) != epoch) {
+          throw AllocationWire.deny(409, "LEARNING_EPOCH_CHANGED");
+        }
         return new Attempt(rows.getObject(3, UUID.class), rows.getObject(4, UUID.class),
             rows.getString(5), rows.getString(6), rows.getString(7), rows.getString(8),
             rows.getBoolean(9));

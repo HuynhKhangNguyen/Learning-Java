@@ -153,17 +153,138 @@ public class CanonicalThreeServiceRuntimeIT {
   static int publicPort(String service){return switch(service){case "identity"->18081;case "content"->18082;case "learning"->18083;default->throw new IllegalArgumentException();};}
   static int privatePort(String service){return publicPort(service)+360;}
   static void sanitize(ProcessBuilder builder){builder.environment().keySet().removeIf(k->k.toUpperCase(Locale.ROOT).startsWith("SPRING_")||k.toUpperCase(Locale.ROOT).startsWith("SERVER_")||k.toUpperCase(Locale.ROOT).startsWith("MANAGEMENT_")||k.equals("JAVA_TOOL_OPTIONS")||k.equals("_JAVA_OPTIONS"));}
-  static void start(String service)throws Exception{
-    for(int port:new int[]{publicPort(service),privatePort(service)})closed(port);
-    String property=service.equals("identity")?"canonical":"admission";
-    var builder=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin/java.exe").toString(),"-jar",jar(service).toString(),
-        "--spring.profiles.active=canonical","--server.port="+publicPort(service),"--backendlab.trust.config="+directory.resolve(service+".properties"),
-        "--backendlab."+property+".config="+directory.resolve(service+"-canonical.properties"),"--logging.level.root=ERROR");
-    builder.directory(directory.toFile()).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.appendTo(directory.resolve(service+"-canonical.log").toFile()));sanitize(builder);
-    var process=builder.start();apps.put(service,process);long deadline=System.nanoTime()+Duration.ofSeconds(35).toNanos();
-    while(System.nanoTime()<deadline){if(!process.isAlive())throw new IllegalStateException("Owned canonical app exited; inspect retained log");
-      try{String path=service.equals("identity")?"/api/v1/session":"/api/v1/transport/status";if(call(service,"edge",publicPort(service),"GET",path,null,Map.of("X-Backend-Lab-Client-IP","127.0.0.1")).statusCode()==200)return;}catch(java.io.IOException startup){}Thread.sleep(100);}
-    throw new IllegalStateException("Canonical startup timeout");
+  /**
+   * Tách AF_UNIX selector PipeImpl của từng packaged child khỏi JVM peer.
+   * Leaf một ký tự giữ tên socket dài nhất dưới100 bytes trên Windows lab;
+   * option nằm trên exact child command nên heap flags inherited vẫn giữ nguyên.
+   */
+  static String javaIpcOption(String owner) throws Exception {
+    if (!Set.of("b", "c", "i", "l", "p").contains(owner)) {
+      throw new IllegalArgumentException("Unknown owned Java IPC namespace");
+    }
+    String runId = lab.getProperty("lab.runId");
+    Path expected = root.resolve(".tools/ipc-" + runId.substring(0, 8))
+        .toAbsolutePath()
+        .normalize();
+    String configured = System.getProperty("jdk.net.unixdomain.tmpdir");
+    if (configured == null
+        || !Path.of(configured).toAbsolutePath().normalize().equals(expected)) {
+      throw new IllegalStateException("Owned Java IPC root required");
+    }
+    Path child = expected.resolve(owner);
+    int longestSocketBytes = child.toString().getBytes(StandardCharsets.UTF_8).length
+        + 1
+        + "socket_2147483647".length();
+    if (longestSocketBytes > 100) {
+      throw new IllegalStateException("Owned Java IPC path exceeds qualified budget");
+    }
+    Files.createDirectories(child);
+    return "-Djdk.net.unixdomain.tmpdir=" + child;
+  }
+  static void start(String service) throws Exception {
+    String property = service.equals("identity") ? "canonical" : "admission";
+    Path canonicalLog = directory.resolve(service + "-canonical.log");
+    var builder = new ProcessBuilder(
+        Path.of(System.getProperty("java.home"), "bin/java.exe").toString(),
+        javaIpcOption(service.substring(0, 1)),
+        "-jar", jar(service).toString(),
+        "--spring.profiles.active=canonical",
+        "--server.port=" + publicPort(service),
+        "--backendlab.trust.config=" + directory.resolve(service + ".properties"),
+        "--backendlab." + property + ".config="
+            + directory.resolve(service + "-canonical.properties"),
+        "--logging.level.root=ERROR");
+    builder.directory(directory.toFile())
+        .redirectErrorStream(true)
+        .redirectOutput(ProcessBuilder.Redirect.appendTo(
+            canonicalLog.toFile()));
+    sanitize(builder);
+
+    // Exact child được retry một lần chỉ khi fail-closed trước readiness.
+    // Timeout còn sống không retry/nới budget; product config và clock gate giữ nguyên.
+    for (int attempt = 1; attempt <= 2; attempt++) {
+      for (int port : new int[]{publicPort(service), privatePort(service)}) {
+        closed(port);
+      }
+      long clockRejectionsBefore = Files.exists(canonicalLog)
+          ? Files.readString(canonicalLog).lines()
+              .filter(line -> line.contains(
+                  "Transport clock unavailable or outside verified budget"))
+              .count()
+          : 0;
+      Process process = builder.start();
+      apps.put(service, process);
+      long deadline = System.nanoTime() + Duration.ofSeconds(35).toNanos();
+      String lastProbe = "NOT_ATTEMPTED";
+      boolean retryClockReadiness = false;
+      while (System.nanoTime() < deadline) {
+        if (!process.isAlive()) {
+          int exit = process.exitValue();
+          apps.remove(service, process);
+          long clockRejectionsAfter = Files.readString(canonicalLog).lines()
+              .filter(line -> line.contains(
+                  "Transport clock unavailable or outside verified budget"))
+              .count();
+          boolean clockReadinessRejected = clockRejectionsAfter > clockRejectionsBefore;
+          String category = clockReadinessRejected
+              ? "TRANSPORT_CLOCK_READINESS"
+              : "OTHER_STARTUP_EXIT";
+          if (attempt == 1 && clockReadinessRejected) {
+            System.out.println(
+                "CANONICAL_START_RETRY service=" + service
+                    + " firstExit=" + exit
+                    + " probe=" + lastProbe
+                    + " category=" + category);
+            retryClockReadiness = true;
+            break;
+          }
+          throw new IllegalStateException(
+              "Owned canonical app exited service=" + service
+                  + " exit=" + exit
+                  + " probe=" + lastProbe
+                  + " category=" + category
+                  + "; inspect retained log");
+        }
+        try {
+          String path = service.equals("identity")
+              ? "/api/v1/session"
+              : "/api/v1/transport/status";
+          int status = call(
+              service,
+              "edge",
+              publicPort(service),
+              "GET",
+              path,
+              null,
+              Map.of("X-Backend-Lab-Client-IP", "127.0.0.1"))
+              .statusCode();
+          lastProbe = "HTTP_" + status;
+          if (status == 200) {
+            return;
+          }
+        } catch (java.io.IOException startup) {
+          // Chỉ giữ class cố định; message có thể chứa endpoint/config của lab.
+          lastProbe = startup.getClass().getSimpleName();
+        }
+        Thread.sleep(100);
+      }
+      if (retryClockReadiness) {
+        continue;
+      }
+      if (process.isAlive()) {
+        throw new IllegalStateException(
+            "Canonical startup timeout service=" + service
+                + " processAlive=true"
+                + " probe=" + lastProbe);
+      }
+      throw new IllegalStateException(
+          "Owned canonical app exited service=" + service
+              + " exit=" + process.exitValue()
+              + " probe=" + lastProbe
+              + " category=EXIT_AFTER_WAIT"
+              + "; inspect retained log");
+    }
+    throw new IllegalStateException("Canonical startup retry exhausted service=" + service);
   }
   static void stop(String service)throws Exception{var process=apps.remove(service);if(process!=null){process.destroy();if(!process.waitFor(8,TimeUnit.SECONDS)){process.destroyForcibly();if(!process.waitFor(5,TimeUnit.SECONDS))throw new IllegalStateException("Owned child cleanup failed");}}}
   static void closed(int port)throws Exception{long deadline=System.nanoTime()+Duration.ofSeconds(5).toNanos();int refused=0;while(System.nanoTime()<deadline){try(var socket=new Socket()){socket.connect(new InetSocketAddress("127.0.0.1",port),150);refused=0;}catch(java.io.IOException expected){if(++refused==2)return;}Thread.sleep(50);}throw new IllegalStateException("Named listener still reachable");}

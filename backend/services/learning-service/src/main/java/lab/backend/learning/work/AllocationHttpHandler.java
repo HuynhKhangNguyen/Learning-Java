@@ -27,7 +27,9 @@ public final class AllocationHttpHandler {
     UUID context = UUID.fromString(WireCodec.idempotencyKey(single(request, "X-Session-Context")));
     java.util.Map<String, Object> result;
     if (path.equals(BASE)) {
-      if (!request.getMethod().equals("POST")) throw AllocationWire.deny(405, "METHOD_DENIED");
+      if (!request.getMethod().equals("POST")) {
+        throw AllocationWire.deny(405, "METHOD_DENIED");
+      }
       String contentType = request.getContentType();
       if (contentType == null || !java.util.Set.of("application/json",
           "application/json;charset=utf-8", "application/json; charset=utf-8")
@@ -42,9 +44,13 @@ public final class AllocationHttpHandler {
       result = coordinator.create(() -> AdmissionWire.Request.createAttempt(
           credential, context, csrf, origin, body), key, validated);
     } else {
-      if (!request.getMethod().equals("GET")) throw AllocationWire.deny(405, "METHOD_DENIED");
+      if (!request.getMethod().equals("GET")) {
+        throw AllocationWire.deny(405, "METHOD_DENIED");
+      }
       UUID attempt = UUID.fromString(WireCodec.idempotencyKey(path.substring(BASE.length() + 1)));
-      if (request.getInputStream().read() != -1) throw AllocationWire.deny(400, "UNEXPECTED_BODY");
+      if (request.getInputStream().read() != -1) {
+        throw AllocationWire.deny(400, "UNEXPECTED_BODY");
+      }
       result = coordinator.read(() -> AdmissionWire.Request.readAttempt(
           credential, context, attempt), attempt);
     }
@@ -57,7 +63,9 @@ public final class AllocationHttpHandler {
 
   private static String single(HttpServletRequest request, String name) {
     Enumeration<String> values = request.getHeaders(name);
-    if (values == null || !values.hasMoreElements()) throw AllocationWire.deny(401, "SESSION_INVALID");
+    if (values == null || !values.hasMoreElements()) {
+      throw AllocationWire.deny(401, "SESSION_INVALID");
+    }
     String value = values.nextElement();
     if (values.hasMoreElements() || value == null || value.length() > 8192) {
       throw AllocationWire.deny(400, "AMBIGUOUS_HEADER");
@@ -70,7 +78,9 @@ public final class AllocationHttpHandler {
     for (String part : cookie.split(";", -1)) {
       String item = part.strip();
       if (item.startsWith("__Host-backend-lab-session=")) {
-        if (found != null) throw AllocationWire.deny(401, "SESSION_INVALID");
+        if (found != null) {
+          throw AllocationWire.deny(401, "SESSION_INVALID");
+        }
         found = item.substring("__Host-backend-lab-session=".length());
       }
     }
